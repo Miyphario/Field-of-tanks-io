@@ -158,26 +158,10 @@ public class Tank : MonoBehaviour
 
     public void SelectNewGun(int gunIndex, int level)
     {
-        PrefabManager pm = PrefabManager.Instance;
+        GameObject[] guns = PrefabManager.Instance.GetGunsByLevel(level);
+        if (guns.Length <= 0) return;
 
-        switch (level)
-        {
-            case 3:
-                Upgrade(pm.Tier1[gunIndex].GetComponent<Gun>());
-                break;
-
-            case 6:
-                Upgrade(pm.Tier2[gunIndex].GetComponent<Gun>());
-                break;
-
-            case 9:
-                Upgrade(pm.Tier3[gunIndex].GetComponent<Gun>());
-                break;
-
-            case 12:
-                Upgrade(pm.Tier4[gunIndex].GetComponent<Gun>());
-                break;
-        }
+        Upgrade(guns[gunIndex].GetComponent<Gun>());
     }
 
     public void SelectNewRandomGun()
@@ -187,30 +171,11 @@ public class Tank : MonoBehaviour
 
     public void SelectNewRandomGun(int level)
     {
-        PrefabManager pm = PrefabManager.Instance;
-        int index = -1;
+        GameObject[] guns = PrefabManager.Instance.GetGunsByLevel(level);
+        if (guns.Length <= 0) return;
 
-        switch (level)
-        {
-            case 3:
-                index = Random.Range(0, pm.Tier1.Length);
-                break;
-
-            case 6:
-                index = Random.Range(0, pm.Tier2.Length);
-                break;
-
-            case 9:
-                index = Random.Range(0, pm.Tier3.Length);
-                break;
-
-            case 12:
-                index = Random.Range(0, pm.Tier4.Length);
-                break;
-        }
-
-        if (index > -1)
-            SelectNewGun(index, level);
+        int index = Random.Range(0, guns.Length);
+        SelectNewGun(index, level);
     }
 
     public static bool CanCreateNewGun(int level)

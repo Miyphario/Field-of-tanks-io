@@ -27,4 +27,16 @@ public class PrefabManager : MonoBehaviour
             return;
         }
     }
+
+    public GameObject[] GetGunsByLevel(int level)
+    {
+        return level switch
+        {
+            3 => _tier1,
+            6 => _tier2,
+            9 => _tier3,
+            12 => _tier4,
+            _ => default,
+        };
+    }
 }

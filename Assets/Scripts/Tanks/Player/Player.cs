@@ -64,7 +64,7 @@ public class Player : Tank
 
     protected override void DestroyMe()
     {
-        //GameManager.Instance.RestartScene();
+        GameManager.Instance.RestartScene();
     }
 
     public void SelectUpgrade(int upgrade)

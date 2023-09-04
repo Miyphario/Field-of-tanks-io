@@ -1,48 +1,45 @@
-using System.Collections;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
 {
-    public float Damage => _bulletDamage + _owner.Damage;
-    public float BulletSpeed => _bulletSpeed + _owner.BulletSpeed;
-    public float FireRate => Mathf.Clamp(_owner.FireRate - _fireRate, 0.05f, 10f);
-
-    [SerializeField] private float _bulletDamage;
-    [SerializeField] private float _bulletSpeed;
-    [SerializeField] private float _fireRate;
-    private Coroutine _shootRoutine;
+    
     private bool _isShooting;
     public bool IsShooting => _isShooting;
-    private bool _canShoot = true;
 
-    [SerializeField] private GameObject _bullet;
-    [SerializeField] private Transform[] _shootPoints;
+    [SerializeField] private GunShootPoint[] _shootPoints;
+
+    [SerializeField, Header("UI")]
+    private Sprite _uiSprite;
+    public Sprite UISprite => _uiSprite;
 
     private Tank _owner;
+    public Tank Owner => _owner;
 
     private void Awake()
     {
         _owner = transform.root.GetComponent<Tank>();
+        foreach (var point in _shootPoints)
+        {
+            point.Initialize(this);
+        }
     }
 
     public void ShootStart()
     {
         _isShooting = true;
-        if (!_canShoot) return;
-        _shootRoutine = StartCoroutine(ShootIE());
+        foreach (var point in _shootPoints)
+        {
+            point.Shoot();
+        }
     }
 
     public void ShootEnd()
     {
         _isShooting = false;
-        if (_shootRoutine == null || !_canShoot) return;
-        StopCoroutine(_shootRoutine);
-        _shootRoutine = null;
     }
 
     public void Shoot()
     {
-        if (!_canShoot) return;
         ShootStart();
         _isShooting = false;
     }
@@ -53,25 +50,5 @@ public class Gun : MonoBehaviour
         StopAllCoroutines();
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
-    }
-
-    private void CreateBullet()
-    {
-        foreach (var point in _shootPoints)
-        {
-            Bullet bul = Instantiate(_bullet, point.position, transform.rotation).GetComponent<Bullet>();
-            bul.Initialize(Damage, BulletSpeed, _owner);
-        }
-    }
-
-    private IEnumerator ShootIE()
-    {
-        while (_isShooting)
-        {
-            CreateBullet();
-            _canShoot = false;
-            yield return new WaitForSeconds(FireRate);
-            _canShoot = true;
-        }
     }
 }

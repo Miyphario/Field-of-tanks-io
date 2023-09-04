@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class CameraManager : MonoBehaviour
 {
-    [SerializeField] private float _smoothSpeed = 5f;
-
     private bool _initialized;
 
     public void Initialize()
