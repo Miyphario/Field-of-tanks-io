@@ -7,7 +7,7 @@ public class Enemy : Tank
     {
         base.Awake();
 
-        OnLevelUp += LevelUp;
+        OnLevelUp += HandleLevelUp;
     }
 
     protected override void Start()
@@ -34,7 +34,7 @@ public class Enemy : Tank
         }
     }
 
-    private void LevelUp(int level)
+    private void HandleLevelUp(int level)
     {
         if (CanCreateNewGun(level))
         {

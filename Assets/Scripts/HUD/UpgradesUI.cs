@@ -1,5 +1,4 @@
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,7 +27,7 @@ public class UpgradesUI : MonoBehaviour
 
     public void Initialize()
     {
-        WorldManager.Instance.HostPlayer.OnMenuSelected += Player_OnMenuSelected;
+        WorldManager.Instance.HostPlayer.OnMenuSelected += HandlePlayerMenuSelected;
 
         _firstButtonText = _firstUpgradeButton.GetComponentInChildren<TextMeshProUGUI>();
         _secondButtonText = _secondUpgradeButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -41,7 +40,7 @@ public class UpgradesUI : MonoBehaviour
         SetActiveButtons(0);
     }
 
-    private void Player_OnMenuSelected(UpgradeMenu menu)
+    private void HandlePlayerMenuSelected(UpgradeMenu menu)
     {
         switch (menu)
         {

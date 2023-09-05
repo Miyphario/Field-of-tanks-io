@@ -11,9 +11,11 @@ public class HUDManager : MonoBehaviour
     [SerializeField, Header("Bars")] private RectTransform _tankBarsTransform;
     [SerializeField] private RectTransform _destructibleBarsTransform;
 
-    [SerializeField, Header("HUDs")] private UpgradesUI _upgradesUI;
+    [SerializeField, Header("HUDs")]
+    private UpgradesUI _upgradesUI;
     [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
+    [SerializeField] private PlayerInfoUI _playerInfoUI;
 
     public void Initialize()
     {
@@ -25,6 +27,7 @@ public class HUDManager : MonoBehaviour
             _mobileControls.gameObject.SetActive(false);
 
         _upgradesUI.Initialize();
+        _playerInfoUI.Initialize();
     }
 
     public BarUI CreateHealthbar(bool smallBar = false)

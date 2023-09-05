@@ -9,8 +9,8 @@ public class InputManager
 
     public event Action<Vector2> OnMove;
     public event Action<Vector2> OnLook;
-    public event Action<Vector2> OnLookStarted;
-    public event Action<Vector2> OnLookEnded;
+    public event Action OnLookStarted;
+    public event Action OnLookEnded;
     public event Action OnShootStarted;
     public event Action OnShootEnded;
 
@@ -34,13 +34,9 @@ public class InputManager
         _controls.Player.Move.performed += ctx => OnMove?.Invoke(ctx.ReadValue<Vector2>());
         _controls.Player.Move.canceled += ctx => OnMove?.Invoke(ctx.ReadValue<Vector2>());
 
-        _controls.Player.Look.started += ctx => OnLook?.Invoke(ctx.ReadValue<Vector2>());
-        _controls.Player.Look.started += ctx => OnLookStarted?.Invoke(ctx.ReadValue<Vector2>());
-
+        _controls.Player.Look.started += ctx => OnLookStarted?.Invoke();
         _controls.Player.Look.performed += ctx => OnLook?.Invoke(ctx.ReadValue<Vector2>());
-
-        _controls.Player.Look.canceled += ctx => OnLook?.Invoke(ctx.ReadValue<Vector2>());
-        _controls.Player.Look.canceled += ctx => OnLookEnded?.Invoke(ctx.ReadValue<Vector2>());
+        _controls.Player.Look.canceled += ctx => OnLookEnded?.Invoke();
 
         _controls.Player.Shoot.started += ctx => OnShootStarted?.Invoke();
         _controls.Player.Shoot.canceled += ctx => OnShootEnded?.Invoke();

@@ -1,4 +1,5 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,10 +9,10 @@ public class Tank : MonoBehaviour
     public virtual float Health { get; protected set; }
     public event Action<Tank> OnTakeDamage;
 
-    public virtual float Speed { get; protected set; } = 6f;
-    public virtual float BulletSpeed { get; protected set; } = 1f;
-    public virtual float Damage { get; protected set; } = 10f;
-    public virtual float FireRate { get; protected set; } = 1f;
+    public virtual float Speed { get; protected set; } = Constants.DEFAULT_MOVE_SPEED;
+    public virtual float BulletSpeed { get; protected set; } = Constants.DEFAULT_BULLET_SPEED;
+    public virtual float Damage { get; protected set; } = Constants.DEFAULT_DAMAGE;
+    public virtual float FireRate { get; protected set; } = Constants.DEFAULT_FIRE_RATE;
 
     public TankController Controller { get; protected set; }
 
@@ -25,10 +26,12 @@ public class Tank : MonoBehaviour
     public virtual int XP { get; protected set; }
     public virtual int MaxXP { get; protected set; } = Constants.DEFAULT_MAX_XP;
     public virtual int Level { get; protected set; }
-    public int RewardXP => Level * 3;
+    public int RewardXP => Level * 3 + 3;
     private int _upgradeCount;
     public int UpgradeCount => _upgradeCount;
     public event Action<int> OnLevelUp;
+    public event Action<int, int> OnXpUpdated;
+    public event Action OnUpgrade;
 
     protected BarUI _healthbar;
 
@@ -89,6 +92,8 @@ public class Tank : MonoBehaviour
 
     public void AddXP(int xp)
     {
+        if (xp <= 0) return;
+
         int curXp = XP + xp - MaxXP;
         if (curXp >= 0)
         {
@@ -106,6 +111,8 @@ public class Tank : MonoBehaviour
         {
             XP += xp;
         }
+
+        OnXpUpdated?.Invoke(XP, MaxXP);
     }
 
     public void Upgrade(UpgradeType upgradeType)
@@ -115,31 +122,32 @@ public class Tank : MonoBehaviour
         switch (upgradeType)
         {
             case UpgradeType.Damage:
-                Damage += Constants.DAMAGE_PER_LEVEL;
+                Damage = Mathf.Clamp(Damage + Constants.DAMAGE_PER_LEVEL, 0, Constants.MAX_DAMAGE);
                 break;
 
             case UpgradeType.FireRate:
-                FireRate -= Constants.FIRE_RATE_PER_LEVEL;
+                FireRate = Mathf.Clamp(FireRate - Constants.FIRE_RATE_PER_LEVEL, Constants.MIN_FIRE_RATE, FireRate);
                 break;
 
             case UpgradeType.BulletSpeed:
-                BulletSpeed += Constants.BULLET_SPEED_PER_LEVEL;
+                BulletSpeed = Mathf.Clamp(BulletSpeed + Constants.SPEED_PER_LEVEL, 0, Constants.MAX_SPEED);
                 break;
 
             case UpgradeType.MaxHealth:
                 float healthPerc = Health / MaxHealth;
-                MaxHealth += Constants.MAX_HEALTH_PER_LEVEL;
+                MaxHealth = Mathf.Clamp(MaxHealth + Constants.MAX_HEALTH_PER_LEVEL, 0, Constants.MAX_HEALTH);
                 Health = healthPerc * MaxHealth;
                 _healthbar.SetMaxValue(MaxHealth);
                 _healthbar.SetValue(Health);
                 break;
 
             case UpgradeType.Speed:
-                Speed += Constants.SPEED_PER_LEVEL;
+                Speed = Mathf.Clamp(Speed + Constants.SPEED_PER_LEVEL, 0, Constants.MAX_SPEED);
                 break;
         }
 
         _upgradeCount--;
+        OnUpgrade?.Invoke();
     }
 
     public void Upgrade(Gun newGun)
@@ -151,6 +159,8 @@ public class Tank : MonoBehaviour
         Destroy(_gun.gameObject);
         _gun = g;
         _upgradeCount--;
+
+        OnUpgrade?.Invoke();
 
         if (isShooting)
             _gun.ShootStart();
@@ -180,8 +190,7 @@ public class Tank : MonoBehaviour
 
     public static bool CanCreateNewGun(int level)
     {
-        if (level <= 0) return false;
-        return level % 3 == 0;
+        return PrefabManager.Instance.GetCurrentTier(level) > -1;
     }
 
 #if UNITY_EDITOR

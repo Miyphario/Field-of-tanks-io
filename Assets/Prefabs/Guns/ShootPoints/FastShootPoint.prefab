@@ -99,8 +99,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _bulletDamage: 2
-  _bulletSpeed: 10
-  _fireRate: 0.5
+  _bulletSpeed: 9
+  _fireRate: 0.35
   _bullet: {fileID: 1023031374534149509, guid: 76f487044eb162c408c71cd42063e45c, type: 3}
   _shootPoint: {fileID: 9161087675022775244}
 --- !u!1 &9083400850943756585

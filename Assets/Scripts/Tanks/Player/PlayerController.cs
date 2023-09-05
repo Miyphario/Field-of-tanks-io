@@ -4,7 +4,7 @@ public class PlayerController : TankController
 {
     public new Player Tank => base.Tank as Player;
 
-    private Vector2 _input;
+    private Vector2 _moveInput;
     private Vector2 _currentMoveInput;
     public Vector2 MoveInput => _currentMoveInput;
     private Vector2 _smoothInput;
@@ -12,18 +12,20 @@ public class PlayerController : TankController
     private Vector2 _lookInput;
     private Vector2 _mousePosition;
 
+    private bool _isLooking;
+
     protected override void Start()
     {
         base.Start();
 
-        InputManager.Instance.OnMove += inp => _input = inp;
-        InputManager.Instance.OnLook += inp => _lookInput = inp;
+        InputManager.Instance.OnMove += Move;
 
-        InputManager.Instance.OnLookStarted += inp => Tank.Gun.ShootStart();
-        InputManager.Instance.OnLookEnded += inp => Tank.Gun.ShootEnd();
+        InputManager.Instance.OnLookStarted += ShootStart;
+        InputManager.Instance.OnLook += Look;
+        InputManager.Instance.OnLookEnded += ShootEnd;
 
-        InputManager.Instance.OnShootStarted += () => Tank.Gun.ShootStart();
-        InputManager.Instance.OnShootEnded += () => Tank.Gun.ShootEnd();
+        InputManager.Instance.OnShootStarted += ShootStart;
+        InputManager.Instance.OnShootEnded += ShootEnd;
 
         InputManager.Instance.OnMouseMove += pos => _mousePosition = pos;
 
@@ -34,18 +36,18 @@ public class PlayerController : TankController
         // Mobile controls
         if (Application.isMobilePlatform)
         {
-            HUDManager.Instance.MobileControls.OnMove += inp => _input = inp;
-            HUDManager.Instance.MobileControls.OnMoveEnded += () => _input = Vector2.zero;
+            HUDManager.Instance.MobileControls.OnMove += Move;
+            HUDManager.Instance.MobileControls.OnMoveEnded += () => Move(Vector2.zero);
 
-            HUDManager.Instance.MobileControls.OnLookStarted += () => Tank.Gun.ShootStart();
-            HUDManager.Instance.MobileControls.OnLook += inp => _lookInput = inp;
-            HUDManager.Instance.MobileControls.OnLookEnded += () => Tank.Gun.ShootEnd();
+            HUDManager.Instance.MobileControls.OnLookStarted += ShootStart;
+            HUDManager.Instance.MobileControls.OnLook += Look;
+            HUDManager.Instance.MobileControls.OnLookEnded += ShootEnd;
         }
     }
 
     private void Update()
     {
-        _currentMoveInput = Vector2.SmoothDamp(_currentMoveInput, _input, ref _smoothInput, _rb.drag / 60f);
+        _currentMoveInput = Vector2.SmoothDamp(_currentMoveInput, _moveInput, ref _smoothInput, _rb.drag / 60f);
         _currentMoveInput = WorldManager.Instance.ClampMoveInput(_rb.position, _currentMoveInput);
 
         if (GameManager.Instance.IsKeyboardControls)
@@ -57,7 +59,7 @@ public class PlayerController : TankController
         {
             Vector2 inp;
             if (_lookInput == Vector2.zero)
-                inp = _input;
+                inp = _moveInput;
             else
                 inp = _lookInput;
 
@@ -68,5 +70,35 @@ public class PlayerController : TankController
     private void FixedUpdate()
     {
         _rb.velocity = Tank.Speed * _currentMoveInput;
+    }
+
+
+    private void ShootStart()
+    {
+        Tank.Gun.ShootStart();
+        _isLooking = true;
+    }
+
+    private void ShootEnd()
+    {
+        Tank.Gun.ShootEnd();
+        _isLooking = false;
+    }
+
+    private void Look(Vector2 input)
+    {
+        _lookInput = input;
+    }
+
+    private void Move(Vector2 input)
+    {
+        _moveInput = input;
+
+        if (!GameManager.Instance.IsKeyboardControls)
+        {
+            if (_moveInput != Vector2.zero)
+                if (!_isLooking)
+                    _lookInput = _moveInput;
+        }
     }
 }

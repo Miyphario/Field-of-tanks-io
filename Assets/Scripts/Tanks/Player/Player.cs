@@ -16,11 +16,11 @@ public class Player : Tank
     public override int MaxXP { get => _maxXp; protected set => _maxXp = value; }
     public override int Level { get => _level; protected set => _level = value; }
 
-    private sfloat _maxHealth = 100f;
+    private sfloat _maxHealth = Constants.DEFAULT_MAX_HEALTH;
     private sfloat _health;
-    private sfloat _speed = 6f;
-    private sfloat _damage = 10f;
-    private sfloat _fireRate = 1f;
+    private sfloat _speed = Constants.DEFAULT_MOVE_SPEED;
+    private sfloat _damage = Constants.DEFAULT_DAMAGE;
+    private sfloat _fireRate = Constants.DEFAULT_FIRE_RATE;
 
     private sint _xp;
     private sint _maxXp = Constants.DEFAULT_MAX_XP;
@@ -33,13 +33,11 @@ public class Player : Tank
     {
         base.Awake();
 
-        OnLevelUp += Player_OnLevelUp;
+        OnLevelUp += HandleLevelUp;
     }
 
-    private void Player_OnLevelUp(int level)
+    private void HandleLevelUp(int level)
     {
-        Debug.Log("Cur Level: " + Level);
-
         UpgradeMenu lastMenu = _upgradeMenu;
 
         if (CanCreateNewGun(Level - 1))
@@ -55,8 +53,6 @@ public class Player : Tank
         {
             _upgradeMenu = UpgradeMenu.Base;
         }
-        
-        
 
         if (_upgradeMenu != lastMenu)
             OnMenuSelected?.Invoke(_upgradeMenu);

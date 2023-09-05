@@ -60,7 +60,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: _bulletDamage
-      value: 3
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: m_Name
@@ -137,7 +137,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: _bulletDamage
-      value: 3
+      value: 2.5
       objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: m_Name

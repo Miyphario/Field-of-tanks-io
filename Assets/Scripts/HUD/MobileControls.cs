@@ -27,6 +27,9 @@ public class MobileControls : MonoBehaviour
     {
         _movementStick.Initialize();
         _lookStick.Initialize();
+
+        _movementStick.RectTransform.anchoredPosition = _stickSize;
+        _lookStick.RectTransform.anchoredPosition = new Vector2(Screen.width - _stickSize.x, _stickSize.y);
     }
 
     private void OnEnable()
