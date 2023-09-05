@@ -30,6 +30,17 @@ public class PlayerController : TankController
         InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
         InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
         InputManager.Instance.OnThirdUpgrade += () => Tank.SelectUpgrade(3);
+
+        // Mobile controls
+        if (Application.isMobilePlatform)
+        {
+            HUDManager.Instance.MobileControls.OnMove += inp => _input = inp;
+            HUDManager.Instance.MobileControls.OnMoveEnded += () => _input = Vector2.zero;
+
+            HUDManager.Instance.MobileControls.OnLookStarted += () => Tank.Gun.ShootStart();
+            HUDManager.Instance.MobileControls.OnLook += inp => _lookInput = inp;
+            HUDManager.Instance.MobileControls.OnLookEnded += () => Tank.Gun.ShootEnd();
+        }
     }
 
     private void Update()

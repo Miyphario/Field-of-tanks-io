@@ -24,7 +24,7 @@ public class Player : Tank
 
     private sint _xp;
     private sint _maxXp = Constants.DEFAULT_MAX_XP;
-    private sint _level = 1;
+    private sint _level;
 
     private UpgradeMenu _upgradeMenu;
     public event Action<UpgradeMenu> OnMenuSelected;

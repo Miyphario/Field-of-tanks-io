@@ -24,7 +24,7 @@ public class Tank : MonoBehaviour
 
     public virtual int XP { get; protected set; }
     public virtual int MaxXP { get; protected set; } = Constants.DEFAULT_MAX_XP;
-    public virtual int Level { get; protected set; } = 1;
+    public virtual int Level { get; protected set; }
     public int RewardXP => Level * 3;
     private int _upgradeCount;
     public int UpgradeCount => _upgradeCount;
@@ -180,6 +180,7 @@ public class Tank : MonoBehaviour
 
     public static bool CanCreateNewGun(int level)
     {
+        if (level <= 0) return false;
         return level % 3 == 0;
     }
 

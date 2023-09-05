@@ -13,6 +13,7 @@ public class HUDManager : MonoBehaviour
 
     [SerializeField, Header("HUDs")] private UpgradesUI _upgradesUI;
     [SerializeField] private MobileControls _mobileControls;
+    public MobileControls MobileControls => _mobileControls;
 
     public void Initialize()
     {

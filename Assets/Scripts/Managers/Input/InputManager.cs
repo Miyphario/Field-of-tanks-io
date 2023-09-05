@@ -70,7 +70,7 @@ public class InputManager
 
         if (Application.isMobilePlatform)
         {
-            TouchSimulation.Enable();
+            //TouchSimulation.Enable();
             EnhancedTouchSupport.Enable();
             UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown += FingerDown;
         }
@@ -82,7 +82,7 @@ public class InputManager
         {
             UnityEngine.InputSystem.EnhancedTouch.Touch.onFingerDown -= FingerDown;
             EnhancedTouchSupport.Disable();
-            TouchSimulation.Disable();
+            //TouchSimulation.Disable();
         }
 
         _controls?.Disable();
