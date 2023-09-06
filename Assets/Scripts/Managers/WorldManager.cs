@@ -1,14 +1,14 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance { get; private set; }
 
     [SerializeField] private GameObject _playerPrefab;
-    [SerializeField] private Transform _playerStart;
 
     public Player HostPlayer { get; private set; }
 
@@ -28,6 +28,14 @@ public class WorldManager : MonoBehaviour
     private int _curTeamID = 0;
     public Gamemode Gamemode { get; private set; } = Gamemode.Deathmath;
 
+    [SerializeField, Header("Pools")]
+    private ObjectsPool _enemiesPool;
+    public ObjectsPool EnemiesPool => _enemiesPool;
+    [SerializeField] private ObjectsPool _bulletsPool;
+    public ObjectsPool BulletsPool => _bulletsPool;
+    [SerializeField] private ObjectsPool _destructiblesPool;
+    public ObjectsPool DestructiblesPool => _destructiblesPool;
+
     public void Initialize()
     {
         if (Instance == null)
@@ -40,7 +48,10 @@ public class WorldManager : MonoBehaviour
 
         HostPlayer = Instantiate(_playerPrefab, GetRandomSpawnPosition(1f), Quaternion.identity).GetComponent<Player>();
         _tanks.Add(HostPlayer);
+    }
 
+    private void Start()
+    {
         StartCoroutine(EnemySpawningIE());
         StartCoroutine(DestructibleSpawningIE());
     }
@@ -119,14 +130,20 @@ public class WorldManager : MonoBehaviour
                 Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
 
                 _curTeamID++;
-                Tank tank = Instantiate(_enemyPrefab, spawnPos, spawnRot).GetComponent<Tank>();
+                Enemy tank = EnemiesPool.GetFromPool(_enemyPrefab, spawnPos, spawnRot).GetComponent<Enemy>();
                 _tanks.Add(tank);
                 int teamId = Gamemode switch
                 {
                     Gamemode.Teammatch => Random.Range(0, 2),
                     _ => _curTeamID
                 };
-                tank.Initialize(teamId);
+
+                int startLevel = 0;
+                if (Vector2.Distance(spawnPos, HostPlayer.transform.position) >= 20)
+                {
+                    startLevel = Random.Range(0, 13);
+                }
+                tank.Initialize(teamId, startLevel);
                 tank.OnDestroyed += () => _tanks.Remove(tank);
 
                 yield return new WaitForSeconds(Random.Range(0.25f, 1f));

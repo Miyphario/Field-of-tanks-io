@@ -14,15 +14,17 @@ public class Bullet : MonoBehaviour
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
-        StartCoroutine(DestroyIE());
     }
 
-    public void Initialize(float damage, float speed, Tank owner)
+    public void Initialize(float damage, float speed, float size, Tank owner)
     {
         _damage = damage;
         _speed = speed;
+        transform.localScale = new(size, size, size);
         _owner = owner;
         _teamID = owner.TeamID;
+        
+        StartCoroutine(DestroyIE());
     }
 
     private void FixedUpdate()
@@ -51,7 +53,8 @@ public class Bullet : MonoBehaviour
 
     public void DestoryMe()
     {
-        Destroy(gameObject);
+        WorldManager.Instance.BulletsPool.AddToPool(gameObject);
+        _rb.velocity = Vector2.zero;
     }
 
     private IEnumerator DestroyIE()

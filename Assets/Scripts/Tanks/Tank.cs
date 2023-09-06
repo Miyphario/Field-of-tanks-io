@@ -1,11 +1,10 @@
 using System;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Tank : MonoBehaviour
 {
-    public virtual float MaxHealth { get; protected set; } = 100f;
+    public virtual float MaxHealth { get; protected set; } = Constants.DEFAULT_MAX_HEALTH;
     public virtual float Health { get; protected set; }
     public event Action<Tank> OnTakeDamage;
 
@@ -26,6 +25,8 @@ public class Tank : MonoBehaviour
     public virtual int XP { get; protected set; }
     public virtual int MaxXP { get; protected set; } = Constants.DEFAULT_MAX_XP;
     public virtual int Level { get; protected set; }
+    public virtual int Tier { get; protected set; }
+    public event Action<int> OnTierUpdated;
     public int RewardXP => Level * 3 + 3;
     private int _upgradeCount;
     public int UpgradeCount => _upgradeCount;
@@ -39,17 +40,34 @@ public class Tank : MonoBehaviour
     {
         Controller = GetComponent<TankController>();
         Health = MaxHealth;
+        InitBar();
     }
 
     protected virtual void Start()
     {
-        _healthbar = HUDManager.Instance.CreateHealthbar();
+        /* _healthbar = HUDManager.Instance.CreateHealthbar();
         bool enableBar = this switch
         {
             Player => true,
             _ => false
         };
-        _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar);
+        _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar); */
+        InitBar();
+    }
+
+    // Change this code please
+    private void InitBar()
+    {
+        if (_healthbar == null && HUDManager.Instance != null)
+        {
+            _healthbar = HUDManager.Instance.CreateHealthbar();
+            bool enableBar = this switch
+            {
+                Player => true,
+                _ => false
+            };
+            _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar);
+        }
     }
 
     public void Initialize(int teamID)
@@ -63,14 +81,14 @@ public class Tank : MonoBehaviour
         {
             Health = Mathf.Clamp(Health - damage, 0f, MaxHealth);
             _healthbar.SetValue(Health);
-            if (attacker != null)
+            if (attacker != null && gameObject.activeSelf)
                 OnTakeDamage?.Invoke(attacker);
         }
         else
         {
             Health = 0f;
+            _healthbar.Disable();
             OnDestroyed?.Invoke();
-            _healthbar.Dispose();
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();
@@ -87,6 +105,8 @@ public class Tank : MonoBehaviour
 
     protected virtual void DestroyMe()
     {
+        StopAllCoroutines();
+        _healthbar.Dispose();
         Destroy(gameObject);
     }
 
@@ -98,11 +118,7 @@ public class Tank : MonoBehaviour
         if (curXp >= 0)
         {
             XP = 0;
-            MaxXP += Constants.MAX_XP_MULTIPLIER;
-            Level++;
-            OnLevelUp?.Invoke(Level);
-            _upgradeCount++;
-            TakeDamage(-MaxHealth);
+            AddLevel();
 
             if (curXp > 0)
                 AddXP(curXp);
@@ -113,6 +129,28 @@ public class Tank : MonoBehaviour
         }
 
         OnXpUpdated?.Invoke(XP, MaxXP);
+    }
+
+    public void AddLevel(int level)
+    {
+        if (level == 0) return;
+
+        Level += level;
+        _upgradeCount += level;
+        MaxXP += level * Constants.MAX_XP_MULTIPLIER;
+        int newTier = PrefabManager.Instance.GetLastTier(Level);
+        if (Tier != newTier)
+        {
+            Tier = newTier;
+            OnTierUpdated?.Invoke(Tier);
+        }
+        OnLevelUp?.Invoke(Level);
+        TakeDamage(-MaxHealth);
+    }
+
+    public void AddLevel()
+    {
+        AddLevel(1);
     }
 
     public void Upgrade(UpgradeType upgradeType)
@@ -155,20 +193,24 @@ public class Tank : MonoBehaviour
         if (_upgradeCount <= 0) return;
 
         bool isShooting = _gun.IsShooting;
-        Gun g = Instantiate(newGun.gameObject, transform).GetComponent<Gun>();
-        Destroy(_gun.gameObject);
-        _gun = g;
+        UpdateWeapon(newGun);
         _upgradeCount--;
-
         OnUpgrade?.Invoke();
 
         if (isShooting)
             _gun.ShootStart();
     }
 
-    public void SelectNewGun(int gunIndex, int level)
+    private void UpdateWeapon(Gun gun)
     {
-        GameObject[] guns = PrefabManager.Instance.GetGunsByLevel(level);
+        Gun g = Instantiate(gun.gameObject, transform).GetComponent<Gun>();
+        Destroy(_gun.gameObject);
+        _gun = g;
+    }
+
+    public void SelectNewGun(int gunIndex, int tier)
+    {
+        GameObject[] guns = PrefabManager.Instance.GetGunsByTier(tier);
         if (guns.Length <= 0) return;
 
         Upgrade(guns[gunIndex].GetComponent<Gun>());
@@ -176,21 +218,46 @@ public class Tank : MonoBehaviour
 
     public void SelectNewRandomGun()
     {
-        SelectNewRandomGun(Level);
+        SelectNewRandomGun(Tier);
     }
 
-    public void SelectNewRandomGun(int level)
+    public void SelectNewRandomGun(int tier)
     {
-        GameObject[] guns = PrefabManager.Instance.GetGunsByLevel(level);
+        GameObject[] guns = PrefabManager.Instance.GetGunsByTier(tier);
         if (guns.Length <= 0) return;
 
         int index = Random.Range(0, guns.Length);
-        SelectNewGun(index, level);
+        SelectNewGun(index, tier);
     }
 
-    public static bool CanCreateNewGun(int level)
+    public bool CanCreateNewGun(int level)
     {
+        int lastTier = PrefabManager.Instance.GetLastTier(level);
+        if (Tier != lastTier) return true;
         return PrefabManager.Instance.GetCurrentTier(level) > -1;
+    }
+
+    protected void ResetToDefault()
+    {
+        UpdateWeapon(PrefabManager.Instance.DefaultGun);
+
+        Damage = Constants.DEFAULT_DAMAGE;
+        Speed = Constants.DEFAULT_MOVE_SPEED;
+        FireRate = Constants.DEFAULT_FIRE_RATE;
+        BulletSpeed = Constants.DEFAULT_BULLET_SPEED;
+        MaxHealth = Constants.DEFAULT_MAX_HEALTH;
+        Health = MaxHealth;
+        MaxXP = Constants.DEFAULT_MAX_XP;
+        XP = 0;
+        _teamID = 0;
+        _upgradeCount = 0;
+        Tier = 0;
+
+        if (_healthbar != null)
+        {
+            _healthbar.SetMaxValue(MaxHealth);
+            _healthbar.SetValue(Health, true);
+        }
     }
 
 #if UNITY_EDITOR

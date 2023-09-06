@@ -15,7 +15,7 @@ public class TankController : MonoBehaviour
 
     protected virtual void Start() { }
 
-    protected void RotateToPoint(Vector2 point)
+    /* protected void RotateToPoint(Vector2 point)
     {
         var rot = RotationToPoint(point);
         transform.rotation = rot;
@@ -34,7 +34,7 @@ public class TankController : MonoBehaviour
 
     protected float AngleToPoint(Vector2 point, float offset)
     {
-        Vector3 difference = Helper.DirectionToPoint(transform.position, point);
+        Vector3 difference = transform.position.DirectionToPoint(point);
         return Mathf.Atan2(difference.y, difference.x) * Mathf.Rad2Deg + offset;
     }
 
@@ -59,5 +59,5 @@ public class TankController : MonoBehaviour
     {
         float rotZ = AngleToPoint(point, offset);
         return Quaternion.Euler(0, 0, rotZ);
-    }
+    } */
 }

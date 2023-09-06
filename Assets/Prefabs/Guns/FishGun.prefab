@@ -133,10 +133,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2926577497400679920}
     m_Modifications:
-    - target: {fileID: 141174634145908268, guid: b3f5f9f70726fff499623593981738e7, type: 3}
-      propertyPath: _bulletDamage
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: b3f5f9f70726fff499623593981738e7, type: 3}
       propertyPath: m_Name
       value: SmallShootPoint (1)
@@ -210,10 +206,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2926577497400679920}
     m_Modifications:
-    - target: {fileID: 141174634145908268, guid: b3f5f9f70726fff499623593981738e7, type: 3}
-      propertyPath: _bulletDamage
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: b3f5f9f70726fff499623593981738e7, type: 3}
       propertyPath: m_Name
       value: SmallShootPoint

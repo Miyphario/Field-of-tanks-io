@@ -15,6 +15,7 @@ public class Player : Tank
     public override int XP { get => _xp; protected set => _xp = value; }
     public override int MaxXP { get => _maxXp; protected set => _maxXp = value; }
     public override int Level { get => _level; protected set => _level = value; }
+    public override int Tier { get => _tier; protected set => _tier = value; }
 
     private sfloat _maxHealth = Constants.DEFAULT_MAX_HEALTH;
     private sfloat _health;
@@ -25,6 +26,7 @@ public class Player : Tank
     private sint _xp;
     private sint _maxXp = Constants.DEFAULT_MAX_XP;
     private sint _level;
+    private sint _tier;
 
     private UpgradeMenu _upgradeMenu;
     public event Action<UpgradeMenu> OnMenuSelected;
@@ -32,7 +34,6 @@ public class Player : Tank
     protected override void Awake()
     {
         base.Awake();
-
         OnLevelUp += HandleLevelUp;
     }
 
@@ -42,7 +43,7 @@ public class Player : Tank
 
         if (CanCreateNewGun(Level - 1))
         {
-            SelectNewRandomGun(Level - 1);
+            SelectNewRandomGun(Tier);
         }
 
         if (CanCreateNewGun(Level))

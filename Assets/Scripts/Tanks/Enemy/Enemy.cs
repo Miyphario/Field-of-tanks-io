@@ -3,17 +3,33 @@ using UnityEngine;
 
 public class Enemy : Tank
 {
+    public new EnemyController Controller => base.Controller as EnemyController;
+
     protected override void Awake()
     {
         base.Awake();
-
         OnLevelUp += HandleLevelUp;
+        OnTierUpdated += HandleTierUpdated;
     }
 
     protected override void Start()
     {
         base.Start();
+    }
+
+    public void Initialize(int teamID, int startLevel)
+    {
+        Initialize(teamID);
+        Controller.Initialize();
+        AddLevel(startLevel);
         StartCoroutine(CheckDistanceIE());
+    }
+
+    protected override void DestroyMe()
+    {
+        StopAllCoroutines();
+        WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
+        ResetToDefault();
     }
 
     private IEnumerator CheckDistanceIE()
@@ -34,13 +50,14 @@ public class Enemy : Tank
         }
     }
 
+    private void HandleTierUpdated(int tier)
+    {
+        SelectNewRandomGun();
+    }
+
     private void HandleLevelUp(int level)
     {
-        if (CanCreateNewGun(level))
-        {
-            SelectNewRandomGun();
-        }
-        else
+        while (UpgradeCount > 0)
         {
             float rand = Random.Range(0f, 100f);
             switch (rand)
@@ -61,6 +78,15 @@ public class Enemy : Tank
                     Upgrade(UpgradeType.Damage);
                     break;
             }
+
+            /* if (CanCreateNewGun(level))
+            {
+                SelectNewRandomGun();
+            }
+            else
+            {
+                
+            } */
         }
     }
 }

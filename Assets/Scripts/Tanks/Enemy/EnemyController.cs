@@ -55,16 +55,6 @@ public class EnemyController : TankController
     protected override void Awake()
     {
         base.Awake();
-
-        _accuracy = Random.Range(0.1f, 2.5f);
-        _minRotationSpeed = Random.Range(100f, 200f);
-        _maxRotationSpeed = Random.Range(200f, 300f) + _minRotationSpeed;
-
-        _retreatHealthPercent = Random.Range(10f, 35f);
-
-        _detectEnemyDistance = Random.Range(10f, 16f);
-        _curDetectEnemyDistance = _detectEnemyDistance;
-
         OnTargetChanged += tar =>
         {
             StartLogic();
@@ -85,11 +75,26 @@ public class EnemyController : TankController
                 OnTargetChanged?.Invoke(_target);
             }
         };
+
+        Tank.OnDestroyed += () =>
+        {
+            StopAllCoroutines();
+            _target = null;
+            _rb.velocity = Vector2.zero;
+        };
     }
 
-    protected override void Start()
+    public void Initialize()
     {
-        base.Start();
+        _accuracy = Random.Range(0.1f, 2.5f);
+        _minRotationSpeed = Random.Range(100f, 200f);
+        _maxRotationSpeed = Random.Range(200f, 300f) + _minRotationSpeed;
+
+        _retreatHealthPercent = Random.Range(10f, 35f);
+
+        _detectEnemyDistance = Random.Range(10f, 16f);
+        _curDetectEnemyDistance = _detectEnemyDistance;
+        
         StartCoroutine(SightIE());
         StartLogic();
     }
@@ -164,7 +169,7 @@ public class EnemyController : TankController
                 Destructible dest = FindDestructible(out float distance);
                 if (dest != null)
                 {
-                    _lookDirection = Helper.DirectionToPoint(transform.position, dest.transform.position);
+                    _lookDirection = transform.position.DirectionToPoint(dest.transform.position);
                     _state = AIState.Wandering;
                     MoveToPosition(dest.transform.position, ShootDistance - 0.5f);
 
@@ -188,12 +193,12 @@ public class EnemyController : TankController
                 }
 
                 Vector2 pos = new Vector2(_target.transform.position.x, _target.transform.position.y) + spd;
-                _lookDirection = Helper.DirectionToPoint(transform.position, pos);
+                _lookDirection = transform.position.DirectionToPoint(pos);
 
                 if (IsRetreat)
                 {
                     _state = AIState.Retreat;
-                    _moveDirection = Helper.DirectionToPoint(_target.transform.position, transform.position);
+                    _moveDirection = _target.transform.position.DirectionToPoint(transform.position);
 
                     if (_distanceToTarget <= MaxEnemyDistance)
                         _isMoving = true;
@@ -309,7 +314,7 @@ public class EnemyController : TankController
         float distance = Vector2.Distance(transform.position, position);
         if (distance > minDistance)
         {
-            _moveDirection = Helper.DirectionToPoint(transform.position, position);
+            _moveDirection = transform.position.DirectionToPoint(position);
             _isMoving = true;
         }
         else
@@ -324,7 +329,7 @@ public class EnemyController : TankController
         while (Vector2.Distance(transform.position, position) > minDistance)
         {
             _isMoving = true;
-            _moveDirection = Helper.DirectionToPoint(transform.position, position);
+            _moveDirection = transform.position.DirectionToPoint(position);
             _lookDirection = _moveDirection;
             yield return new WaitForSeconds(0.2f);
         }

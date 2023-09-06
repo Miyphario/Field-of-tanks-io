@@ -10,6 +10,7 @@ public class GunShootPoint : MonoBehaviour
     [SerializeField] private float _bulletDamage;
     [SerializeField] private float _bulletSpeed;
     [SerializeField] private float _fireRate;
+    [SerializeField] private float _bulletSize;
     [SerializeField] private GameObject _bullet;
     [SerializeField] private Transform _shootPoint;
     private bool _canShoot = true;
@@ -30,8 +31,8 @@ public class GunShootPoint : MonoBehaviour
 
     private void CreateBullet()
     {
-        Bullet bul = Instantiate(_bullet, _shootPoint.position, transform.rotation).GetComponent<Bullet>();
-        bul.Initialize(Damage, BulletSpeed, _gun.Owner);
+        Bullet bul = WorldManager.Instance.BulletsPool.GetFromPool(_bullet, _shootPoint.position, transform.rotation).GetComponent<Bullet>();
+        bul.Initialize(Damage, BulletSpeed, _bulletSize, _gun.Owner);
     }
 
     private IEnumerator ShootIE()

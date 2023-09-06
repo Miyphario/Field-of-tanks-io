@@ -9,7 +9,8 @@ public class Destructible : MonoBehaviour
     private float _health;
     public float Health => _health;
 
-    [SerializeField, Header("Reward")] private int _minRewardXp;
+    [SerializeField, Header("Reward")]
+    private int _minRewardXp;
     [SerializeField] private int _maxRewardXp;
     private int _rewardXp;
     [SerializeField, Header("Health Restore")] private float _minHealthRestore;
@@ -37,7 +38,7 @@ public class Destructible : MonoBehaviour
         StartCoroutine(CheckPositionIE());
     }
 
-    public bool TakeDamage(float damage, Tank owner)
+    public bool TakeDamage(float damage, Tank attacker)
     {
         if (_health - damage > 0)
         {
@@ -47,12 +48,12 @@ public class Destructible : MonoBehaviour
         else
         {
             _health = 0;
-            OnDestroyed?.Invoke();
             _healthbar.Dispose();
-            if (owner != null)
+            OnDestroyed?.Invoke();
+            if (attacker != null)
             {
-                owner.AddXP(_rewardXp);
-                owner.TakeDamage(-_healthRestore);
+                attacker.AddXP(_rewardXp);
+                attacker.TakeDamage(-_healthRestore);
             }
             Destroy(gameObject);
             return true;

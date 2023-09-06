@@ -50,21 +50,21 @@ public class PlayerController : TankController
         _currentMoveInput = Vector2.SmoothDamp(_currentMoveInput, _moveInput, ref _smoothInput, _rb.drag / 60f);
         _currentMoveInput = WorldManager.Instance.ClampMoveInput(_rb.position, _currentMoveInput);
 
+        Vector2 rotDirection;
         if (GameManager.Instance.IsKeyboardControls)
         {
             Vector2 mousePos = GameManager.Instance.MainCamera.ScreenToWorldPoint(_mousePosition);
-            RotateToPoint(mousePos, -90f);
+            rotDirection = transform.position.DirectionToPoint(mousePos);
         }
         else
         {
-            Vector2 inp;
             if (_lookInput == Vector2.zero)
-                inp = _moveInput;
+                rotDirection = _moveInput;
             else
-                inp = _lookInput;
-
-            transform.rotation = RotationToDirection(inp);
+                rotDirection = _lookInput;
         }
+
+        transform.rotation = transform.rotation.RotationToDirection(transform.rotation, rotDirection);
     }
 
     private void FixedUpdate()
@@ -76,7 +76,6 @@ public class PlayerController : TankController
     private void ShootStart()
     {
         Tank.Gun.ShootStart();
-        _isLooking = true;
     }
 
     private void ShootEnd()
@@ -88,6 +87,7 @@ public class PlayerController : TankController
     private void Look(Vector2 input)
     {
         _lookInput = input;
+        _isLooking = true;
     }
 
     private void Move(Vector2 input)
