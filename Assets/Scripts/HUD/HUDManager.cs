@@ -1,7 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class HUDManager : MonoBehaviour
 {
+    [SerializeField] private BackgroundUI _darkBackground;
     public static HUDManager Instance { get; private set; }
     public RectTransform CanvasRect => _canvasRect;
     public float HealthbarRenderDistance => GameManager.Instance.MainCamera.orthographicSize + 10f;
@@ -16,6 +18,8 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
     [SerializeField] private PlayerInfoUI _playerInfoUI;
+    [SerializeField] private PauseUI _pauseUI;
+    public PauseUI PauseUI => _pauseUI;
 
     public void Initialize()
     {
@@ -28,6 +32,20 @@ public class HUDManager : MonoBehaviour
 
         _upgradesUI.Initialize();
         _playerInfoUI.Initialize();
+        _darkBackground.Initialize();
+        _pauseUI.Initialize();
+
+        GameManager.Instance.OnPauseChanged += pause =>
+        {
+            if (pause)
+            {
+                _darkBackground.Show();
+            }
+            else
+            {
+                _darkBackground.Hide();
+            }
+        };
     }
 
     public BarUI CreateHealthbar(bool smallBar = false)

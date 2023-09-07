@@ -15,9 +15,9 @@ public class Gun : MonoBehaviour
     private Tank _owner;
     public Tank Owner => _owner;
 
-    private void Awake()
+    public void Initialize(Tank owner)
     {
-        _owner = transform.root.GetComponent<Tank>();
+        _owner = owner;
         foreach (var point in _shootPoints)
         {
             point.Initialize(this);
@@ -50,5 +50,12 @@ public class Gun : MonoBehaviour
         StopAllCoroutines();
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
+    }
+
+    public Gun Change(Gun gun)
+    {
+        Gun g = Instantiate(gun.gameObject, transform.parent).GetComponent<Gun>();
+        Destroy(gameObject);
+        return g;
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,16 +20,20 @@ public class GameManager
             if (value)
             {
                 Time.timeScale = 0f;
-                _isPaused = true;
             }
             else
             {
                 Time.timeScale = 1f;
-                _isPaused = false;
             }
+
+            if (_isPaused != value)
+                OnPauseChanged?.Invoke(value);
+            _isPaused = value;
         }
     }
     private bool _isPaused;
+
+    public event Action<bool> OnPauseChanged;
 
     public GameManager()
     {

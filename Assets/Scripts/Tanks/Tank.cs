@@ -40,6 +40,7 @@ public class Tank : MonoBehaviour
     {
         Controller = GetComponent<TankController>();
         Health = MaxHealth;
+        _gun.Initialize(this);
         InitBar();
     }
 
@@ -203,9 +204,8 @@ public class Tank : MonoBehaviour
 
     private void UpdateWeapon(Gun gun)
     {
-        Gun g = Instantiate(gun.gameObject, transform).GetComponent<Gun>();
-        Destroy(_gun.gameObject);
-        _gun = g;
+        _gun = _gun.Change(gun);
+        _gun.Initialize(this);
     }
 
     public void SelectNewGun(int gunIndex, int tier)
