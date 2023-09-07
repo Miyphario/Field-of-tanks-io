@@ -1,9 +1,12 @@
 using System.Collections;
 using UnityEngine;
 
-public class Enemy : Tank
+public class Enemy : Tank, IPoolable
 {
     public new EnemyController Controller => base.Controller as EnemyController;
+
+    private bool _isAlive = true;
+    public bool IsAlive => _isAlive;
 
     protected override void Awake()
     {
@@ -19,19 +22,14 @@ public class Enemy : Tank
 
     public void Initialize(int teamID, int startLevel)
     {
+        _isAlive = true;
         Initialize(teamID);
         Controller.Initialize();
         AddLevel(startLevel);
         StartCoroutine(CheckDistanceIE());
     }
 
-    protected override void DestroyMe()
-    {
-        StopAllCoroutines();
-        WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
-        ResetToDefault();
-    }
-
+    protected override void DestroyMe() => AddToPool();
     private IEnumerator CheckDistanceIE()
     {
         while (true)
@@ -78,15 +76,14 @@ public class Enemy : Tank
                     Upgrade(UpgradeType.Damage);
                     break;
             }
-
-            /* if (CanCreateNewGun(level))
-            {
-                SelectNewRandomGun();
-            }
-            else
-            {
-                
-            } */
         }
+    }
+
+    public void AddToPool()
+    {
+        StopAllCoroutines();
+        WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
+        ResetToDefault();
+        _isAlive = false;
     }
 }

@@ -78,9 +78,13 @@ public class EnemyController : TankController
 
         Tank.OnDestroyed += () =>
         {
+            DisabledInput = true;
             StopAllCoroutines();
-            _target = null;
+            StopFlex();
+            _moveDirection = Vector2.zero;
+            _lookDirection = Vector2.zero;
             _rb.velocity = Vector2.zero;
+            _target = null;
         };
     }
 
@@ -95,6 +99,8 @@ public class EnemyController : TankController
         _detectEnemyDistance = Random.Range(10f, 16f);
         _curDetectEnemyDistance = _detectEnemyDistance;
         
+        DisabledInput = false;
+
         StartCoroutine(SightIE());
         StartLogic();
     }
@@ -115,6 +121,8 @@ public class EnemyController : TankController
 
     private void Update()
     {
+        if (DisabledInput) return;
+
         if (_lookDirection != Vector2.zero)
         {
             Quaternion toRot = Quaternion.LookRotation(Vector3.forward, _lookDirection);
@@ -124,6 +132,8 @@ public class EnemyController : TankController
 
     private void FixedUpdate()
     {
+        if (DisabledInput) return;
+
         if (_isMoving || _isFlexing)
         {
             Vector2 direction = _moveDirection;

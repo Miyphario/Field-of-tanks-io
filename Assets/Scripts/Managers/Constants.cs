@@ -8,7 +8,7 @@ public static class Constants
     public const float DAMAGE_PER_LEVEL = 3f;
     public const float SPEED_PER_LEVEL = 0.3f;
     public const float FIRE_RATE_PER_LEVEL = 0.06f;
-    public const float MAX_HEALTH_PER_LEVEL = 8f;
+    public const float MAX_HEALTH_PER_LEVEL = 10f;
 
     public const float MIN_FIRE_RATE = 0.08f;
     public const float MAX_SPEED = 20f;

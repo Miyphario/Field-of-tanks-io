@@ -21,6 +21,7 @@ public class InputManager
     public event Action OnFirstUpgrade;
     public event Action OnSecondUpgrade;
     public event Action OnThirdUpgrade;
+    public event Action OnBack;
 
     private readonly PlayerControls _controls = new();
 
@@ -50,6 +51,8 @@ public class InputManager
         _controls.Player.FirstUpgrade.canceled += ctx => OnFirstUpgrade?.Invoke();
         _controls.Player.SecondUpgrade.canceled += ctx => OnSecondUpgrade?.Invoke();
         _controls.Player.ThirdUpgrade.canceled += ctx => OnThirdUpgrade?.Invoke();
+
+        _controls.Player.Back.canceled += ctx => OnBack?.Invoke();
 
         Enable();
     }

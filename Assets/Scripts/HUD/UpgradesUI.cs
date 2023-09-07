@@ -16,6 +16,8 @@ public class UpgradesUI : MonoBehaviour
     [SerializeField] private Image _thirdButtonImage;
     private TextMeshProUGUI _thirdButtonText;
 
+    [SerializeField] private Button _backButton;
+
     [SerializeField, Header("Images")]
     private Sprite _tankSprite;
     [SerializeField] private Sprite _gunSprite;
@@ -36,8 +38,10 @@ public class UpgradesUI : MonoBehaviour
         _firstUpgradeButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.SelectUpgrade(1));
         _secondUpgradeButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.SelectUpgrade(2));
         _thirdUpgradeButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.SelectUpgrade(3));
+        _backButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.UpgradeMenuBack());
 
         SetActiveButtons(0);
+        SetBackButtonActive(false);
     }
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
@@ -46,6 +50,7 @@ public class UpgradesUI : MonoBehaviour
         {
             case UpgradeMenu.None:
                 SetActiveButtons(0);
+                SetBackButtonActive(false);
                 break;
 
             case UpgradeMenu.Base:
@@ -56,6 +61,7 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonText.text = "Gun";
 
                 SetActiveButtons(2);
+                SetBackButtonActive(false);
                 break;
 
             case UpgradeMenu.Tank:
@@ -66,6 +72,7 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonText.text = "Speed";
 
                 SetActiveButtons(2);
+                SetBackButtonActive(true);
                 break;
 
             case UpgradeMenu.Gun:
@@ -79,6 +86,7 @@ public class UpgradesUI : MonoBehaviour
                 _thirdButtonText.text = "Bullet Speed";
 
                 SetActiveButtons(3);
+                SetBackButtonActive(true);
                 break;
 
             case UpgradeMenu.NewGun:
@@ -92,23 +100,28 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonText.text = "";
 
                 SetActiveButtons(2);
+                SetBackButtonActive(false);
                 break;
         }
     }
 
     public void SetActiveButtons(int count)
     {
+        GameObject buttonsParent = _firstUpgradeButton.transform.parent.gameObject;
+        if (count == 0)
+        {
+            if (buttonsParent.activeSelf)
+                buttonsParent.SetActive(false);
+            return;
+        }
+        else
+        {
+            if (!buttonsParent.activeSelf)
+                buttonsParent.SetActive(true);
+        }
+
         switch (count)
         {
-            case 0:
-                if (_firstUpgradeButton.gameObject.activeSelf)
-                    _firstUpgradeButton.gameObject.SetActive(false);
-                if (_secondUpgradeButton.gameObject.activeSelf)
-                    _secondUpgradeButton.gameObject.SetActive(false);
-                if (_thirdUpgradeButton.gameObject.activeSelf)
-                    _thirdUpgradeButton.gameObject.SetActive(false);
-                break;
-
             case 1:
                 if (!_firstUpgradeButton.gameObject.activeSelf)
                     _firstUpgradeButton.gameObject.SetActive(true);
@@ -151,5 +164,11 @@ public class UpgradesUI : MonoBehaviour
         {
             _thirdButtonImage.preserveAspect = true;
         }
+    }
+
+    private void SetBackButtonActive(bool active)
+    {
+        if (_backButton.gameObject.activeSelf != active)
+            _backButton.gameObject.SetActive(active);
     }
 }

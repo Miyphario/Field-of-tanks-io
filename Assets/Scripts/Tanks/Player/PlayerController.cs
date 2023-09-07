@@ -32,6 +32,7 @@ public class PlayerController : TankController
         InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
         InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
         InputManager.Instance.OnThirdUpgrade += () => Tank.SelectUpgrade(3);
+        InputManager.Instance.OnBack += () => Tank.UpgradeMenuBack();
 
         // Mobile controls
         if (Application.isMobilePlatform)

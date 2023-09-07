@@ -2,36 +2,35 @@ using UnityEngine;
 
 public class ObjectsPool : MonoBehaviour
 {
+    [SerializeField] private GameObject _prefab;
+
     public void AddToPool(GameObject gameObject)
     {
         if (gameObject.activeSelf)
             gameObject.SetActive(false);
-        
-        gameObject.transform.SetParent(transform);
     }
 
-    public GameObject GetFromPool(GameObject originalObject, Vector3 newPosition, Quaternion newRotation, Transform newParent)
+    public GameObject GetFromPool(Vector3 newPosition, Quaternion newRotation)
     {
         GameObject obj = null;
-        for (int i = transform.childCount - 1; i >= 0;)
+        for (int i = transform.childCount - 1; i >= 0; i--)
         {
-            obj = transform.GetChild(i).gameObject;
-            break;
+            GameObject curObj = transform.GetChild(i).gameObject;
+            IPoolable child = curObj.GetComponent<IPoolable>();
+            if (!child.IsAlive)
+            {
+                obj = curObj;
+                break;
+            }
         }
 
         if (obj == null)
-            obj = Instantiate(originalObject);
+            obj = Instantiate(_prefab, transform);
 
-        obj.transform.SetParent(newParent);
         obj.transform.SetPositionAndRotation(newPosition, newRotation);
         if (!obj.activeSelf)
             obj.SetActive(true);
 
         return obj;
-    }
-
-    public GameObject GetFromPool(GameObject originalObject, Vector3 newPosition, Quaternion newRotation)
-    {
-        return GetFromPool(originalObject, newPosition, newRotation, null);
     }
 }

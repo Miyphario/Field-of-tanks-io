@@ -27,7 +27,7 @@ public class Tank : MonoBehaviour
     public virtual int Level { get; protected set; }
     public virtual int Tier { get; protected set; }
     public event Action<int> OnTierUpdated;
-    public int RewardXP => Level * 3 + 3;
+    public int RewardXP => MaxXP / 2;
     private int _upgradeCount;
     public int UpgradeCount => _upgradeCount;
     public event Action<int> OnLevelUp;
@@ -230,13 +230,6 @@ public class Tank : MonoBehaviour
         SelectNewGun(index, tier);
     }
 
-    public bool CanCreateNewGun(int level)
-    {
-        int lastTier = PrefabManager.Instance.GetLastTier(level);
-        if (Tier != lastTier) return true;
-        return PrefabManager.Instance.GetCurrentTier(level) > -1;
-    }
-
     protected void ResetToDefault()
     {
         UpdateWeapon(PrefabManager.Instance.DefaultGun);
@@ -251,6 +244,7 @@ public class Tank : MonoBehaviour
         XP = 0;
         _teamID = 0;
         _upgradeCount = 0;
+        Level = 0;
         Tier = 0;
 
         if (_healthbar != null)

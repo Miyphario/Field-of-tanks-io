@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Bullet : MonoBehaviour
+public class Bullet : MonoBehaviour, IPoolable
 {
     [SerializeField] private float _timeToDestroy = 5f;
 
@@ -11,6 +11,9 @@ public class Bullet : MonoBehaviour
     private Tank _owner;
     private int _teamID;
 
+    private bool _isAlive = true;
+    public bool IsAlive => _isAlive;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
@@ -18,6 +21,7 @@ public class Bullet : MonoBehaviour
 
     public void Initialize(float damage, float speed, float size, Tank owner)
     {
+        _isAlive = true;
         _damage = damage;
         _speed = speed;
         transform.localScale = new(size, size, size);
@@ -38,7 +42,7 @@ public class Bullet : MonoBehaviour
         {
             dest.Push(transform.position);
             dest.TakeDamage(_damage, _owner);
-            DestoryMe();
+            AddToPool();
             return;
         }
 
@@ -48,18 +52,19 @@ public class Bullet : MonoBehaviour
         if (tank.TakeDamage(_damage, _owner))
             _owner.AddXP(tank.RewardXP);
         
-        DestoryMe();
-    }
-
-    public void DestoryMe()
-    {
-        WorldManager.Instance.BulletsPool.AddToPool(gameObject);
-        _rb.velocity = Vector2.zero;
+        AddToPool();
     }
 
     private IEnumerator DestroyIE()
     {
         yield return new WaitForSeconds(_timeToDestroy);
-        DestoryMe();
+        AddToPool();
+    }
+
+    public void AddToPool()
+    {
+        WorldManager.Instance.BulletsPool.AddToPool(gameObject);
+        _rb.velocity = Vector2.zero;
+        _isAlive = false;
     }
 }

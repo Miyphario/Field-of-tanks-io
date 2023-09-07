@@ -46,6 +46,12 @@ public class PrefabManager : MonoBehaviour
         return Mathf.Clamp((int)tier, 0, _gunTier.Length - 1);
     }
 
+    public int GetLastTierLevel(int level)
+    {
+        int tier = GetLastTier(level);
+        return tier * 3;
+    }
+
     public GameObject[] GetGunsByLevel(int level)
     {
         if (level <= 0 || level % 3 != 0) return default;

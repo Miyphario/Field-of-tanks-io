@@ -35,28 +35,29 @@ public class Player : Tank
     {
         base.Awake();
         OnLevelUp += HandleLevelUp;
+        OnTierUpdated += HandleTierUpdated;
     }
 
     private void HandleLevelUp(int level)
     {
-        UpgradeMenu lastMenu = _upgradeMenu;
-
-        if (CanCreateNewGun(Level - 1))
+        int lastTierLevel = PrefabManager.Instance.GetLastTierLevel(level);
+        if (lastTierLevel > 0 && level > lastTierLevel)
         {
-            SelectNewRandomGun(Tier);
+            SelectNewRandomGun();
+            _upgradeMenu = UpgradeMenu.None;
         }
 
-        if (CanCreateNewGun(Level))
-        {
-            _upgradeMenu = UpgradeMenu.NewGun;
-        }
-        else
+        if (_upgradeMenu == UpgradeMenu.None)
         {
             _upgradeMenu = UpgradeMenu.Base;
-        }
-
-        if (_upgradeMenu != lastMenu)
             OnMenuSelected?.Invoke(_upgradeMenu);
+        }
+    }
+
+    private void HandleTierUpdated(int tier)
+    {
+        _upgradeMenu = UpgradeMenu.NewGun;
+        OnMenuSelected?.Invoke(_upgradeMenu);
     }
 
     protected override void DestroyMe()
@@ -116,7 +117,7 @@ public class Player : Tank
                 break;
 
             case UpgradeMenu.NewGun:
-                SelectNewGun(upgrade - 1, Level);
+                SelectNewGun(upgrade - 1, Tier);
                 break;
         }
 
@@ -126,5 +127,14 @@ public class Player : Tank
             _upgradeMenu = UpgradeMenu.Base;
 
         OnMenuSelected?.Invoke(_upgradeMenu);
+    }
+
+    public void UpgradeMenuBack()
+    {
+        if (_upgradeMenu == UpgradeMenu.Gun || _upgradeMenu == UpgradeMenu.Tank)
+        {
+            _upgradeMenu = UpgradeMenu.Base;
+            OnMenuSelected?.Invoke(_upgradeMenu);
+        }
     }
 }

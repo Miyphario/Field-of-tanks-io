@@ -107,6 +107,15 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Back"",
+                    ""type"": ""Button"",
+                    ""id"": ""9f75a66d-4c6e-452c-b90d-b93a3c49e139"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -316,6 +325,28 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""ThirdUpgrade"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c380bdf3-c250-4e64-96d6-a42b43cbd760"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""e7a91d10-4811-4be9-a021-2d2272611761"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Back"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -851,6 +882,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         m_Player_FirstUpgrade = m_Player.FindAction("FirstUpgrade", throwIfNotFound: true);
         m_Player_SecondUpgrade = m_Player.FindAction("SecondUpgrade", throwIfNotFound: true);
         m_Player_ThirdUpgrade = m_Player.FindAction("ThirdUpgrade", throwIfNotFound: true);
+        m_Player_Back = m_Player.FindAction("Back", throwIfNotFound: true);
         // UI
         m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
         m_UI_Navigate = m_UI.FindAction("Navigate", throwIfNotFound: true);
@@ -933,6 +965,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_FirstUpgrade;
     private readonly InputAction m_Player_SecondUpgrade;
     private readonly InputAction m_Player_ThirdUpgrade;
+    private readonly InputAction m_Player_Back;
     public struct PlayerActions
     {
         private @PlayerControls m_Wrapper;
@@ -946,6 +979,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         public InputAction @FirstUpgrade => m_Wrapper.m_Player_FirstUpgrade;
         public InputAction @SecondUpgrade => m_Wrapper.m_Player_SecondUpgrade;
         public InputAction @ThirdUpgrade => m_Wrapper.m_Player_ThirdUpgrade;
+        public InputAction @Back => m_Wrapper.m_Player_Back;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -982,6 +1016,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ThirdUpgrade.started += instance.OnThirdUpgrade;
             @ThirdUpgrade.performed += instance.OnThirdUpgrade;
             @ThirdUpgrade.canceled += instance.OnThirdUpgrade;
+            @Back.started += instance.OnBack;
+            @Back.performed += instance.OnBack;
+            @Back.canceled += instance.OnBack;
         }
 
         private void UnregisterCallbacks(IPlayerActions instance)
@@ -1013,6 +1050,9 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
             @ThirdUpgrade.started -= instance.OnThirdUpgrade;
             @ThirdUpgrade.performed -= instance.OnThirdUpgrade;
             @ThirdUpgrade.canceled -= instance.OnThirdUpgrade;
+            @Back.started -= instance.OnBack;
+            @Back.performed -= instance.OnBack;
+            @Back.canceled -= instance.OnBack;
         }
 
         public void RemoveCallbacks(IPlayerActions instance)
@@ -1159,6 +1199,7 @@ public partial class @PlayerControls: IInputActionCollection2, IDisposable
         void OnFirstUpgrade(InputAction.CallbackContext context);
         void OnSecondUpgrade(InputAction.CallbackContext context);
         void OnThirdUpgrade(InputAction.CallbackContext context);
+        void OnBack(InputAction.CallbackContext context);
     }
     public interface IUIActions
     {

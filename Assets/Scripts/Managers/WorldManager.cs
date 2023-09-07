@@ -14,7 +14,6 @@ public class WorldManager : MonoBehaviour
 
     [SerializeField] private Vector2 _worldSize;
     public Vector2 WorldSize => _worldSize;
-    [SerializeField] private GameObject _enemyPrefab;
 
     private List<Tank> _tanks = new();
     public IReadOnlyList<Tank> Tanks => _tanks;
@@ -130,7 +129,7 @@ public class WorldManager : MonoBehaviour
                 Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
 
                 _curTeamID++;
-                Enemy tank = EnemiesPool.GetFromPool(_enemyPrefab, spawnPos, spawnRot).GetComponent<Enemy>();
+                Enemy tank = EnemiesPool.GetFromPool(spawnPos, spawnRot).GetComponent<Enemy>();
                 _tanks.Add(tank);
                 int teamId = Gamemode switch
                 {
@@ -139,9 +138,9 @@ public class WorldManager : MonoBehaviour
                 };
 
                 int startLevel = 0;
-                if (Vector2.Distance(spawnPos, HostPlayer.transform.position) >= 20)
+                if (Vector2.Distance(spawnPos, HostPlayer.transform.position) >= 30)
                 {
-                    startLevel = Random.Range(0, 13);
+                    startLevel = Random.Range(0, HostPlayer.Level + 6);
                 }
                 tank.Initialize(teamId, startLevel);
                 tank.OnDestroyed += () => _tanks.Remove(tank);

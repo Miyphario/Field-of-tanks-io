@@ -118,7 +118,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3149629877862761716}
-  - {fileID: 1300717787379589480}
+  - {fileID: 3846761733399712737}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!70 &4841311431582128869
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd6191c21c1fd14429e4428c9ff058f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gun: {fileID: 7026747551093812347}
+  _gun: {fileID: 5110291653312847602}
 --- !u!114 &3120615703219972346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -208,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0def98603dc5ef449a1520df7528dbee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!1001 &4219971075841391768
+--- !u!1001 &2161512111554104849
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -258,22 +258,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5904529536273444270, guid: d82326d4bf2f13442805a9ec3f3c3a90, type: 3}
       propertyPath: m_Name
-      value: Pistol
+      value: Gun
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d82326d4bf2f13442805a9ec3f3c3a90, type: 3}
---- !u!4 &1300717787379589480 stripped
+--- !u!4 &3846761733399712737 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2926577497400679920, guid: d82326d4bf2f13442805a9ec3f3c3a90, type: 3}
-  m_PrefabInstance: {fileID: 4219971075841391768}
+  m_PrefabInstance: {fileID: 2161512111554104849}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7026747551093812347 stripped
+--- !u!114 &5110291653312847602 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6562972806545936611, guid: d82326d4bf2f13442805a9ec3f3c3a90, type: 3}
-  m_PrefabInstance: {fileID: 4219971075841391768}
+  m_PrefabInstance: {fileID: 2161512111554104849}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 0}
   m_Enabled: 1
