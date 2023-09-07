@@ -30,6 +30,15 @@ public class MobileControls : MonoBehaviour
 
         _movementStick.RectTransform.anchoredPosition = _stickSize;
         _lookStick.RectTransform.anchoredPosition = new Vector2(Screen.width - _stickSize.x, _stickSize.y);
+
+        GameManager.Instance.OnPauseChanged += pause =>
+        {
+            if (pause)
+            {
+                HandleFingerUp(_lookFinger);
+                HandleFingerUp(_movementFinger);
+            }
+        };
     }
 
     private void OnEnable()
@@ -72,6 +81,8 @@ public class MobileControls : MonoBehaviour
 
     private void HandleFingerMove(Finger finger)
     {
+        if (GameManager.Instance.IsPaused) return;
+
         if (_movementFinger != finger && _lookFinger != finger) return;
 
         Vector2 knobPosition;
@@ -104,6 +115,8 @@ public class MobileControls : MonoBehaviour
 
     private void HandleFingerDown(Finger finger)
     {
+        if (GameManager.Instance.IsPaused) return;
+
         if (_movementFinger == null && finger.screenPosition.x < Screen.width / 2f)
         {
             _movementFinger = finger;

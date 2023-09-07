@@ -16,7 +16,7 @@ public class Player : Tank
     public override int MaxXP { get => _maxXp; protected set => _maxXp = value; }
     public override int Level { get => _level; protected set => _level = value; }
     public override int Tier { get => _tier; protected set => _tier = value; }
-
+    
     private sfloat _maxHealth = Constants.DEFAULT_MAX_HEALTH;
     private sfloat _health;
     private sfloat _speed = Constants.DEFAULT_MOVE_SPEED;
@@ -28,6 +28,7 @@ public class Player : Tank
     private sint _level;
     private sint _tier;
 
+    private bool _gunSelected = true;
     private UpgradeMenu _upgradeMenu;
     public event Action<UpgradeMenu> OnMenuSelected;
 
@@ -41,10 +42,11 @@ public class Player : Tank
     private void HandleLevelUp(int level)
     {
         int lastTierLevel = PrefabManager.Instance.GetLastTierLevel(level);
-        if (lastTierLevel > 0 && level > lastTierLevel)
+        if (lastTierLevel > 0 && level > lastTierLevel && !_gunSelected)
         {
             SelectNewRandomGun();
             _upgradeMenu = UpgradeMenu.None;
+            _gunSelected = true;
         }
 
         if (_upgradeMenu == UpgradeMenu.None)
@@ -56,6 +58,7 @@ public class Player : Tank
 
     private void HandleTierUpdated(int tier)
     {
+        _gunSelected = false;
         _upgradeMenu = UpgradeMenu.NewGun;
         OnMenuSelected?.Invoke(_upgradeMenu);
     }
@@ -118,6 +121,7 @@ public class Player : Tank
 
             case UpgradeMenu.NewGun:
                 SelectNewGun(upgrade - 1, Tier);
+                _gunSelected = true;
                 break;
         }
 

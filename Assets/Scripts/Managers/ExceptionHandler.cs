@@ -76,7 +76,7 @@ public class ExceptionHandler : MonoBehaviour
 
             using StreamWriter writer = new(path, true);
             writer.WriteLine(DateTime.Now.ToString("g"));
-            writer.WriteLine("------------------------------------------");
+            writer.WriteLine("-----------------------------------------");
             writer.WriteLine(logString);
             writer.WriteLine(stackTrace);
             writer.WriteLine();

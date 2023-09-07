@@ -10,7 +10,7 @@ public class ObjectsPool : MonoBehaviour
             gameObject.SetActive(false);
     }
 
-    public GameObject GetFromPool(Vector3 newPosition, Quaternion newRotation)
+    public GameObject GetFromPool(Vector3 position, Quaternion rotation)
     {
         GameObject obj = null;
         for (int i = transform.childCount - 1; i >= 0; i--)
@@ -27,7 +27,7 @@ public class ObjectsPool : MonoBehaviour
         if (obj == null)
             obj = Instantiate(_prefab, transform);
 
-        obj.transform.SetPositionAndRotation(newPosition, newRotation);
+        obj.transform.SetPositionAndRotation(position, rotation);
         if (!obj.activeSelf)
             obj.SetActive(true);
 

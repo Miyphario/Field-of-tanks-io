@@ -4,6 +4,8 @@ public class PlayerController : TankController
 {
     public new Player Tank => base.Tank as Player;
 
+    [SerializeField] private GameObject _shootLine;
+
     private Vector2 _moveInput;
     private Vector2 _currentMoveInput;
     public Vector2 MoveInput => _currentMoveInput;
@@ -78,12 +80,16 @@ public class PlayerController : TankController
     private void ShootStart()
     {
         Tank.Gun.ShootStart();
+        if (!_shootLine.activeSelf)
+            _shootLine.SetActive(true);
     }
 
     private void ShootEnd()
     {
         Tank.Gun.ShootEnd();
         _isLooking = false;
+        if (_shootLine.activeSelf)
+            _shootLine.SetActive(false);
     }
 
     private void Look(Vector2 input)
