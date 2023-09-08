@@ -74,6 +74,7 @@ public class Tank : MonoBehaviour
     public void Initialize(int teamID)
     {
         _teamID = teamID;
+        Health = MaxHealth;
     }
 
     public bool TakeDamage(float damage, Tank attacker)
@@ -239,7 +240,6 @@ public class Tank : MonoBehaviour
         FireRate = Constants.DEFAULT_FIRE_RATE;
         BulletSpeed = Constants.DEFAULT_BULLET_SPEED;
         MaxHealth = Constants.DEFAULT_MAX_HEALTH;
-        Health = MaxHealth;
         MaxXP = Constants.DEFAULT_MAX_XP;
         XP = 0;
         _teamID = 0;
@@ -247,11 +247,8 @@ public class Tank : MonoBehaviour
         Level = 0;
         Tier = 0;
 
-        if (_healthbar != null)
-        {
-            _healthbar.SetMaxValue(MaxHealth);
-            _healthbar.SetValue(Health, true);
-        }
+        _healthbar.SetMaxValue(MaxHealth);
+        _healthbar.SetValue(MaxHealth, true);
     }
 
 #if UNITY_EDITOR

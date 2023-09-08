@@ -17,7 +17,7 @@ public class MobileControls : MonoBehaviour
 
     public event Action OnMoveStarted;
     public event Action<Vector2> OnMove;
-    public event Action OnMoveEnded;
+    public event Action<Vector2> OnMoveEnded;
 
     public event Action OnLookStarted;
     public event Action<Vector2> OnLook;
@@ -66,7 +66,7 @@ public class MobileControls : MonoBehaviour
             if (_movementStick.gameObject.activeSelf)
                 _movementStick.gameObject.SetActive(false);
             _movementAmount = Vector2.zero;
-            OnMoveEnded?.Invoke();
+            OnMoveEnded?.Invoke(_movementAmount);
         }
         else if (_lookFinger == finger)
         {

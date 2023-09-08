@@ -16,6 +16,13 @@ public class PlayerController : TankController
 
     private bool _isLooking;
 
+    protected override void Awake()
+    {
+        base.Awake();
+        
+        Tank.OnDestroyed += () => DisabledInput = true;
+    }
+
     protected override void Start()
     {
         base.Start();
@@ -29,7 +36,11 @@ public class PlayerController : TankController
         InputManager.Instance.OnShootStarted += ShootStart;
         InputManager.Instance.OnShootEnded += ShootEnd;
 
-        InputManager.Instance.OnMouseMove += pos => _mousePosition = pos;
+        InputManager.Instance.OnMouseMove += pos => 
+        {
+            if (DisabledInput) return;
+            _mousePosition = pos;
+        };
 
         InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
         InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
@@ -37,11 +48,24 @@ public class PlayerController : TankController
         InputManager.Instance.OnBack += () => Tank.UpgradeMenuBack();
         InputManager.Instance.OnEscape += () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
 
+        GameManager.Instance.OnPauseChanged += pause =>
+        {
+            if (!pause)
+            {
+                DisabledInput = false;
+                return;
+            }
+
+            ShootEnd();
+            Move(Vector2.zero);
+            DisabledInput = true;
+        };
+
         // Mobile controls
         if (Application.isMobilePlatform)
         {
             HUDManager.Instance.MobileControls.OnMove += Move;
-            HUDManager.Instance.MobileControls.OnMoveEnded += () => Move(Vector2.zero);
+            HUDManager.Instance.MobileControls.OnMoveEnded += Move;
 
             HUDManager.Instance.MobileControls.OnLookStarted += ShootStart;
             HUDManager.Instance.MobileControls.OnLook += Look;
@@ -79,6 +103,8 @@ public class PlayerController : TankController
 
     private void ShootStart()
     {
+        if (DisabledInput) return;
+
         Tank.Gun.ShootStart();
         if (!_shootLine.activeSelf)
             _shootLine.SetActive(true);
@@ -86,6 +112,8 @@ public class PlayerController : TankController
 
     private void ShootEnd()
     {
+        if (DisabledInput) return;
+
         Tank.Gun.ShootEnd();
         _isLooking = false;
         if (_shootLine.activeSelf)
@@ -94,12 +122,16 @@ public class PlayerController : TankController
 
     private void Look(Vector2 input)
     {
+        if (DisabledInput) return;
+
         _lookInput = input;
         _isLooking = true;
     }
 
     private void Move(Vector2 input)
     {
+        if (DisabledInput) return;
+
         _moveInput = input;
 
         if (!GameManager.Instance.IsKeyboardControls)

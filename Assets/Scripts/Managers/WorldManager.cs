@@ -7,6 +7,7 @@ using Random = UnityEngine.Random;
 public class WorldManager : MonoBehaviour
 {
     public static WorldManager Instance { get; private set; }
+    [SerializeField] private Vector2 _maxDistanceToCamera;
 
     [SerializeField] private GameObject _playerPrefab;
 
@@ -103,6 +104,19 @@ public class WorldManager : MonoBehaviour
         if ((position.y >= maxY && direction.y > 0f) || (position.y <= -maxY && direction.y < 0f)) direction.y = 0f;
 
         return direction;
+    }
+
+    public Vector2 GetMaxDistanceToCamera(float objectSize)
+    {
+        return new(_maxDistanceToCamera.x + objectSize, _maxDistanceToCamera.y + objectSize);
+    }
+
+    public bool IsFarFromCamera(Vector2 position, float objectSize)
+    {
+        Vector2 camPos = GameManager.Instance.MainCamera.transform.position;
+        Vector2 dist = new(Mathf.Abs(position.x - camPos.x), Mathf.Abs(position.y - camPos.y));
+        Vector2 maxDist = GetMaxDistanceToCamera(objectSize);
+        return dist.x > maxDist.x || dist.y > maxDist.y;
     }
 
     private Vector2 GetRandomSpawnPosition(float objectSize)

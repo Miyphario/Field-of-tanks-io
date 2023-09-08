@@ -39,7 +39,8 @@ public class EnemyController : TankController
     private float _detectEnemyDistance = 12f;
     private float _curDetectEnemyDistance = 12f;
     private float MaxEnemyDistance => _curDetectEnemyDistance + 3f;
-    private float ShootDistance => _curDetectEnemyDistance - 3f;
+    private Vector2 _moveDistance;
+    private Vector2 _shootDistance;
 
     private AIState _state = AIState.Idle;
     private float _retreatHealthPercent = 20f;
@@ -98,6 +99,9 @@ public class EnemyController : TankController
 
         _detectEnemyDistance = Random.Range(10f, 16f);
         _curDetectEnemyDistance = _detectEnemyDistance;
+
+        _moveDistance = new(Random.Range(4f, 12f), Random.Range(1.5f, 3f));
+        _shootDistance = new(_moveDistance.x + 3f, _moveDistance.y + 3f);
         
         DisabledInput = false;
 
@@ -171,25 +175,26 @@ public class EnemyController : TankController
     private IEnumerator LogicIE()
     {
         float waitTime = 0.2f;
+        Vector2 wanderingDistance = new(1, 1);
 
         while (true)
         {
             if (_target == null)
             {
-                Destructible dest = FindDestructible(out float distance);
+                Destructible dest = FindDestructible();
                 if (dest != null)
                 {
                     _lookDirection = transform.position.DirectionToPoint(dest.transform.position);
                     _state = AIState.Wandering;
-                    MoveToPosition(dest.transform.position, ShootDistance - 0.5f);
+                    MoveToPosition(dest.transform.position, _moveDistance);
 
-                    if (distance <= ShootDistance)
+                    if (!IsFarFromPosition(dest.transform.position, _shootDistance))
                         Tank.Gun.Shoot();
                 }
                 else
                 {
                     _state = AIState.Wandering;
-                    yield return MoveToPositionIE(WorldManager.Instance.RandomPointAround(transform.position, 6f, 1f), 1f);
+                    yield return MoveToPositionIE(WorldManager.Instance.RandomPointAround(transform.position, 6f, 1f), wanderingDistance);
                     _state = AIState.Idle;
                     yield return new WaitForSeconds(Random.Range(0.8f, 2f));
                 }
@@ -216,10 +221,10 @@ public class EnemyController : TankController
                 else
                 {
                     _state = AIState.ChaseToTarget;
-                    MoveToPosition(_target.transform.position, ShootDistance - 0.5f);
+                    MoveToPosition(_target.transform.position, _moveDistance);
                 }
 
-                if (_distanceToTarget <= ShootDistance)
+                if (!IsFarFromPosition(_target.transform.position, _shootDistance))
                     Tank.Gun.Shoot();
 
                 if (!_isFlexing)
@@ -250,7 +255,7 @@ public class EnemyController : TankController
             if (_target != null)
             {
                 _distanceToTarget = DistanceToPoint(_target.transform.position);
-                if (_distanceToTarget > MaxEnemyDistance || _target.Health <= 0f)
+                if (_distanceToTarget > MaxEnemyDistance || _target.Health <= 0f || !_target.gameObject.activeSelf)
                 {
                     _target = null;
                     OnTargetChanged?.Invoke(_target);
@@ -294,35 +299,34 @@ public class EnemyController : TankController
         }
     }
 
-    private Destructible FindDestructible(out float distance)
+    private Destructible FindDestructible()
     {
-        distance = -1f;
         Destructible selectedDest = null;
-        float curDist = _curDetectEnemyDistance;
         float curHealth = WorldManager.Instance.Destructibles[0].Health;
         foreach (Destructible dest in WorldManager.Instance.Destructibles)
         {
-            distance = DistanceToPoint(dest.transform.position);
+            float distance = DistanceToPoint(dest.transform.position);
             if (distance > _curDetectEnemyDistance) continue;
 
             if (selectedDest == null || dest.Health < curHealth)
             {
-                curDist = distance;
                 curHealth = dest.Health;
                 selectedDest = dest;
             }
         }
 
-        if (distance > -1f)
-            distance = curDist;
-
         return selectedDest;
     }
 
-    private void MoveToPosition(Vector2 position, float minDistance)
+    private bool IsFarFromPosition(in Vector2 position, in Vector2 minDistance)
     {
-        float distance = Vector2.Distance(transform.position, position);
-        if (distance > minDistance)
+        Vector2 dist = new(Mathf.Abs(position.x - transform.position.x), Mathf.Abs(position.y - transform.position.y));
+        return dist.x > minDistance.x || dist.y > minDistance.y;
+    }
+
+    private void MoveToPosition(in Vector2 position, in Vector2 minDistance)
+    {
+        if (IsFarFromPosition(position, minDistance))
         {
             _moveDirection = transform.position.DirectionToPoint(position);
             _isMoving = true;
@@ -334,9 +338,9 @@ public class EnemyController : TankController
         }
     }
 
-    private IEnumerator MoveToPositionIE(Vector2 position, float minDistance)
+    private IEnumerator MoveToPositionIE(Vector2 position, Vector2 minDistance)
     {
-        while (Vector2.Distance(transform.position, position) > minDistance)
+        while (IsFarFromPosition(position, minDistance))
         {
             _isMoving = true;
             _moveDirection = transform.position.DirectionToPoint(position);
@@ -361,7 +365,26 @@ public class EnemyController : TankController
         if (_state == AIState.ChaseToTarget)
         {
             float ch = Random.Range(0f, 1f);
-            if (ch <= 0.64f)
+            if (_flexDirection == VectorDirection.DOWN)
+            {
+                if (ch <= 0.4f)
+                {
+                    _flexDirection = VectorDirection.LEFT;
+                }
+                else if (ch <= 0.8f)
+                {
+                    _flexDirection = VectorDirection.RIGHT;
+                }
+                else if (ch <= 0.9f)
+                {
+                    _flexDirection = VectorDirection.UP;
+                }
+                else
+                {
+                    _flexDirection = VectorDirection.ZERO;
+                }
+            }
+            else if (ch <= 0.64f)
             {
                 if (ch <= 0.32f)
                 {
@@ -374,26 +397,34 @@ public class EnemyController : TankController
             }
             else
             {
-                if (ch <= 0.86f)
+                if (ch <= 0.8f)
                 {
                     _flexDirection = VectorDirection.DOWN;
                 }
-                else
+                else if (ch <= 0.9f)
                 {
                     _flexDirection = VectorDirection.UP;
+                }
+                else
+                {
+                    _flexDirection = VectorDirection.ZERO;
                 }
             }
         }
         else if (_state == AIState.Retreat)
         {
             float ch = Random.Range(0f, 1f);
-            if (ch <= 0.5f)
+            if (ch <= 0.45f)
             {
                 _flexDirection = VectorDirection.RIGHT;
             }
-            else
+            else if (ch <= 0.9f)
             {
                 _flexDirection = VectorDirection.LEFT;
+            }
+            else
+            {
+                _flexDirection = VectorDirection.ZERO;
             }
         }
     }
@@ -423,7 +454,7 @@ public class EnemyController : TankController
         }
         else
         {
-            Gizmos.DrawRay(transform.position, _lookDirection * ShootDistance);
+            Gizmos.DrawRay(transform.position, _lookDirection * _shootDistance.x);
         }
     }
 }

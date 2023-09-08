@@ -1,10 +1,10 @@
 using System.Collections;
 using UnityEngine;
+using Unity.VisualScripting;
 
 public class Bullet : MonoBehaviour, IPoolable
 {
-    [SerializeField] private float _timeToDestroy = 5f;
-
+    private float _timeToDestroy;
     private float _speed;
     private float _damage;
     private Rigidbody2D _rb;
@@ -27,7 +27,14 @@ public class Bullet : MonoBehaviour, IPoolable
         transform.localScale = new(size, size, size);
         _owner = owner;
         _teamID = owner.TeamID;
-        
+
+        Vector2 maxDist = WorldManager.Instance.GetMaxDistanceToCamera(size);
+        Vector2 curSpd = transform.up * speed;
+        curSpd -= owner.Controller.Velocity;
+        curSpd = curSpd.Abs();
+        Vector2 times = new(maxDist.x / curSpd.x, maxDist.y / curSpd.y);
+        _timeToDestroy = Mathf.Min(times.x, times.y);
+
         StartCoroutine(DestroyIE());
     }
 

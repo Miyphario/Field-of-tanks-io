@@ -62,16 +62,20 @@ public class Destructible : MonoBehaviour
         return false;
     }
 
+    public void Push(Vector3 position, float force)
+    {
+        _rb.AddExplosionForce(force, position, 5f);
+    }
+
     public void Push(Vector3 position)
     {
-        _rb.AddExplosionForce(100f, position, 5f);
+        Push(position, 100f);
     }
 
     private IEnumerator CheckPositionIE()
     {
-        float objectSize = 1f;
-        float maxX = WorldManager.Instance.WorldSize.x / 2f - objectSize;
-        float maxY = WorldManager.Instance.WorldSize.y / 2f - objectSize;
+        float maxX = WorldManager.Instance.WorldSize.x / 2f - transform.localScale.x;
+        float maxY = WorldManager.Instance.WorldSize.y / 2f - transform.localScale.x;
 
         while (true)
         {
@@ -80,31 +84,30 @@ public class Destructible : MonoBehaviour
 
             if (_rb.position.x < -maxX)
             {
-                finalPos.x = _rb.position.x - objectSize;
+                finalPos.x = _rb.position.x - transform.localScale.x;
                 push = true;
             }
             else if (_rb.position.x > maxX)
             {
-                finalPos.x = _rb.position.x + objectSize;
+                finalPos.x = _rb.position.x + transform.localScale.x;
                 push = true;
             }
 
             if (_rb.position.y < -maxY)
             {
-                finalPos.y = _rb.position.y - objectSize;
+                finalPos.y = _rb.position.y - transform.localScale.x;
                 push = true;
             }
             else if (_rb.position.y > maxY)
             {
-                finalPos.y = _rb.position.y + objectSize;
+                finalPos.y = _rb.position.y + transform.localScale.x;
                 push = true;
             }
 
             if (push)
-                Push(finalPos);
+                Push(finalPos, 300f);
 
-            float distToPlayer = Vector2.Distance(transform.position, WorldManager.Instance.HostPlayer.transform.position);
-            if (distToPlayer > HUDManager.Instance.HealthbarRenderDistance)
+            if (WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
             {
                 _healthbar.Disable();
             }

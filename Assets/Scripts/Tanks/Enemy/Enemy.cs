@@ -30,12 +30,12 @@ public class Enemy : Tank, IPoolable
     }
 
     protected override void DestroyMe() => AddToPool();
+
     private IEnumerator CheckDistanceIE()
     {
         while (true)
         {
-            float dist = Vector2.Distance(transform.position, WorldManager.Instance.HostPlayer.transform.position);
-            if (dist > HUDManager.Instance.HealthbarRenderDistance)
+            if (WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
             {
                 _healthbar.Disable();
             }

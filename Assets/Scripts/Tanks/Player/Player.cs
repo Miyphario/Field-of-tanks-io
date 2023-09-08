@@ -70,7 +70,7 @@ public class Player : Tank
 
     public void SelectUpgrade(int upgrade)
     {
-        if (UpgradeCount <= 0) return;
+        if (UpgradeCount <= 0 || Controller.DisabledInput) return;
 
         switch (_upgradeMenu)
         {
@@ -135,6 +135,8 @@ public class Player : Tank
 
     public void UpgradeMenuBack()
     {
+        if (Controller.DisabledInput) return;
+
         if (_upgradeMenu == UpgradeMenu.Gun || _upgradeMenu == UpgradeMenu.Tank)
         {
             _upgradeMenu = UpgradeMenu.Base;

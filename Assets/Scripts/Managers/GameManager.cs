@@ -63,7 +63,7 @@ public class GameManager
 
             if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                break;
+                yield break;
             }
 
             if (Gamepad.current == null)
