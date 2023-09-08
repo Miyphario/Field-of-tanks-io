@@ -1,17 +1,22 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class Tank : MonoBehaviour
 {
     public virtual float MaxHealth { get; protected set; } = Constants.DEFAULT_MAX_HEALTH;
-    public virtual float Health { get; protected set; }
+    public virtual float Health { get; protected set; } = Constants.DEFAULT_MAX_HEALTH;
     public event Action<Tank> OnTakeDamage;
 
     public virtual float Speed { get; protected set; } = Constants.DEFAULT_MOVE_SPEED;
     public virtual float BulletSpeed { get; protected set; } = Constants.DEFAULT_BULLET_SPEED;
     public virtual float Damage { get; protected set; } = Constants.DEFAULT_DAMAGE;
+    public virtual float TouchDamage { get; protected set; } = Constants.DEFAULT_TOUCH_DAMAGE;
     public virtual float FireRate { get; protected set; } = Constants.DEFAULT_FIRE_RATE;
+    private bool _canTouchDamage = true;
+    private readonly float _touchDamageReloadSpeed = 0.6f;
+    private readonly float _touchDamageAngle = 35f;
 
     public TankController Controller { get; protected set; }
 
@@ -39,42 +44,24 @@ public class Tank : MonoBehaviour
     protected virtual void Awake()
     {
         Controller = GetComponent<TankController>();
-        Health = MaxHealth;
         _gun.Initialize(this);
-        InitBar();
-    }
 
-    protected virtual void Start()
-    {
-        /* _healthbar = HUDManager.Instance.CreateHealthbar();
+        _healthbar = HUDManager.Instance.CreateHealthbar();
         bool enableBar = this switch
         {
             Player => true,
             _ => false
         };
-        _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar); */
-        InitBar();
+        _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar);
     }
 
-    // Change this code please
-    private void InitBar()
-    {
-        if (_healthbar == null && HUDManager.Instance != null)
-        {
-            _healthbar = HUDManager.Instance.CreateHealthbar();
-            bool enableBar = this switch
-            {
-                Player => true,
-                _ => false
-            };
-            _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar);
-        }
-    }
+    protected virtual void Start() { }
 
     public void Initialize(int teamID)
     {
         _teamID = teamID;
         Health = MaxHealth;
+        _canTouchDamage = true;
     }
 
     public bool TakeDamage(float damage, Tank attacker)
@@ -184,6 +171,10 @@ public class Tank : MonoBehaviour
             case UpgradeType.Speed:
                 Speed = Mathf.Clamp(Speed + Constants.SPEED_PER_LEVEL, 0, Constants.MAX_SPEED);
                 break;
+
+            case UpgradeType.TouchDamage:
+                TouchDamage = Mathf.Clamp(TouchDamage + Constants.TOUCH_DAMAGE_PER_LEVEL, 0, Constants.MAX_DAMAGE);
+                break;
         }
 
         _upgradeCount--;
@@ -235,20 +226,59 @@ public class Tank : MonoBehaviour
     {
         UpdateWeapon(PrefabManager.Instance.DefaultGun);
 
+        MaxXP = Constants.DEFAULT_MAX_XP;
         Damage = Constants.DEFAULT_DAMAGE;
         Speed = Constants.DEFAULT_MOVE_SPEED;
         FireRate = Constants.DEFAULT_FIRE_RATE;
-        BulletSpeed = Constants.DEFAULT_BULLET_SPEED;
         MaxHealth = Constants.DEFAULT_MAX_HEALTH;
-        MaxXP = Constants.DEFAULT_MAX_XP;
-        XP = 0;
-        _teamID = 0;
+        BulletSpeed = Constants.DEFAULT_BULLET_SPEED;
+        TouchDamage = Constants.DEFAULT_TOUCH_DAMAGE;
         _upgradeCount = 0;
+        _teamID = 0;
         Level = 0;
         Tier = 0;
+        XP = 0;
 
         _healthbar.SetMaxValue(MaxHealth);
         _healthbar.SetValue(MaxHealth, true);
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (!_canTouchDamage || Controller.DisabledInput) return;
+
+        bool canDamage(Vector3 position)
+        {
+            Vector3 targetDir = position - transform.position;
+            float angle = Vector2.Angle(targetDir, transform.up);
+            return angle <= _touchDamageAngle;
+        }
+
+        if (col.collider.TryGetComponent<Tank>(out var tank))
+        {
+            if (canDamage(tank.transform.position))
+                tank.TakeDamage(TouchDamage);
+            else
+                return;
+        }
+        else if (col.collider.TryGetComponent<Destructible>(out var dest))
+        {
+            if (canDamage(dest.transform.position))
+                dest.TakeDamage(TouchDamage, this);
+            else
+                return;
+        }
+        else
+            return;
+
+        _canTouchDamage = false;
+        StartCoroutine(ReloadTouchDamageIE());
+    }
+
+    private IEnumerator ReloadTouchDamageIE()
+    {
+        yield return new WaitForSeconds(_touchDamageReloadSpeed);
+        _canTouchDamage = true;
     }
 
 #if UNITY_EDITOR

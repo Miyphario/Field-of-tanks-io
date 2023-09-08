@@ -29,7 +29,7 @@ public class UpgradesUI : MonoBehaviour
 
     public void Initialize()
     {
-        WorldManager.Instance.HostPlayer.OnMenuSelected += HandlePlayerMenuSelected;
+        WorldManager.Instance.OnPlayerCreated += player => player.OnMenuSelected += HandlePlayerMenuSelected;
 
         _firstButtonText = _firstUpgradeButton.GetComponentInChildren<TextMeshProUGUI>();
         _secondButtonText = _secondUpgradeButton.GetComponentInChildren<TextMeshProUGUI>();
@@ -71,7 +71,10 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonImage.sprite = _speedSprite;
                 _secondButtonText.text = "Speed";
 
-                SetActiveButtons(2);
+                _thirdButtonImage.sprite = _damageSprite;
+                _thirdButtonText.text = "Damage";
+
+                SetActiveButtons(3);
                 SetBackButtonActive(true);
                 break;
 

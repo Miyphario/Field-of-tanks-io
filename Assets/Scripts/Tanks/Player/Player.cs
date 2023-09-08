@@ -9,6 +9,7 @@ public class Player : Tank
     public override float Health { get => _health; protected set => _health = value; }
     public override float Speed { get => _speed; protected set => _speed = value; }
     public override float Damage { get => _damage; protected set => _damage = value; }
+    public override float TouchDamage { get => _touchDamage; protected set => _touchDamage = value; }
     public override float FireRate { get => _fireRate; protected set => _fireRate = value; }
     public new PlayerController Controller => base.Controller as PlayerController;
 
@@ -22,6 +23,7 @@ public class Player : Tank
     private sfloat _speed = Constants.DEFAULT_MOVE_SPEED;
     private sfloat _damage = Constants.DEFAULT_DAMAGE;
     private sfloat _fireRate = Constants.DEFAULT_FIRE_RATE;
+    private sfloat _touchDamage = Constants.DEFAULT_TOUCH_DAMAGE;
 
     private sint _xp;
     private sint _maxXp = Constants.DEFAULT_MAX_XP;
@@ -98,6 +100,10 @@ public class Player : Tank
 
                     case 2:
                         Upgrade(UpgradeType.Speed);
+                        break;
+                    
+                    case 3:
+                        Upgrade(UpgradeType.TouchDamage);
                         break;
                 }
                 break;

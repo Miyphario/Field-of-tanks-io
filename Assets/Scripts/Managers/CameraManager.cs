@@ -6,8 +6,11 @@ public class CameraManager : MonoBehaviour
 
     public void Initialize()
     {
-        transform.position = WorldManager.Instance.HostPlayer.transform.position;
-        _initialized = true;
+        WorldManager.Instance.OnPlayerCreated += player =>
+        {
+            transform.position = WorldManager.Instance.HostPlayer.transform.position;
+            _initialized = true;
+        };
     }
 
     private void FixedUpdate()

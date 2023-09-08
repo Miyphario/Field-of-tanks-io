@@ -1,12 +1,38 @@
 using System;
-/*
+
 public static class NumToString
 {
     public const float SECONDS_IN_DAY = 86400f;
     public const float SECONDS_IN_HOUR = 3600f;
     public const float SECONDS_IN_MINUTE = 60f;
 
-    public static string GetReducedTime(float timeInSec)
+    public static string GetShortFloat(float num, int maxFloatNums)
+    {
+        string returnZero()
+        {
+            return num.ToString("f0");
+        }
+
+        if (maxFloatNums <= 0)
+            return returnZero();
+
+        float t = (float)(num - Math.Truncate(num));
+        if (t == 0f)
+        {
+            return returnZero();
+        }
+        else
+        {
+            return num.ToString($"f{maxFloatNums}");
+        }
+    }
+
+    public static string GetShortFloat(float num)
+    {
+        return GetShortFloat(num, 2);
+    }
+
+    /* public static string GetReducedTime(float timeInSec)
     {
         string time = "";
         switch (timeInSec)
@@ -108,6 +134,5 @@ public static class NumToString
 
         time += addNum.ToString("n" + maxNums) + suffix;
         return time;
-    }
+    } */
 }
-*/

@@ -91,13 +91,13 @@ public class EnemyController : TankController
 
     public void Initialize()
     {
-        _accuracy = Random.Range(0.1f, 2.5f);
+        _accuracy = Random.Range(0.1f, 3f);
         _minRotationSpeed = Random.Range(100f, 200f);
         _maxRotationSpeed = Random.Range(200f, 300f) + _minRotationSpeed;
 
         _retreatHealthPercent = Random.Range(10f, 35f);
 
-        _detectEnemyDistance = Random.Range(10f, 16f);
+        _detectEnemyDistance = Random.Range(11f, 18f);
         _curDetectEnemyDistance = _detectEnemyDistance;
 
         _moveDistance = new(Random.Range(4f, 12f), Random.Range(1.5f, 3f));
@@ -273,7 +273,7 @@ public class EnemyController : TankController
             float curDist = _curDetectEnemyDistance;
             foreach (Tank tank in WorldManager.Instance.Tanks)
             {
-                if (tank.TeamID == Tank.TeamID || tank == Tank || tank.Health <= 0f) continue;
+                if (tank.TeamID == Tank.TeamID || tank == Tank || tank.Health <= 0f || !tank.gameObject.activeSelf) continue;
                 if (tank == _target) continue;
 
                 dist = DistanceToPoint(tank.transform.position);

@@ -11,7 +11,8 @@ public enum UpgradeType
     BulletSpeed,
     Speed,
     FireRate,
-    MaxHealth
+    MaxHealth,
+    TouchDamage
 }
 
 public enum AIState

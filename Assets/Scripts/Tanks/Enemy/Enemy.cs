@@ -20,12 +20,11 @@ public class Enemy : Tank, IPoolable
         base.Start();
     }
 
-    public void Initialize(int teamID, int startLevel)
+    public new void Initialize(int teamID)
     {
         _isAlive = true;
-        Initialize(teamID);
+        base.Initialize(teamID);
         Controller.Initialize();
-        AddLevel(startLevel);
         StartCoroutine(CheckDistanceIE());
     }
 
@@ -55,25 +54,36 @@ public class Enemy : Tank, IPoolable
 
     private void HandleLevelUp(int level)
     {
+        UpgradeType[] otherUpgrades = new UpgradeType[]
+        {
+            UpgradeType.Speed,
+            UpgradeType.BulletSpeed
+        };
+
         while (UpgradeCount > 0)
         {
             float rand = Random.Range(0f, 100f);
             switch (rand)
             {
+                case var _ when rand <= 15f:
+                    Upgrade(UpgradeType.Damage);
+                    break;
+                
+                case var _ when rand <= 30f:
+                    Upgrade(UpgradeType.TouchDamage);
+                    break;
+
+                case var _ when rand <= 45f:
+                    Upgrade(UpgradeType.MaxHealth);
+                    break;
+
                 case var _ when rand <= 60f:
-                    Upgrade(UpgradeType.Speed);
-                    break;
-
-                case var _ when rand <= 35f:
-                    Upgrade(UpgradeType.BulletSpeed);
-                    break;
-
-                case var _ when rand <= 20f:
                     Upgrade(UpgradeType.FireRate);
                     break;
 
                 default:
-                    Upgrade(UpgradeType.Damage);
+                    int r = Random.Range(0, otherUpgrades.Length);
+                    Upgrade(otherUpgrades[r]);
                     break;
             }
         }

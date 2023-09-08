@@ -10,6 +10,7 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private Vector2 _maxDistanceToCamera;
 
     [SerializeField] private GameObject _playerPrefab;
+    public event Action<Player> OnPlayerCreated;
 
     public Player HostPlayer { get; private set; }
 
@@ -45,13 +46,15 @@ public class WorldManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-
-        HostPlayer = Instantiate(_playerPrefab, GetRandomSpawnPosition(1f), Quaternion.identity).GetComponent<Player>();
-        _tanks.Add(HostPlayer);
     }
 
     private void Start()
     {
+        HostPlayer = Instantiate(_playerPrefab, GetRandomSpawnPosition(1f), Quaternion.identity).GetComponent<Player>();
+        HostPlayer.Initialize(0);
+        _tanks.Add(HostPlayer);
+        OnPlayerCreated?.Invoke(HostPlayer);
+
         StartCoroutine(EnemySpawningIE());
         StartCoroutine(DestructibleSpawningIE());
     }
@@ -156,7 +159,8 @@ public class WorldManager : MonoBehaviour
                 {
                     startLevel = Random.Range(0, HostPlayer.Level + 6);
                 }
-                tank.Initialize(teamId, startLevel);
+                tank.Initialize(teamId);
+                tank.AddLevel(startLevel);
                 tank.OnDestroyed += () => _tanks.Remove(tank);
 
                 yield return new WaitForSeconds(Random.Range(0.25f, 1f));
