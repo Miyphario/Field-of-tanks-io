@@ -3,7 +3,8 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Bushes
   layers:
   - Default
   - TransparentFX
@@ -46,6 +47,9 @@ TagManager:
     locked: 0
   - name: Tank
     uniqueID: 1002355325
+    locked: 0
+  - name: Bushes
+    uniqueID: 1631416381
     locked: 0
   - name: Particles
     uniqueID: 2948279177

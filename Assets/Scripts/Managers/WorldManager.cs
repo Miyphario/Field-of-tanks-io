@@ -29,13 +29,18 @@ public class WorldManager : MonoBehaviour
     private int _curTeamID = 0;
     public Gamemode Gamemode { get; private set; } = Gamemode.Deathmath;
 
-    [SerializeField, Header("Pools")]
-    private ObjectsPool _enemiesPool;
+    [Header("Pools")]
+    [SerializeField] private ObjectsPool _enemiesPool;
     public ObjectsPool EnemiesPool => _enemiesPool;
     [SerializeField] private ObjectsPool _bulletsPool;
     public ObjectsPool BulletsPool => _bulletsPool;
     [SerializeField] private ObjectsPool _destructiblesPool;
     public ObjectsPool DestructiblesPool => _destructiblesPool;
+
+    [Header("Bushes")]
+    [SerializeField] private GameObject _bushesPrefab;
+    [SerializeField] private Transform _bushesParent;
+    [SerializeField] private float _maxBushes;
 
     public void Initialize()
     {
@@ -57,6 +62,7 @@ public class WorldManager : MonoBehaviour
         _tanks.Add(HostPlayer);
         OnPlayerCreated?.Invoke(HostPlayer);
 
+        StartCoroutine(SpawnBushesIE());
         StartCoroutine(EnemySpawningIE());
         StartCoroutine(DestructibleSpawningIE());
     }
@@ -196,6 +202,26 @@ public class WorldManager : MonoBehaviour
                 dest.OnDestroyed += () => _destructibles.Remove(dest);
 
                 yield return new WaitForSeconds(Random.Range(1f, 1.5f));
+            }
+        }
+    }
+
+    private IEnumerator SpawnBushesIE()
+    {
+        int curBush = 0;
+        while (curBush < _maxBushes)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                Vector2 spawnPos = GetRandomSpawnPosition(1f);
+                Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+                float size = Random.Range(1.75f, 2.2f);
+                GameObject go = Instantiate(_bushesPrefab, spawnPos, spawnRot, _bushesParent);
+                go.transform.localScale = new(size, size, size);
+                go.SetActive(true);
+                curBush++;
+
+                if (curBush >= _maxBushes) yield break;
             }
         }
     }

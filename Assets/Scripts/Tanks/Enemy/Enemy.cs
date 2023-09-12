@@ -13,6 +13,7 @@ public class Enemy : Tank, IPoolable
         base.Awake();
         OnLevelUp += HandleLevelUp;
         OnTierUpdated += HandleTierUpdated;
+        OnInvisible += HandleInvisible;
     }
 
     protected override void Start()
@@ -34,13 +35,16 @@ public class Enemy : Tank, IPoolable
     {
         while (true)
         {
-            if (WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
+            if (!IsInvisible)
             {
-                _healthbar.Disable();
-            }
-            else
-            {
-                _healthbar.Enable();
+                if (WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
+                {
+                    _healthbar.Disable();
+                }
+                else
+                {
+                    _healthbar.Enable();
+                }
             }
 
             yield return new WaitForSeconds(Constants.HEALTHBAR_RENDER_TIME);
@@ -95,5 +99,20 @@ public class Enemy : Tank, IPoolable
         WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
         ResetToDefault();
         _isAlive = false;
+    }
+
+    private void HandleInvisible(bool invisible)
+    {
+        if (invisible)
+        {
+            _healthbar.Disable();
+        }
+        else
+        {
+            if (!WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
+            {
+                _healthbar.Enable();
+            }
+        }
     }
 }

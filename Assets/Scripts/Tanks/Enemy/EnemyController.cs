@@ -38,6 +38,7 @@ public class EnemyController : TankController
 
     private float _detectEnemyDistance = 12f;
     private float _curDetectEnemyDistance = 12f;
+    private float _detectInvisibleDistance = 3f;
     private float MaxEnemyDistance => _curDetectEnemyDistance + 3f;
     private Vector2 _moveDistance;
     private Vector2 _shootDistance;
@@ -99,6 +100,7 @@ public class EnemyController : TankController
 
         _detectEnemyDistance = Random.Range(11f, 18f);
         _curDetectEnemyDistance = _detectEnemyDistance;
+        _detectInvisibleDistance = Random.Range(2f, 4f);
 
         _moveDistance = new(Random.Range(4f, 12f), Random.Range(1.5f, 3f));
         _shootDistance = new(_moveDistance.x + 3f, _moveDistance.y + 3f);
@@ -281,8 +283,12 @@ public class EnemyController : TankController
 
                 if (_target != null)
                     if (dist > minDistance) continue;
-
-                if (dist < curDist)
+                
+                if (tank.IsInvisible && !tank.Gun.IsShooting)
+                {
+                    if (dist > _detectInvisibleDistance) continue;
+                }
+                else if (dist < curDist)
                 {
                     curDist = dist;
                     tar = tank;

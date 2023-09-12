@@ -48,8 +48,8 @@ public class PlayerController : TankController
 
         InputManager.Instance.OnMouseMove += MouseMove;
 
-        InputManager.Instance.OnFirstUpgrade += () => Tank.TakeDamage(Tank.MaxHealth); // Tank.SelectUpgrade(1);
-        InputManager.Instance.OnSecondUpgrade += () => Tank.AddLevel(); //Tank.SelectUpgrade(2);
+        InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
+        InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
         InputManager.Instance.OnThirdUpgrade += () => Tank.SelectUpgrade(3);
         InputManager.Instance.OnBack += () => Tank.UpgradeMenuBack();
         InputManager.Instance.OnEscape += () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
@@ -83,8 +83,8 @@ public class PlayerController : TankController
 
         InputManager.Instance.OnMouseMove -= MouseMove;
 
-        InputManager.Instance.OnFirstUpgrade -= () => Tank.TakeDamage(Tank.MaxHealth); // Tank.SelectUpgrade(1);
-        InputManager.Instance.OnSecondUpgrade -= () => Tank.AddLevel(); //Tank.SelectUpgrade(2);
+        InputManager.Instance.OnFirstUpgrade -= () => Tank.SelectUpgrade(1);
+        InputManager.Instance.OnSecondUpgrade -= () => Tank.SelectUpgrade(2);
         InputManager.Instance.OnThirdUpgrade -= () => Tank.SelectUpgrade(3);
         InputManager.Instance.OnBack -= () => Tank.UpgradeMenuBack();
         InputManager.Instance.OnEscape -= () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;

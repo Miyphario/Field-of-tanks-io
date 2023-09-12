@@ -41,6 +41,10 @@ public class Tank : MonoBehaviour
 
     protected BarUI _healthbar;
 
+    private bool _isInvisible;
+    public bool IsInvisible => _isInvisible;
+    public event Action<bool> OnInvisible;
+
     protected virtual void Awake()
     {
         Controller = GetComponent<TankController>();
@@ -305,6 +309,24 @@ public class Tank : MonoBehaviour
 
         _canTouchDamage = false;
         StartCoroutine(ReloadTouchDamageIE());
+    }
+    
+    private void OnTriggerEnter2D(Collider2D col)
+    {
+        if (col.CompareTag("Bushes"))
+        {
+            _isInvisible = true;
+            OnInvisible?.Invoke(_isInvisible);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D col)
+    {
+        if (col.CompareTag("Bushes"))
+        {
+            _isInvisible = false;
+            OnInvisible?.Invoke(_isInvisible);
+        }
     }
 
     private IEnumerator ReloadTouchDamageIE()
