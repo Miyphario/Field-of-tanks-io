@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Threading;
 using UnityEngine;
 using sfloat = SafeFloat;
 using sint = SafeInt;
@@ -95,14 +97,17 @@ public class Player : Tank
                 switch (upgrade)
                 {
                     case 1:
+                        if (!CanUpgrade(UpgradeType.MaxHealth)) return;
                         Upgrade(UpgradeType.MaxHealth);
                         break;
 
                     case 2:
+                        if (!CanUpgrade(UpgradeType.Speed)) return;
                         Upgrade(UpgradeType.Speed);
                         break;
                     
                     case 3:
+                        if (!CanUpgrade(UpgradeType.TouchDamage)) return;
                         Upgrade(UpgradeType.TouchDamage);
                         break;
                 }
@@ -112,14 +117,17 @@ public class Player : Tank
                 switch (upgrade)
                 {
                     case 1:
+                        if (!CanUpgrade(UpgradeType.Damage)) return;
                         Upgrade(UpgradeType.Damage);
                         break;
 
                     case 2:
+                        if (!CanUpgrade(UpgradeType.FireRate)) return;
                         Upgrade(UpgradeType.FireRate);
                         break;
 
                     case 3:
+                        if (!CanUpgrade(UpgradeType.BulletSpeed)) return;
                         Upgrade(UpgradeType.BulletSpeed);
                         break;
                 }

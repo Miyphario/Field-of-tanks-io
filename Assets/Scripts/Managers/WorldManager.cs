@@ -46,6 +46,8 @@ public class WorldManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        GameManager.Instance.OnGameRestarting += Restart;
     }
 
     private void Start()
@@ -57,6 +59,11 @@ public class WorldManager : MonoBehaviour
 
         StartCoroutine(EnemySpawningIE());
         StartCoroutine(DestructibleSpawningIE());
+    }
+
+    private void Restart()
+    {
+        StopAllCoroutines();
     }
 
     //public void StartHost()

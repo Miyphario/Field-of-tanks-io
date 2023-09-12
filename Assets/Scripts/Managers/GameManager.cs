@@ -34,6 +34,8 @@ public class GameManager
     private bool _isPaused;
 
     public event Action<bool> OnPauseChanged;
+    public event Action OnGameRestarting;
+    public bool GameRestarting { get; private set; }
 
     public GameManager()
     {
@@ -50,8 +52,22 @@ public class GameManager
         }
     }
 
+    public void RestartScene(float time)
+    {
+        GameRestarting = true;
+        OnGameRestarting?.Invoke();
+        InputManager.Instance.Disable();
+        Bootstrap.Instance.StartCoroutine(RestartSceneIE(time));
+    }
+
     public void RestartScene()
     {
+        RestartScene(0);
+    }
+
+    private IEnumerator RestartSceneIE(float time)
+    {
+        yield return new WaitForSeconds(time);
         SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().buildIndex);
     }
 

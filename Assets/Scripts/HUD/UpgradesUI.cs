@@ -46,6 +46,8 @@ public class UpgradesUI : MonoBehaviour
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
     {
+        Player pl = WorldManager.Instance.HostPlayer;
+
         switch (menu)
         {
             case UpgradeMenu.None:
@@ -56,9 +58,11 @@ public class UpgradesUI : MonoBehaviour
             case UpgradeMenu.Base:
                 _firstButtonImage.sprite = _tankSprite;
                 _firstButtonText.text = "Tank";
+                _firstUpgradeButton.interactable = true;
 
                 _secondButtonImage.sprite = _gunSprite;
                 _secondButtonText.text = "Gun";
+                _secondUpgradeButton.interactable = true;
 
                 SetActiveButtons(2);
                 SetBackButtonActive(false);
@@ -66,13 +70,40 @@ public class UpgradesUI : MonoBehaviour
 
             case UpgradeMenu.Tank:
                 _firstButtonImage.sprite = _healthSprite;
-                _firstButtonText.text = "Health";
+                if (pl.CanUpgrade(UpgradeType.MaxHealth))
+                {
+                    _firstUpgradeButton.interactable = true;
+                    _firstButtonText.text = "Health";
+                }
+                else
+                {
+                    _firstUpgradeButton.interactable = false;
+                    _firstButtonText.text = "MAX";
+                }
 
                 _secondButtonImage.sprite = _speedSprite;
-                _secondButtonText.text = "Speed";
+                if (pl.CanUpgrade(UpgradeType.Speed))
+                {
+                    _secondUpgradeButton.interactable = true;
+                    _secondButtonText.text = "Speed";
+                }
+                else
+                {
+                    _secondUpgradeButton.interactable = false;
+                    _secondButtonText.text = "MAX";
+                }
 
                 _thirdButtonImage.sprite = _damageSprite;
-                _thirdButtonText.text = "Damage";
+                if (pl.CanUpgrade(UpgradeType.TouchDamage))
+                {
+                    _thirdUpgradeButton.interactable = true;
+                    _thirdButtonText.text = "Damage";
+                }
+                else
+                {
+                    _thirdUpgradeButton.interactable = false;
+                    _thirdButtonText.text = "MAX";
+                }
 
                 SetActiveButtons(3);
                 SetBackButtonActive(true);
@@ -80,13 +111,40 @@ public class UpgradesUI : MonoBehaviour
 
             case UpgradeMenu.Gun:
                 _firstButtonImage.sprite = _damageSprite;
-                _firstButtonText.text = "Damage";
+                if (pl.CanUpgrade(UpgradeType.Damage))
+                {
+                    _firstUpgradeButton.interactable = true;
+                    _firstButtonText.text = "Damage";
+                }
+                else
+                {
+                    _firstUpgradeButton.interactable = false;
+                    _firstButtonText.text = "MAX";
+                }
 
                 _secondButtonImage.sprite = _fireRateSprite;
-                _secondButtonText.text = "Fire Rate";
+                if (pl.CanUpgrade(UpgradeType.FireRate))
+                {
+                    _secondUpgradeButton.interactable = true;
+                    _secondButtonText.text = "Fire Rate";
+                }
+                else
+                {
+                    _secondUpgradeButton.interactable = false;
+                    _secondButtonText.text = "MAX";
+                }
 
                 _thirdButtonImage.sprite = _bulletSpeedSprite;
-                _thirdButtonText.text = "Bullet Speed";
+                if (pl.CanUpgrade(UpgradeType.BulletSpeed))
+                {
+                    _thirdUpgradeButton.interactable = true;
+                    _thirdButtonText.text = "Bullet Speed";
+                }
+                else
+                {
+                    _thirdUpgradeButton.interactable = false;
+                    _thirdButtonText.text = "MAX";
+                }
 
                 SetActiveButtons(3);
                 SetBackButtonActive(true);
@@ -98,9 +156,11 @@ public class UpgradesUI : MonoBehaviour
 
                 _firstButtonImage.sprite = guns[0].GetComponent<Gun>().UISprite;
                 _firstButtonText.text = "";
+                _firstUpgradeButton.interactable = true;
 
                 _secondButtonImage.sprite = guns[1].GetComponent<Gun>().UISprite;
                 _secondButtonText.text = "";
+                _secondUpgradeButton.interactable = true;
 
                 SetActiveButtons(2);
                 SetBackButtonActive(false);

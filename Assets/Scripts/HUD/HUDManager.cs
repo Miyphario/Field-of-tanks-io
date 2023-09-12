@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class HUDManager : MonoBehaviour
 {
@@ -7,8 +6,6 @@ public class HUDManager : MonoBehaviour
     public static HUDManager Instance { get; private set; }
     public RectTransform CanvasRect => _canvasRect;
     public float HealthbarRenderDistance => GameManager.Instance.MainCamera.orthographicSize + 10f;
-    public const float HEALTHBAR_RENDER_TIME = 1.5f;
-
     [SerializeField] private RectTransform _canvasRect;
     [SerializeField, Header("Bars")] private RectTransform _tankBarsTransform;
     [SerializeField] private RectTransform _destructibleBarsTransform;

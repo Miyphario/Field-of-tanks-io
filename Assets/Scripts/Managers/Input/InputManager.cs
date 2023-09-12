@@ -1,6 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.EnhancedTouch;
 
 public class InputManager
@@ -55,8 +54,6 @@ public class InputManager
 
         _controls.Player.Back.canceled += ctx => OnBack?.Invoke();
         _controls.Player.Escape.canceled += ctx => OnEscape?.Invoke();
-
-        Enable();
     }
 
     private void FingerDown(Finger finger)

@@ -13,7 +13,8 @@ public class Destructible : MonoBehaviour
     private int _minRewardXp;
     [SerializeField] private int _maxRewardXp;
     private int _rewardXp;
-    [SerializeField, Header("Health Restore")] private float _minHealthRestore;
+    [SerializeField, Header("Health Restore")]
+    private float _minHealthRestore;
     [SerializeField] private float _maxHealthRestore;
     private float _healthRestore;
 
@@ -116,7 +117,7 @@ public class Destructible : MonoBehaviour
                 _healthbar.Enable();
             }
 
-            yield return new WaitForSeconds(HUDManager.HEALTHBAR_RENDER_TIME);
+            yield return new WaitForSeconds(Constants.HEALTHBAR_RENDER_TIME);
         }
     }
 

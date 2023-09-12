@@ -1,6 +1,4 @@
-using System.Collections;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerInfoUI : MonoBehaviour
@@ -42,7 +40,7 @@ public class PlayerInfoUI : MonoBehaviour
             _lastFrameRate = _frameCounter/_timeCounter;
             _frameCounter = 0;
             _timeCounter = 0;
-            _gameInfo.text = "fps: " + ((int)_lastFrameRate);
+            _gameInfo.text = "fps: " + Mathf.RoundToInt(_lastFrameRate);
         }
     }
 

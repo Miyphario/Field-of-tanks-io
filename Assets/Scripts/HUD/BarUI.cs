@@ -64,7 +64,6 @@ public class BarUI : MonoBehaviour
     public void Disable()
     {
         if (!gameObject.activeSelf) return;
-
         gameObject.SetActive(false);
     }
 

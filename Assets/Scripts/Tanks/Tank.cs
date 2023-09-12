@@ -16,7 +16,7 @@ public class Tank : MonoBehaviour
     public virtual float FireRate { get; protected set; } = Constants.DEFAULT_FIRE_RATE;
     private bool _canTouchDamage = true;
     private readonly float _touchDamageReloadSpeed = 0.6f;
-    private readonly float _touchDamageAngle = 35f;
+    private readonly float _touchDamageAngle = 40f;
 
     public TankController Controller { get; protected set; }
 
@@ -140,6 +140,38 @@ public class Tank : MonoBehaviour
     public void AddLevel()
     {
         AddLevel(1);
+    }
+
+    public bool CanUpgrade(UpgradeType upgradeType)
+    {
+        switch (upgradeType)
+        {
+            case UpgradeType.Damage:
+                if (Damage < Constants.MAX_DAMAGE) return true;
+                break;
+
+            case UpgradeType.FireRate:
+                if (FireRate > Constants.MIN_FIRE_RATE) return true;
+                break;
+
+            case UpgradeType.BulletSpeed:
+                if (BulletSpeed < Constants.MAX_SPEED) return true;
+                break;
+
+            case UpgradeType.Speed:
+                if (Speed < Constants.MAX_SPEED) return true;
+                break;
+
+            case UpgradeType.MaxHealth:
+                if (MaxHealth < Constants.MAX_HEALTH) return true;
+                break;
+
+            case UpgradeType.TouchDamage:
+                if (TouchDamage < Constants.MAX_DAMAGE) return true;
+                break;
+        }
+
+        return false;
     }
 
     public void Upgrade(UpgradeType upgradeType)

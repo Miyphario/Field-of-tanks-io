@@ -21,12 +21,22 @@ public class PlayerController : TankController
         base.Awake();
         
         Tank.OnDestroyed += () => DisabledInput = true;
+        GameManager.Instance.OnPauseChanged += HandlePauseToggled;
+        GameManager.Instance.OnGameRestarting += () => 
+        {
+            StopInput();
+            HandlePauseToggled(true);
+        };
     }
 
     protected override void Start()
     {
         base.Start();
+        StartInput();
+    }
 
+    private void StartInput()
+    {
         InputManager.Instance.OnMove += Move;
 
         InputManager.Instance.OnLookStarted += ShootStart;
@@ -36,30 +46,13 @@ public class PlayerController : TankController
         InputManager.Instance.OnShootStarted += ShootStart;
         InputManager.Instance.OnShootEnded += ShootEnd;
 
-        InputManager.Instance.OnMouseMove += pos => 
-        {
-            if (DisabledInput) return;
-            _mousePosition = pos;
-        };
+        InputManager.Instance.OnMouseMove += MouseMove;
 
-        InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
-        InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
+        InputManager.Instance.OnFirstUpgrade += () => Tank.TakeDamage(Tank.MaxHealth); // Tank.SelectUpgrade(1);
+        InputManager.Instance.OnSecondUpgrade += () => Tank.AddLevel(); //Tank.SelectUpgrade(2);
         InputManager.Instance.OnThirdUpgrade += () => Tank.SelectUpgrade(3);
         InputManager.Instance.OnBack += () => Tank.UpgradeMenuBack();
         InputManager.Instance.OnEscape += () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
-
-        GameManager.Instance.OnPauseChanged += pause =>
-        {
-            if (!pause)
-            {
-                DisabledInput = false;
-                return;
-            }
-
-            ShootEnd();
-            Move(Vector2.zero);
-            DisabledInput = true;
-        };
 
         // Mobile controls
         if (Application.isMobilePlatform)
@@ -70,6 +63,41 @@ public class PlayerController : TankController
             HUDManager.Instance.MobileControls.OnLookStarted += ShootStart;
             HUDManager.Instance.MobileControls.OnLook += Look;
             HUDManager.Instance.MobileControls.OnLookEnded += ShootEnd;
+        }
+
+        InputManager.Instance.Enable();
+    }
+
+    private void StopInput()
+    {
+        InputManager.Instance.Disable();
+
+        InputManager.Instance.OnMove -= Move;
+
+        InputManager.Instance.OnLookStarted -= ShootStart;
+        InputManager.Instance.OnLook -= Look;
+        InputManager.Instance.OnLookEnded -= ShootEnd;
+
+        InputManager.Instance.OnShootStarted -= ShootStart;
+        InputManager.Instance.OnShootEnded -= ShootEnd;
+
+        InputManager.Instance.OnMouseMove -= MouseMove;
+
+        InputManager.Instance.OnFirstUpgrade -= () => Tank.TakeDamage(Tank.MaxHealth); // Tank.SelectUpgrade(1);
+        InputManager.Instance.OnSecondUpgrade -= () => Tank.AddLevel(); //Tank.SelectUpgrade(2);
+        InputManager.Instance.OnThirdUpgrade -= () => Tank.SelectUpgrade(3);
+        InputManager.Instance.OnBack -= () => Tank.UpgradeMenuBack();
+        InputManager.Instance.OnEscape -= () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
+
+        // Mobile controls
+        if (Application.isMobilePlatform)
+        {
+            HUDManager.Instance.MobileControls.OnMove -= Move;
+            HUDManager.Instance.MobileControls.OnMoveEnded -= Move;
+
+            HUDManager.Instance.MobileControls.OnLookStarted -= ShootStart;
+            HUDManager.Instance.MobileControls.OnLook -= Look;
+            HUDManager.Instance.MobileControls.OnLookEnded -= ShootEnd;
         }
     }
 
@@ -140,5 +168,24 @@ public class PlayerController : TankController
                 if (!_isLooking)
                     _lookInput = _moveInput;
         }
+    }
+
+    private void MouseMove(Vector2 position)
+    {
+        if (DisabledInput) return;
+        _mousePosition = position;
+    }
+
+    private void HandlePauseToggled(bool pause)
+    {
+        if (!pause)
+        {
+            DisabledInput = false;
+            return;
+        }
+
+        ShootEnd();
+        Move(Vector2.zero);
+        DisabledInput = true;
     }
 }

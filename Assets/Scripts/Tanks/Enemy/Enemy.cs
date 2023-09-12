@@ -43,7 +43,7 @@ public class Enemy : Tank, IPoolable
                 _healthbar.Enable();
             }
 
-            yield return new WaitForSeconds(HUDManager.HEALTHBAR_RENDER_TIME);
+            yield return new WaitForSeconds(Constants.HEALTHBAR_RENDER_TIME);
         }
     }
 
