@@ -52,7 +52,7 @@ public class WorldManager : MonoBehaviour
             return;
         }
 
-        GameManager.Instance.OnGameRestarting += Restart;
+        GameManager.Instance.OnGameRestarting += () => StopAllCoroutines();
     }
 
     private void Start()
@@ -65,11 +65,6 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(SpawnBushesIE());
         StartCoroutine(EnemySpawningIE());
         StartCoroutine(DestructibleSpawningIE());
-    }
-
-    private void Restart()
-    {
-        StopAllCoroutines();
     }
 
     //public void StartHost()
@@ -141,6 +136,11 @@ public class WorldManager : MonoBehaviour
                            Random.Range(-_worldSize.y / 2f + objectSize, _worldSize.y / 2f - objectSize));
     }
 
+    private Quaternion GetRandomRotation()
+    {
+        return Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+    }
+
     private IEnumerator EnemySpawningIE()
     {
         yield return new WaitForSeconds(0.5f);
@@ -156,7 +156,7 @@ public class WorldManager : MonoBehaviour
             for (int i = _tanks.Count; i < _maxTanks; i++)
             {
                 Vector2 spawnPos = GetRandomSpawnPosition(1f);
-                Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+                Quaternion spawnRot = GetRandomRotation();
 
                 _curTeamID++;
                 Enemy tank = EnemiesPool.GetFromPool(spawnPos, spawnRot).GetComponent<Enemy>();
@@ -187,21 +187,26 @@ public class WorldManager : MonoBehaviour
         {
             if (_destructibles.Count >= _maxDestructibles)
             {
-                yield return new WaitForSeconds(3f);
+                yield return new WaitForSeconds(4f);
                 continue;
             }
 
-            for (int i = _destructibles.Count; i < _maxDestructibles; i++)
+            while (_destructibles.Count < _maxDestructibles)
             {
-                Vector2 spawnPos = GetRandomSpawnPosition(0.8f);
-                Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+                for (int i = 0; i < 4; i++)
+                {
+                    GameObject prefab = _destructiblePrefabs[Random.Range(0, _destructiblePrefabs.Count)];
+                    Vector2 spawnPos = GetRandomSpawnPosition(prefab.transform.localScale.x);
+                    Quaternion spawnRot = GetRandomRotation();
 
-                GameObject prefab = _destructiblePrefabs[Random.Range(0, _destructiblePrefabs.Count)];
-                Destructible dest = Instantiate(prefab, spawnPos, spawnRot).GetComponent<Destructible>();
-                _destructibles.Add(dest);
-                dest.OnDestroyed += () => _destructibles.Remove(dest);
+                    Destructible dest = Instantiate(prefab, spawnPos, spawnRot).GetComponent<Destructible>();
+                    _destructibles.Add(dest);
+                    dest.OnDestroyed += () => _destructibles.Remove(dest);
 
-                yield return new WaitForSeconds(Random.Range(1f, 1.5f));
+                    if (_destructibles.Count >= _maxDestructibles) break;
+                }
+
+                yield return new WaitForSeconds(1f);
             }
         }
     }
@@ -213,9 +218,9 @@ public class WorldManager : MonoBehaviour
         {
             for (int i = 0; i < 4; i++)
             {
-                Vector2 spawnPos = GetRandomSpawnPosition(1f);
-                Quaternion spawnRot = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
                 float size = Random.Range(1.75f, 2.2f);
+                Vector2 spawnPos = GetRandomSpawnPosition(size);
+                Quaternion spawnRot = GetRandomRotation();
                 GameObject go = Instantiate(_bushesPrefab, spawnPos, spawnRot, _bushesParent);
                 go.transform.localScale = new(size, size, size);
                 go.SetActive(true);
@@ -223,6 +228,8 @@ public class WorldManager : MonoBehaviour
 
                 if (curBush >= _maxBushes) yield break;
             }
+
+            yield return new WaitForSeconds(0.1f);
         }
     }
 

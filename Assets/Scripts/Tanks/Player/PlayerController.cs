@@ -43,16 +43,16 @@ public class PlayerController : TankController
         InputManager.Instance.OnLook += Look;
         InputManager.Instance.OnLookEnded += ShootEnd;
 
-        InputManager.Instance.OnShootStarted += ShootStart;
+        InputManager.Instance.OnShootStarted += ShootStartMouse;
         InputManager.Instance.OnShootEnded += ShootEnd;
 
         InputManager.Instance.OnMouseMove += MouseMove;
 
-        InputManager.Instance.OnFirstUpgrade += () => Tank.SelectUpgrade(1);
-        InputManager.Instance.OnSecondUpgrade += () => Tank.SelectUpgrade(2);
-        InputManager.Instance.OnThirdUpgrade += () => Tank.SelectUpgrade(3);
-        InputManager.Instance.OnBack += () => Tank.UpgradeMenuBack();
-        InputManager.Instance.OnEscape += () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
+        InputManager.Instance.OnFirstUpgrade += Tank.SelectUpgrade;
+        InputManager.Instance.OnSecondUpgrade += Tank.SelectUpgrade;
+        InputManager.Instance.OnThirdUpgrade += Tank.SelectUpgrade;
+        InputManager.Instance.OnBack += Tank.UpgradeMenuBack;
+        InputManager.Instance.OnEscape += GameManager.Instance.TogglePause;
 
         // Mobile controls
         if (Application.isMobilePlatform)
@@ -78,16 +78,16 @@ public class PlayerController : TankController
         InputManager.Instance.OnLook -= Look;
         InputManager.Instance.OnLookEnded -= ShootEnd;
 
-        InputManager.Instance.OnShootStarted -= ShootStart;
+        InputManager.Instance.OnShootStarted -= ShootStartMouse;
         InputManager.Instance.OnShootEnded -= ShootEnd;
 
         InputManager.Instance.OnMouseMove -= MouseMove;
 
-        InputManager.Instance.OnFirstUpgrade -= () => Tank.SelectUpgrade(1);
-        InputManager.Instance.OnSecondUpgrade -= () => Tank.SelectUpgrade(2);
-        InputManager.Instance.OnThirdUpgrade -= () => Tank.SelectUpgrade(3);
-        InputManager.Instance.OnBack -= () => Tank.UpgradeMenuBack();
-        InputManager.Instance.OnEscape -= () => GameManager.Instance.IsPaused = !GameManager.Instance.IsPaused;
+        InputManager.Instance.OnFirstUpgrade -= Tank.SelectUpgrade;
+        InputManager.Instance.OnSecondUpgrade -= Tank.SelectUpgrade;
+        InputManager.Instance.OnThirdUpgrade -= Tank.SelectUpgrade;
+        InputManager.Instance.OnBack -= Tank.UpgradeMenuBack;
+        InputManager.Instance.OnEscape -= GameManager.Instance.TogglePause;
 
         // Mobile controls
         if (Application.isMobilePlatform)
@@ -138,10 +138,15 @@ public class PlayerController : TankController
             _shootLine.SetActive(true);
     }
 
+    private void ShootStartMouse()
+    {
+        if (HUDManager.IsPointerOnUI(_mousePosition)) return;
+
+        ShootStart();
+    }
+
     private void ShootEnd()
     {
-        if (DisabledInput) return;
-
         Tank.Gun.ShootEnd();
         _isLooking = false;
         if (_shootLine.activeSelf)

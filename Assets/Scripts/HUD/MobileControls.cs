@@ -1,5 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
 using ETouch = UnityEngine.InputSystem.EnhancedTouch;
 
@@ -116,6 +120,7 @@ public class MobileControls : MonoBehaviour
     private void HandleFingerDown(Finger finger)
     {
         if (GameManager.Instance.IsPaused) return;
+        if (HUDManager.IsPointerOnUI(finger.screenPosition)) return;
 
         if (_movementFinger == null && finger.screenPosition.x < Screen.width / 2f)
         {

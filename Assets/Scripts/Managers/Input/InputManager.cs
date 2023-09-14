@@ -17,9 +17,9 @@ public class InputManager
     public event Action<Vector2, float> OnTouchEnd;
     public event Action<Vector2> OnMouseMove;
 
-    public event Action OnFirstUpgrade;
-    public event Action OnSecondUpgrade;
-    public event Action OnThirdUpgrade;
+    public event Action<int> OnFirstUpgrade;
+    public event Action<int> OnSecondUpgrade;
+    public event Action<int> OnThirdUpgrade;
     public event Action OnBack;
     public event Action OnEscape;
 
@@ -48,9 +48,9 @@ public class InputManager
         _controls.Player.TouchPosition.performed += ctx => OnMouseMove?.Invoke(_controls.Player.TouchPosition.ReadValue<Vector2>());
         _controls.Player.TouchPosition.canceled += ctx => OnMouseMove?.Invoke(_controls.Player.TouchPosition.ReadValue<Vector2>());
 
-        _controls.Player.FirstUpgrade.canceled += ctx => OnFirstUpgrade?.Invoke();
-        _controls.Player.SecondUpgrade.canceled += ctx => OnSecondUpgrade?.Invoke();
-        _controls.Player.ThirdUpgrade.canceled += ctx => OnThirdUpgrade?.Invoke();
+        _controls.Player.FirstUpgrade.canceled += ctx => OnFirstUpgrade?.Invoke(1);
+        _controls.Player.SecondUpgrade.canceled += ctx => OnSecondUpgrade?.Invoke(2);
+        _controls.Player.ThirdUpgrade.canceled += ctx => OnThirdUpgrade?.Invoke(3);
 
         _controls.Player.Back.canceled += ctx => OnBack?.Invoke();
         _controls.Player.Escape.canceled += ctx => OnEscape?.Invoke();

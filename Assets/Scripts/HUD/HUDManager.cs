@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class HUDManager : MonoBehaviour
 {
@@ -7,10 +9,13 @@ public class HUDManager : MonoBehaviour
     public RectTransform CanvasRect => _canvasRect;
     public float HealthbarRenderDistance => GameManager.Instance.MainCamera.orthographicSize + 10f;
     [SerializeField] private RectTransform _canvasRect;
-    [SerializeField, Header("Bars")] private RectTransform _tankBarsTransform;
+
+    [Header("Bars")]
+    [SerializeField] private RectTransform _tankBarsTransform;
     [SerializeField] private RectTransform _destructibleBarsTransform;
 
-    [SerializeField, Header("HUDs")]
+    [Header("HUDs")]
+    [SerializeField]
     private UpgradesUI _upgradesUI;
     [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
@@ -22,10 +27,10 @@ public class HUDManager : MonoBehaviour
     {
         Instance = this;
 
-        if (Application.isMobilePlatform)
+        //if (Application.isMobilePlatform)
             _mobileControls.Initialize();
-        else
-            _mobileControls.gameObject.SetActive(false);
+        //else
+            //_mobileControls.gameObject.SetActive(false);
 
         _upgradesUI.Initialize();
         _playerInfoUI.Initialize();
@@ -63,5 +68,14 @@ public class HUDManager : MonoBehaviour
             bar = Instantiate(parent.GetChild(0), parent).GetComponent<BarUI>();
 
         return bar;
+    }
+
+    public static bool IsPointerOnUI(Vector2 screenPosition)
+    {
+        PointerEventData pointerEventData = new(EventSystem.current){ position = screenPosition };
+        List<RaycastResult> raycastResults = new();
+        EventSystem.current.RaycastAll(pointerEventData, raycastResults);
+
+        return raycastResults.Count > 0;
     }
 }

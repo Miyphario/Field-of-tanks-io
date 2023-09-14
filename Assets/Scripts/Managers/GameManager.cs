@@ -97,4 +97,9 @@ public class GameManager
                 IsKeyboardControls = true;
         }
     }
+
+    public void TogglePause()
+    {
+        IsPaused = !IsPaused;
+    }
 }

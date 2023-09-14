@@ -6,6 +6,7 @@ public static class LayerManager
     public static int Tank { get; private set; }
     public static LayerMask TankMask { get; private set; }
     public static LayerMask DestructibleMask { get; private set; }
+    public static LayerMask UIMask { get; private set; }
 
     static LayerManager()
     {
@@ -13,5 +14,6 @@ public static class LayerManager
         DestructibleMask = LayerMask.GetMask("Destructible");
         Tank = LayerMask.NameToLayer(LayerMask.LayerToName(TankMask));
         Solid = LayerMask.NameToLayer("Solid");
+        UIMask = LayerMask.GetMask("UI");
     }
 }
