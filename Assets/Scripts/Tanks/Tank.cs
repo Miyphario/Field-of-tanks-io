@@ -82,6 +82,7 @@ public class Tank : MonoBehaviour
             Health = 0f;
             _healthbar.Disable();
             OnDestroyed?.Invoke();
+            PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();

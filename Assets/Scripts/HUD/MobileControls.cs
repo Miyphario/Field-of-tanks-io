@@ -1,9 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
 using ETouch = UnityEngine.InputSystem.EnhancedTouch;
 

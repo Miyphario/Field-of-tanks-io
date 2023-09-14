@@ -18,7 +18,8 @@ public class UpgradesUI : MonoBehaviour
 
     [SerializeField] private Button _backButton;
 
-    [SerializeField, Header("Images")]
+    [Header("Images")]
+    [SerializeField]
     private Sprite _tankSprite;
     [SerializeField] private Sprite _gunSprite;
     [SerializeField] private Sprite _healthSprite;
@@ -26,6 +27,16 @@ public class UpgradesUI : MonoBehaviour
     [SerializeField] private Sprite _damageSprite;
     [SerializeField] private Sprite _fireRateSprite;
     [SerializeField] private Sprite _bulletSpeedSprite;
+    [SerializeField] private Sprite _touchDamageSprite;
+
+    [Header("Menus")]
+    [SerializeField] private RectTransform _menuRect;
+    [Header("Animations")]
+    private Vector2 _defaultMenuPosition;
+    [SerializeField] private Vector2 _animMenuPosition;
+    private Vector2 _defaultBackButtonPosition;
+    [SerializeField] private Vector2 _animBackButtonPosition;
+    [SerializeField] private LeanTweenType _animType;
 
     public void Initialize()
     {
@@ -40,8 +51,13 @@ public class UpgradesUI : MonoBehaviour
         _thirdUpgradeButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.SelectUpgrade(3));
         _backButton.onClick.AddListener(() => WorldManager.Instance.HostPlayer.UpgradeMenuBack());
 
+        _defaultMenuPosition = _menuRect.anchoredPosition;
+
+        RectTransform backButtonRect = _backButton.GetComponent<RectTransform>();
+        _defaultBackButtonPosition = backButtonRect.anchoredPosition;
+
         SetActiveButtons(0);
-        SetBackButtonActive(false);
+        SetBackButtonActive(false, true);
     }
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
@@ -52,7 +68,6 @@ public class UpgradesUI : MonoBehaviour
         {
             case UpgradeMenu.None:
                 SetActiveButtons(0);
-                SetBackButtonActive(false);
                 break;
 
             case UpgradeMenu.Base:
@@ -93,7 +108,7 @@ public class UpgradesUI : MonoBehaviour
                     _secondButtonText.text = "MAX";
                 }
 
-                _thirdButtonImage.sprite = _damageSprite;
+                _thirdButtonImage.sprite = _touchDamageSprite;
                 if (pl.CanUpgrade(UpgradeType.TouchDamage))
                 {
                     _thirdUpgradeButton.interactable = true;
@@ -170,17 +185,14 @@ public class UpgradesUI : MonoBehaviour
 
     public void SetActiveButtons(int count)
     {
-        GameObject buttonsParent = _firstUpgradeButton.transform.parent.gameObject;
         if (count == 0)
         {
-            if (buttonsParent.activeSelf)
-                buttonsParent.SetActive(false);
+            ToggleMenu(false);
             return;
         }
         else
         {
-            if (!buttonsParent.activeSelf)
-                buttonsParent.SetActive(true);
+            ToggleMenu(true);
         }
 
         switch (count)
@@ -229,9 +241,55 @@ public class UpgradesUI : MonoBehaviour
         }
     }
 
-    private void SetBackButtonActive(bool active)
+    private void SetBackButtonActive(bool active, bool force = false)
     {
-        if (_backButton.gameObject.activeSelf != active)
-            _backButton.gameObject.SetActive(active);
+        if (!force && _backButton.gameObject.activeSelf == active) return;
+
+        RectTransform backButtonRect = _backButton.GetComponent<RectTransform>();
+        LeanTween.cancel(backButtonRect);
+        float animTime = force ? 0f : 0.2f;
+
+        if (active)
+        {
+            if (!_backButton.gameObject.activeSelf)
+                _backButton.gameObject.SetActive(true);
+
+            LeanTween.move(backButtonRect, _defaultBackButtonPosition, animTime).setIgnoreTimeScale(true).setEase(_animType);
+        }
+        else
+        {
+            LeanTween.move(backButtonRect, _animBackButtonPosition, animTime).setIgnoreTimeScale(true).setEase(_animType).
+            setOnComplete(() => 
+            {
+                if (_backButton.gameObject.activeSelf)
+                    _backButton.gameObject.SetActive(false);
+            });
+        }
+    }
+
+    private void ToggleMenu(bool enable, bool force = false)
+    {
+        if (!force && _menuRect.gameObject.activeSelf == enable) return;
+
+        LeanTween.cancel(_menuRect);
+        float animTime = force ? 0f : 0.45f;
+
+        if (enable)
+        {
+            if (!_menuRect.gameObject.activeSelf)
+                _menuRect.gameObject.SetActive(true);
+
+            LeanTween.move(_menuRect, _defaultMenuPosition, animTime).setIgnoreTimeScale(true).setEase(_animType);
+        }
+        else
+        {
+            SetBackButtonActive(false);
+            LeanTween.move(_menuRect, _animMenuPosition, animTime).setIgnoreTimeScale(true).setEase(_animType).
+            setOnComplete(() => 
+            {
+                if (_menuRect.gameObject.activeSelf)
+                    _menuRect.gameObject.SetActive(false);
+            });
+        }
     }
 }

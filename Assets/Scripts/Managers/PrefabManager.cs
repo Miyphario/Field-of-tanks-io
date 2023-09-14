@@ -15,6 +15,9 @@ public class PrefabManager : MonoBehaviour
     [SerializeField] private GunTier[] _gunTier;
     public Gun DefaultGun => _gunTier[0].Guns[0].GetComponent<Gun>();
 
+    [Header ("Particles")]
+    [SerializeField] private GameObject _tankExplodeEffect;
+
     public void Initialize()
     {
         if (Instance == null)
@@ -68,5 +71,24 @@ public class PrefabManager : MonoBehaviour
         if (tier >= _gunTier.Length || tier < 0) return default;
 
         return _gunTier[tier].Guns;
+    }
+
+    public void CreateParticles(ParticlesType particles, Vector2 position, Quaternion rotation, Transform parent)
+    {
+        GameObject part = null;
+        switch (particles)
+        {
+            case ParticlesType.TankExplode:
+                part = _tankExplodeEffect;
+                break;
+        }
+
+        if (part == null) return;
+        Instantiate(part, position, rotation, parent);
+    }
+
+    public void CreateParticles(ParticlesType particles, Vector2 position, Quaternion rotation)
+    {
+        CreateParticles(particles, position, rotation, null);
     }
 }

@@ -32,3 +32,8 @@ public enum UpgradeMenu
 {
     None, Base, Tank, Gun, NewGun
 }
+
+public enum ParticlesType
+{
+    TankExplode,
+}

@@ -27,10 +27,10 @@ public class HUDManager : MonoBehaviour
     {
         Instance = this;
 
-        //if (Application.isMobilePlatform)
+        if (Application.isMobilePlatform)
             _mobileControls.Initialize();
-        //else
-            //_mobileControls.gameObject.SetActive(false);
+        else
+            _mobileControls.gameObject.SetActive(false);
 
         _upgradesUI.Initialize();
         _playerInfoUI.Initialize();
