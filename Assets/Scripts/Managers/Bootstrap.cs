@@ -31,5 +31,7 @@ public class Bootstrap : MonoBehaviour
         _prefabManager.Initialize();
         _soundManager.Initialize();
         _screenshotManager.Initialize();
+
+        LocalizationManager.Initialize();
     }
 }

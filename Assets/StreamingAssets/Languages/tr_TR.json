@@ -1,0 +1,37 @@
+﻿{
+	"languageName": "Türk",
+	"items": [
+		{
+			"key": "up.Tank",
+			"value": "Tank"
+		},
+		{
+			"key": "up.Gun",
+			"value": "Top"
+		},
+		{
+			"key": "up.Health",
+			"value": "Sağlık"
+		},
+		{
+			"key": "up.Max",
+			"value": "Max"
+		},
+		{
+			"key": "up.Speed",
+			"value": "Hız"
+		},
+		{
+			"key": "up.Damage",
+			"value": "Zarar"
+		},
+		{
+			"key": "up.FireRate",
+			"value": "Atış hızı"
+		},
+		{
+			"key": "up.BulletSpeed",
+			"value": "Mermi hızı"
+		}
+	]
+}

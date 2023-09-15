@@ -1,0 +1,37 @@
+﻿{
+	"languageName": "Русский",
+	"items": [
+		{
+			"key": "up.Tank",
+			"value": "Танк"
+		},
+		{
+			"key": "up.Gun",
+			"value": "Пушка"
+		},
+		{
+			"key": "up.Health",
+			"value": "Здоровье"
+		},
+		{
+			"key": "up.Max",
+			"value": "Макс"
+		},
+		{
+			"key": "up.Speed",
+			"value": "Скорость"
+		},
+		{
+			"key": "up.Damage",
+			"value": "Урон"
+		},
+		{
+			"key": "up.FireRate",
+			"value": "Скорость стрельбы"
+		},
+		{
+			"key": "up.BulletSpeed",
+			"value": "Скорость снаряда"
+		}
+	]
+}

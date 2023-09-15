@@ -72,11 +72,11 @@ public class UpgradesUI : MonoBehaviour
 
             case UpgradeMenu.Base:
                 _firstButtonImage.sprite = _tankSprite;
-                _firstButtonText.text = "Tank";
+                _firstButtonText.GetComponent<LocalizationText>().SetKey("up.Tank");
                 _firstUpgradeButton.interactable = true;
 
                 _secondButtonImage.sprite = _gunSprite;
-                _secondButtonText.text = "Gun";
+                _secondButtonText.GetComponent<LocalizationText>().SetKey("up.Gun");
                 _secondUpgradeButton.interactable = true;
 
                 SetActiveButtons(2);
@@ -88,36 +88,36 @@ public class UpgradesUI : MonoBehaviour
                 if (pl.CanUpgrade(UpgradeType.MaxHealth))
                 {
                     _firstUpgradeButton.interactable = true;
-                    _firstButtonText.text = "Health";
+                    _firstButtonText.GetComponent<LocalizationText>().SetKey("up.Health");
                 }
                 else
                 {
                     _firstUpgradeButton.interactable = false;
-                    _firstButtonText.text = "MAX";
+                    _firstButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 _secondButtonImage.sprite = _speedSprite;
                 if (pl.CanUpgrade(UpgradeType.Speed))
                 {
                     _secondUpgradeButton.interactable = true;
-                    _secondButtonText.text = "Speed";
+                    _secondButtonText.GetComponent<LocalizationText>().SetKey("up.Speed");
                 }
                 else
                 {
                     _secondUpgradeButton.interactable = false;
-                    _secondButtonText.text = "MAX";
+                    _secondButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 _thirdButtonImage.sprite = _touchDamageSprite;
                 if (pl.CanUpgrade(UpgradeType.TouchDamage))
                 {
                     _thirdUpgradeButton.interactable = true;
-                    _thirdButtonText.text = "Damage";
+                    _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.Damage");
                 }
                 else
                 {
                     _thirdUpgradeButton.interactable = false;
-                    _thirdButtonText.text = "MAX";
+                    _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 SetActiveButtons(3);
@@ -129,36 +129,36 @@ public class UpgradesUI : MonoBehaviour
                 if (pl.CanUpgrade(UpgradeType.Damage))
                 {
                     _firstUpgradeButton.interactable = true;
-                    _firstButtonText.text = "Damage";
+                    _firstButtonText.GetComponent<LocalizationText>().SetKey("up.Damage");
                 }
                 else
                 {
                     _firstUpgradeButton.interactable = false;
-                    _firstButtonText.text = "MAX";
+                    _firstButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 _secondButtonImage.sprite = _fireRateSprite;
                 if (pl.CanUpgrade(UpgradeType.FireRate))
                 {
                     _secondUpgradeButton.interactable = true;
-                    _secondButtonText.text = "Fire Rate";
+                    _secondButtonText.GetComponent<LocalizationText>().SetKey("up.FireRate");
                 }
                 else
                 {
                     _secondUpgradeButton.interactable = false;
-                    _secondButtonText.text = "MAX";
+                    _secondButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 _thirdButtonImage.sprite = _bulletSpeedSprite;
                 if (pl.CanUpgrade(UpgradeType.BulletSpeed))
                 {
                     _thirdUpgradeButton.interactable = true;
-                    _thirdButtonText.text = "Bullet Speed";
+                    _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.BulletSpeed");
                 }
                 else
                 {
                     _thirdUpgradeButton.interactable = false;
-                    _thirdButtonText.text = "MAX";
+                    _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
                 SetActiveButtons(3);
@@ -170,11 +170,11 @@ public class UpgradesUI : MonoBehaviour
                 if (guns.Length <= 0) return;
 
                 _firstButtonImage.sprite = guns[0].GetComponent<Gun>().UISprite;
-                _firstButtonText.text = "";
+                _firstButtonText.GetComponent<LocalizationText>().SetKey(string.Empty);
                 _firstUpgradeButton.interactable = true;
 
                 _secondButtonImage.sprite = guns[1].GetComponent<Gun>().UISprite;
-                _secondButtonText.text = "";
+                _secondButtonText.GetComponent<LocalizationText>().SetKey(string.Empty);
                 _secondUpgradeButton.interactable = true;
 
                 SetActiveButtons(2);

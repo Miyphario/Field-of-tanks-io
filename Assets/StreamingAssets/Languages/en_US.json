@@ -1,0 +1,37 @@
+﻿{
+	"languageName": "English",
+	"items": [
+		{
+			"key": "up.Tank",
+			"value": "Tank"
+		},
+		{
+			"key": "up.Gun",
+			"value": "Gun"
+		},
+		{
+			"key": "up.Health",
+			"value": "Health"
+		},
+		{
+			"key": "up.Max",
+			"value": "Max"
+		},
+		{
+			"key": "up.Speed",
+			"value": "Speed"
+		},
+		{
+			"key": "up.Damage",
+			"value": "Damage"
+		},
+		{
+			"key": "up.FireRate",
+			"value": "Fire Rate"
+		},
+		{
+			"key": "up.BulletSpeed",
+			"value": "Bullet Speed"
+		}
+	]
+}
