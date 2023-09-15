@@ -29,7 +29,7 @@ public class Enemy : Tank, IPoolable
         StartCoroutine(CheckDistanceIE());
     }
 
-    protected override void DestroyMe() => AddToPool();
+    protected override void DestroySelf() => AddToPool();
 
     private IEnumerator CheckDistanceIE()
     {
@@ -95,8 +95,8 @@ public class Enemy : Tank, IPoolable
 
     public void AddToPool()
     {
-        StopAllCoroutines();
         WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
+        Helper.EnableAll(transform);
         ResetToDefault();
         _isAlive = false;
     }

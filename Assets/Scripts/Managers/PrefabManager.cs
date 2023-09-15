@@ -17,6 +17,10 @@ public class PrefabManager : MonoBehaviour
 
     [Header ("Particles")]
     [SerializeField] private GameObject _tankExplodeEffect;
+    [SerializeField] private GameObject _bigObjectDestroyEffect;
+    [SerializeField] private GameObject _mediumObjectDestroyEffect;
+    [SerializeField] private GameObject _smallObjectDestroyEffect;
+    [SerializeField] private GameObject _shootEffect;
 
     public void Initialize()
     {
@@ -80,6 +84,22 @@ public class PrefabManager : MonoBehaviour
         {
             case ParticlesType.TankExplode:
                 part = _tankExplodeEffect;
+                break;
+
+            case ParticlesType.Shoot:
+                part = _shootEffect;
+                break;
+
+            case ParticlesType.BigObjectDestroy:
+                part = _bigObjectDestroyEffect;
+                break;
+
+            case ParticlesType.MediumObjectDestroy:
+                part = _mediumObjectDestroyEffect;
+                break;
+
+            case ParticlesType.SmallObjectDestroy:
+                part = _smallObjectDestroyEffect;
                 break;
         }
 

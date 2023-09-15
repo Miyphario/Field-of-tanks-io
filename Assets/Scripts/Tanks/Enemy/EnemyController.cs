@@ -83,6 +83,7 @@ public class EnemyController : TankController
             DisabledInput = true;
             StopAllCoroutines();
             StopFlex();
+            _isMoving = false;
             _moveDirection = Vector2.zero;
             _lookDirection = Vector2.zero;
             _rb.velocity = Vector2.zero;
@@ -275,7 +276,8 @@ public class EnemyController : TankController
             float curDist = _curDetectEnemyDistance;
             foreach (Tank tank in WorldManager.Instance.Tanks)
             {
-                if (tank.TeamID == Tank.TeamID || tank == Tank || tank.Health <= 0f || !tank.gameObject.activeSelf) continue;
+                if (tank.Health <= 0f) continue;
+                if (tank.TeamID == Tank.TeamID || tank == Tank || !tank.gameObject.activeSelf) continue;
                 if (tank == _target) continue;
 
                 dist = DistanceToPoint(tank.transform.position);
@@ -311,6 +313,8 @@ public class EnemyController : TankController
         float curHealth = WorldManager.Instance.Destructibles[0].Health;
         foreach (Destructible dest in WorldManager.Instance.Destructibles)
         {
+            if (dest.Health <= 0f) continue;
+
             float distance = DistanceToPoint(dest.transform.position);
             if (distance > _curDetectEnemyDistance) continue;
 

@@ -9,11 +9,14 @@ public class Destructible : MonoBehaviour
     private float _health;
     public float Health => _health;
 
-    [SerializeField, Header("Reward")]
+    [Header("Reward")]
+    [SerializeField]
     private int _minRewardXp;
     [SerializeField] private int _maxRewardXp;
     private int _rewardXp;
-    [SerializeField, Header("Health Restore")]
+
+    [Header("Health Restore")]
+    [SerializeField]
     private float _minHealthRestore;
     [SerializeField] private float _maxHealthRestore;
     private float _healthRestore;
@@ -21,7 +24,13 @@ public class Destructible : MonoBehaviour
     private Rigidbody2D _rb;
     private BarUI _healthbar;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource _audioSource;
+
     public event Action OnDestroyed;
+
+    [Header("Visual")]
+    [SerializeField] private ParticlesType _particles;
 
     private void Awake()
     {
@@ -45,6 +54,7 @@ public class Destructible : MonoBehaviour
         {
             _health -= damage;
             _healthbar.SetValue(_health);
+            PlayHitSound();
         }
         else
         {
@@ -56,7 +66,7 @@ public class Destructible : MonoBehaviour
                 attacker.AddXP(_rewardXp);
                 attacker.TakeDamage(-_healthRestore);
             }
-            Destroy(gameObject);
+            DestroyMe();
             return true;
         }
 
@@ -119,6 +129,34 @@ public class Destructible : MonoBehaviour
 
             yield return new WaitForSeconds(Constants.HEALTHBAR_RENDER_TIME);
         }
+    }
+
+    private void PlayHitSound()
+    {
+        _audioSource.SetRandomPitchAndVolume(0.9f, 1.1f, 0.8f, 0.9f);
+        _audioSource.PlayOneShot(SoundManager.Instance.HitObj);
+    }
+
+    private void PlayDestroySound()
+    {
+        _audioSource.SetRandomPitchAndVolume(0.9f, 1.1f, 0.9f, 1f);
+        _audioSource.clip = SoundManager.Instance.DestroyObj;
+        _audioSource.Play();
+    }
+
+    public void DestroyMe()
+    {
+        GetComponent<Collider2D>().enabled = false;
+        Helper.DisableAllExcept(transform, _audioSource);
+        PlayDestroySound();
+        PrefabManager.Instance.CreateParticles(_particles, transform.position, Quaternion.identity);
+        StartCoroutine(DestroyMeIE());
+    }
+
+    private IEnumerator DestroyMeIE()
+    {
+        yield return new WaitForSeconds(_audioSource.GetClipRemainingTime());
+        Destroy(gameObject);
     }
 
 #if UNITY_EDITOR

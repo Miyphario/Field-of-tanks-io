@@ -67,7 +67,7 @@ public class Player : Tank
         OnMenuSelected?.Invoke(_upgradeMenu);
     }
 
-    protected override void DestroyMe()
+    protected override void DestroySelf()
     {
         GameManager.Instance.RestartScene();
     }

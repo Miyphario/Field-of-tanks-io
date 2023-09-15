@@ -45,6 +45,8 @@ public class Tank : MonoBehaviour
     public bool IsInvisible => _isInvisible;
     public event Action<bool> OnInvisible;
 
+    [SerializeField] private AudioSource _audioSource;
+
     protected virtual void Awake()
     {
         Controller = GetComponent<TankController>();
@@ -80,9 +82,8 @@ public class Tank : MonoBehaviour
         else
         {
             Health = 0f;
-            _healthbar.Disable();
             OnDestroyed?.Invoke();
-            PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+            _healthbar.Disable();
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();
@@ -97,11 +98,33 @@ public class Tank : MonoBehaviour
         return TakeDamage(damage, null);
     }
 
-    protected virtual void DestroyMe()
+    private void PlayDestroySound()
+    {
+        _audioSource.SetRandomPitchAndVolume(0.9f, 1.1f, 0.9f, 1f);
+        _audioSource.clip = SoundManager.Instance.DestroyTank;
+        _audioSource.Play();
+    }
+
+    private void DestroyMe()
     {
         StopAllCoroutines();
-        _healthbar.Dispose();
+        GetComponent<Collider2D>().enabled = false;
+        Helper.DisableAllExcept(transform, _audioSource);
+        PlayDestroySound();
+        PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+        StartCoroutine(DestroyMeIE());
+    }
+
+    protected virtual void DestroySelf()
+    {
         Destroy(gameObject);
+    }
+
+    private IEnumerator DestroyMeIE()
+    {
+        yield return new WaitForSeconds(_audioSource.GetClipRemainingTime());
+        DestroySelf();
+        GetComponent<Collider2D>().enabled = true;
     }
 
     public void AddXP(int xp)

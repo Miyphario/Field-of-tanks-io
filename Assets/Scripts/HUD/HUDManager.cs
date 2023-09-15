@@ -23,6 +23,10 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private PauseUI _pauseUI;
     public PauseUI PauseUI => _pauseUI;
 
+    [Header("Sounds")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _buttonClick;
+
     public void Initialize()
     {
         Instance = this;
@@ -77,5 +81,30 @@ public class HUDManager : MonoBehaviour
         EventSystem.current.RaycastAll(pointerEventData, raycastResults);
 
         return raycastResults.Count > 0;
+    }
+
+    public void PlaySound(UISound sound)
+    {
+        switch (sound)
+        {
+            case UISound.Button:
+                _audioSource.pitch = Random.Range(0.9f, 1.1f);
+                _audioSource.volume = Random.Range(0.9f, 1f);
+                _audioSource.clip = _buttonClick;
+                break;
+
+            case UISound.Exit:
+                break;
+        }
+
+        if (_audioSource.clip == null) return;
+
+        _audioSource.PlayOneShot(_audioSource.clip);
+        _audioSource.clip = null;
+    }
+
+    public void PlayButtonSound()
+    {
+        PlaySound(UISound.Button);
     }
 }

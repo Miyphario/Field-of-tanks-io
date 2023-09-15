@@ -1,4 +1,6 @@
 
+using System;
+
 public enum Gamemode
 {
     Deathmath,
@@ -35,5 +37,12 @@ public enum UpgradeMenu
 
 public enum ParticlesType
 {
-    TankExplode,
+    TankExplode, Shoot,
+    BigObjectDestroy, MediumObjectDestroy, SmallObjectDestroy
+}
+
+[Serializable]
+public enum UISound
+{
+    Button, Exit
 }

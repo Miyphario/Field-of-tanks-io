@@ -20,7 +20,13 @@ public class PlayerController : TankController
     {
         base.Awake();
         
-        Tank.OnDestroyed += () => DisabledInput = true;
+        Tank.OnDestroyed += () => 
+        {
+            DisabledInput = true;
+            _moveInput = Vector2.zero;
+            _currentMoveInput = Vector2.zero;
+            ShootEnd();
+        };
         GameManager.Instance.OnPauseChanged += HandlePauseToggled;
         GameManager.Instance.OnGameRestarting += () => 
         {
@@ -106,6 +112,7 @@ public class PlayerController : TankController
         _currentMoveInput = Vector2.SmoothDamp(_currentMoveInput, _moveInput, ref _smoothInput, _rb.drag / 60f);
         _currentMoveInput = WorldManager.Instance.ClampMoveInput(_rb.position, _currentMoveInput);
 
+        if (DisabledInput) return;
         Vector2 rotDirection;
         if (GameManager.Instance.IsKeyboardControls)
         {

@@ -9,6 +9,8 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private CameraManager _cameraManager;
     [SerializeField] private HUDManager _hudManager;
     [SerializeField] private PrefabManager _prefabManager;
+    [SerializeField] private ScreenshotManager _screenshotManager;
+    [SerializeField] private SoundManager _soundManager;
 
     private void Awake()
     {
@@ -27,5 +29,7 @@ public class Bootstrap : MonoBehaviour
         _hudManager.Initialize();
         _cameraManager.Initialize();
         _prefabManager.Initialize();
+        _soundManager.Initialize();
+        _screenshotManager.Initialize();
     }
 }

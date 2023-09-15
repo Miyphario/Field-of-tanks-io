@@ -22,6 +22,7 @@ public class InputManager
     public event Action<int> OnThirdUpgrade;
     public event Action OnBack;
     public event Action OnEscape;
+    public event Action OnScreenshot;
 
     private readonly PlayerControls _controls = new();
 
@@ -54,6 +55,8 @@ public class InputManager
 
         _controls.Player.Back.canceled += ctx => OnBack?.Invoke();
         _controls.Player.Escape.canceled += ctx => OnEscape?.Invoke();
+
+        _controls.UI.Screenshot.canceled += ctx => OnScreenshot?.Invoke();
     }
 
     private void FingerDown(Finger finger)
