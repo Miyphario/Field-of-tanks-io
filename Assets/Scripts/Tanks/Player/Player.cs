@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Threading;
-using UnityEngine;
 using sfloat = SafeFloat;
 using sint = SafeInt;
 
@@ -43,6 +40,14 @@ public class Player : Tank
         OnTierUpdated += HandleTierUpdated;
     }
 
+    public new void Initialize(int teamID)
+    {
+        base.Initialize(teamID);
+        _healthbar.Enable();
+        Helper.EnableAll(gameObject);
+        Controller.Initialize();
+    }
+
     private void HandleLevelUp(int level)
     {
         int lastTierLevel = PrefabManager.Instance.GetLastTierLevel(level);
@@ -69,7 +74,10 @@ public class Player : Tank
 
     protected override void DestroySelf()
     {
-        GameManager.Instance.RestartScene();
+        if (gameObject.activeSelf)
+            gameObject.SetActive(false);
+        
+        ResetToDefault();
     }
 
     public void SelectUpgrade(int upgrade)

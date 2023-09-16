@@ -54,11 +54,7 @@ public class Tank : MonoBehaviour
         _gun.Initialize(this);
 
         _healthbar = HUDManager.Instance.CreateHealthbar();
-        bool enableBar = this switch
-        {
-            Player => true,
-            _ => false
-        };
+        bool enableBar = !WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x);
         _healthbar.Initialize(gameObject, 0f, MaxHealth, enableBar);
     }
 
@@ -73,6 +69,8 @@ public class Tank : MonoBehaviour
 
     public bool TakeDamage(float damage, Tank attacker)
     {
+        if (Health <= 0f) return false;
+
         if (Health - damage > 0f)
         {
             Health = Mathf.Clamp(Health - damage, 0f, MaxHealth);
@@ -84,7 +82,6 @@ public class Tank : MonoBehaviour
         {
             Health = 0f;
             OnDestroyed?.Invoke();
-            _healthbar.Disable();
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();
@@ -108,6 +105,7 @@ public class Tank : MonoBehaviour
 
     private void DestroyMe()
     {
+        _healthbar.Disable();
         StopAllCoroutines();
         GetComponent<Collider2D>().enabled = false;
         Helper.DisableAllExcept(transform, _audioSource);
@@ -308,6 +306,8 @@ public class Tank : MonoBehaviour
         Level = 0;
         Tier = 0;
         XP = 0;
+
+        _canTouchDamage = true;
 
         _healthbar.SetMaxValue(MaxHealth);
         _healthbar.SetValue(MaxHealth, true);

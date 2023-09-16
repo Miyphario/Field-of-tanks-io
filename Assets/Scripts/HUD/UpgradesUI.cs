@@ -56,8 +56,7 @@ public class UpgradesUI : MonoBehaviour
         RectTransform backButtonRect = _backButton.GetComponent<RectTransform>();
         _defaultBackButtonPosition = backButtonRect.anchoredPosition;
 
-        SetActiveButtons(0);
-        SetBackButtonActive(false, true);
+        Hide();
     }
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
@@ -183,16 +182,16 @@ public class UpgradesUI : MonoBehaviour
         }
     }
 
-    public void SetActiveButtons(int count)
+    public void SetActiveButtons(int count, bool force = false)
     {
         if (count == 0)
         {
-            ToggleMenu(false);
+            ToggleMenu(false, force);
             return;
         }
         else
         {
-            ToggleMenu(true);
+            ToggleMenu(true, force);
         }
 
         switch (count)
@@ -291,5 +290,11 @@ public class UpgradesUI : MonoBehaviour
                     _menuRect.gameObject.SetActive(false);
             });
         }
+    }
+
+    public void Hide()
+    {
+        SetActiveButtons(0, true);
+        SetBackButtonActive(false, true);
     }
 }

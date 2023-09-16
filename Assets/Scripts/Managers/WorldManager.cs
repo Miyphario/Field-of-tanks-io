@@ -32,6 +32,7 @@ public class WorldManager : MonoBehaviour
     [Header("Pools")]
     [SerializeField] private ObjectsPool _enemiesPool;
     public ObjectsPool EnemiesPool => _enemiesPool;
+    private Coroutine _enemiesSpawnRoutine;
     [SerializeField] private ObjectsPool _bulletsPool;
     public ObjectsPool BulletsPool => _bulletsPool;
     [SerializeField] private ObjectsPool _destructiblesPool;
@@ -41,6 +42,15 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private GameObject _bushesPrefab;
     [SerializeField] private Transform _bushesParent;
     [SerializeField] private float _maxBushes;
+
+    private bool _notReadyToSpawn;
+    private bool _isPlaying;
+    private float _destroyTime = 0.05f;
+    private float _destroyObjectsPerCycle = 15;
+    public bool IsPlaying => _isPlaying;
+    public event Action<bool> OnReadyToSpawn;
+    public event Action OnGameStarted;
+    public event Action OnGameEnded;
 
     public void Initialize()
     {
@@ -57,14 +67,64 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
-        HostPlayer = Instantiate(_playerPrefab, GetRandomSpawnPosition(1f), Quaternion.identity).GetComponent<Player>();
-        HostPlayer.Initialize(0);
-        _tanks.Add(HostPlayer);
-        OnPlayerCreated?.Invoke(HostPlayer);
+        StartCoroutine(BushesSpawnIE());
+        StartCoroutine(DestructibleSpawnIE());
+        _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
+    }
 
-        StartCoroutine(SpawnBushesIE());
-        StartCoroutine(EnemySpawningIE());
-        StartCoroutine(DestructibleSpawningIE());
+    public bool StartGame()
+    {
+        if (_isPlaying || _notReadyToSpawn) return false;
+
+        _curTeamID = 0;
+        if (HostPlayer == null)
+        {
+            HostPlayer = Instantiate(_playerPrefab).GetComponent<Player>();
+            HostPlayer.OnDestroyed += () => 
+            {
+                _tanks.Remove(HostPlayer);
+                _isPlaying = false;
+                Restart();
+                OnGameEnded?.Invoke();
+            };
+        }
+
+        HostPlayer.transform.SetPositionAndRotation(GetRandomSpawnPosition(_playerPrefab.transform.localScale.x),
+                                                    GetRandomRotation());
+        HostPlayer.Initialize(_curTeamID);
+        _curTeamID++;
+        _tanks.Add(HostPlayer);
+
+        if (!HostPlayer.gameObject.activeSelf)
+            HostPlayer.gameObject.SetActive(true);
+
+        OnPlayerCreated?.Invoke(HostPlayer);
+        OnGameStarted?.Invoke();
+
+        _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
+        _isPlaying = true;
+        return _isPlaying;
+    }
+
+    public void Restart()
+    {
+        if (_notReadyToSpawn) return;
+
+        if (!_notReadyToSpawn)
+            OnReadyToSpawn?.Invoke(!_notReadyToSpawn);
+        _notReadyToSpawn = true;
+        StopAllCoroutines();
+
+        StartCoroutine(DestroyAllIE(() =>
+        {
+            if (_notReadyToSpawn)
+                OnReadyToSpawn?.Invoke(!_notReadyToSpawn);
+            _notReadyToSpawn = false;
+
+            StartCoroutine(BushesSpawnIE());
+            StartCoroutine(DestructibleSpawnIE());
+            _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
+        }));
     }
 
     public Vector2 RandomPointAround(in Vector2 point, float distance, float objectSize)
@@ -125,7 +185,7 @@ public class WorldManager : MonoBehaviour
         return Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
     }
 
-    private IEnumerator EnemySpawningIE()
+    private IEnumerator EnemySpawnIE()
     {
         yield return new WaitForSeconds(0.5f);
 
@@ -142,7 +202,6 @@ public class WorldManager : MonoBehaviour
                 Vector2 spawnPos = GetRandomSpawnPosition(1f);
                 Quaternion spawnRot = GetRandomRotation();
 
-                _curTeamID++;
                 Enemy tank = EnemiesPool.GetFromPool(spawnPos, spawnRot).GetComponent<Enemy>();
                 _tanks.Add(tank);
                 int teamId = Gamemode switch
@@ -152,20 +211,49 @@ public class WorldManager : MonoBehaviour
                 };
 
                 int startLevel = 0;
-                if (Vector2.Distance(spawnPos, HostPlayer.transform.position) >= 30)
+                if (Vector2.Distance(spawnPos, GameManager.Instance.MainCamera.transform.position) >= 30)
                 {
-                    startLevel = Random.Range(0, HostPlayer.Level + 6);
+                    int maxLvl;
+                    if (HostPlayer != null && _isPlaying)
+                        maxLvl = HostPlayer.Level + 6;
+                    else
+                        maxLvl = 30;
+                    startLevel = Random.Range(0, maxLvl);
                 }
+                if (tank.TeamID <= 0)
+                    tank.OnDestroyed += () => _tanks.Remove(tank);
+
                 tank.Initialize(teamId);
+                _curTeamID++;
                 tank.AddLevel(startLevel);
-                tank.OnDestroyed += () => _tanks.Remove(tank);
 
                 yield return new WaitForSeconds(Random.Range(0.25f, 1f));
             }
         }
     }
 
-    private IEnumerator DestructibleSpawningIE()
+    private IEnumerator DestroyEnemiesIE(Action actionAfterDestroy)
+    {
+        while (_tanks.Count > 0)
+        {
+            for (int i = 0; i < _destroyObjectsPerCycle; i++)
+            {
+                _tanks[^1].TakeDamage(_tanks[^1].MaxHealth);
+                if (_tanks.Count <= 0) break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        actionAfterDestroy?.Invoke();
+    }
+
+    private IEnumerator DestroyEnemiesIE()
+    {
+        yield return DestroyEnemiesIE(null);
+    }
+
+    private IEnumerator DestructibleSpawnIE()
     {
         while (true)
         {
@@ -195,7 +283,21 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private IEnumerator SpawnBushesIE()
+    private IEnumerator DestroyDestructiblesIE()
+    {
+        while (_destructibles.Count > 0)
+        {
+            for (int i = 0; i < _destroyObjectsPerCycle; i++)
+            {
+                _destructibles[^1].TakeDamage(_destructibles[^1].Health);
+                if (_destructibles.Count <= 0) break;
+            }
+
+            yield return new WaitForSeconds(_destroyTime);
+        }
+    }
+
+    private IEnumerator BushesSpawnIE()
     {
         int curBush = 0;
         while (curBush < _maxBushes)
@@ -213,8 +315,31 @@ public class WorldManager : MonoBehaviour
                 if (curBush >= _maxBushes) yield break;
             }
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(_destroyTime);
         }
+    }
+
+    private IEnumerator DestroyBushesIE()
+    {
+        while (_bushesParent.childCount > 1)
+        {
+            for (int i = 0; i < _destroyObjectsPerCycle; i++)
+            {
+                Destroy(_bushesParent.GetChild(_bushesParent.childCount - 1).gameObject);
+                if (_bushesParent.childCount <= 1) break;
+            }
+
+            yield return new WaitForSeconds(_destroyTime);
+        }
+    }
+
+    private IEnumerator DestroyAllIE(Action actionAfterDestroy)
+    {
+        yield return DestroyBushesIE();
+        yield return DestroyDestructiblesIE();
+        yield return DestroyEnemiesIE();
+
+        actionAfterDestroy?.Invoke();
     }
 
     private void OnDrawGizmos()

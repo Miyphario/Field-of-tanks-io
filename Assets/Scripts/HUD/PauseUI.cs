@@ -6,6 +6,13 @@ public class PauseUI : MonoBehaviour
     [SerializeField] private Button _pauseButton;
     [SerializeField] private Button _unpauseButton;
 
+    private void Awake()
+    {
+#if !UNITY_EDITOR
+        Destroy(gameObject);
+#endif
+    }
+
     public void Initialize()
     {
         if (_unpauseButton.gameObject.activeSelf)
@@ -44,4 +51,13 @@ public class PauseUI : MonoBehaviour
     {
         GameManager.Instance.IsPaused = false;
     }
+
+    public void Show()
+    {
+        GameObject exceptObj = GameManager.Instance.IsPaused ? _pauseButton.transform.parent.gameObject :
+                                                                   _unpauseButton.transform.gameObject;
+        Helper.EnableAllExcept(transform, exceptObj);
+    }
+
+    public void Hide() => Helper.DisableAll(gameObject);
 }

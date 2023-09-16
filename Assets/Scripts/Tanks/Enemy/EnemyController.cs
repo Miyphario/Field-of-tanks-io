@@ -42,6 +42,7 @@ public class EnemyController : TankController
     private float MaxEnemyDistance => _curDetectEnemyDistance + 3f;
     private Vector2 _moveDistance;
     private Vector2 _shootDistance;
+    private float _sightUpdateTime = 0.5f;
 
     private AIState _state = AIState.Idle;
     private float _retreatHealthPercent = 20f;
@@ -98,6 +99,7 @@ public class EnemyController : TankController
         _maxRotationSpeed = Random.Range(200f, 300f) + _minRotationSpeed;
 
         _retreatHealthPercent = Random.Range(10f, 35f);
+        _sightUpdateTime = Random.Range(0.4f, 0.8f);
 
         _detectEnemyDistance = Random.Range(11f, 18f);
         _curDetectEnemyDistance = _detectEnemyDistance;
@@ -177,7 +179,7 @@ public class EnemyController : TankController
 
     private IEnumerator LogicIE()
     {
-        float waitTime = 0.2f;
+        float waitTime = Random.Range(0.15f, 0.3f);
         Vector2 wanderingDistance = new(1, 1);
 
         while (true)
@@ -205,7 +207,7 @@ public class EnemyController : TankController
             else
             {
                 Vector2 spd = Vector2.zero;
-                if (Vector2.Distance(_target.Controller.Velocity, Vector2.zero) > 0.1f)
+                if (Vector2.Distance(_target.Controller.Velocity, Vector2.zero) > 0.2f)
                 {
                     spd = _target.Controller.Velocity / (_target.Speed - _accuracy);
                 }
@@ -303,13 +305,15 @@ public class EnemyController : TankController
                 OnTargetChanged?.Invoke(_target);
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(_sightUpdateTime);
         }
     }
 
     private Destructible FindDestructible()
     {
         Destructible selectedDest = null;
+        if (WorldManager.Instance.Destructibles.Count <= 0) return selectedDest;
+        
         float curHealth = WorldManager.Instance.Destructibles[0].Health;
         foreach (Destructible dest in WorldManager.Instance.Destructibles)
         {

@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 public class HUDManager : MonoBehaviour
 {
@@ -15,13 +18,15 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private RectTransform _destructibleBarsTransform;
 
     [Header("HUDs")]
-    [SerializeField]
-    private UpgradesUI _upgradesUI;
+    [SerializeField] private UpgradesUI _upgradesUI;
     [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
+#if UNITY_EDITOR
     [SerializeField] private PlayerInfoUI _playerInfoUI;
     [SerializeField] private PauseUI _pauseUI;
-    public PauseUI PauseUI => _pauseUI;
+#endif
+    [SerializeField] private MenuUI _menuUI;
+    public MenuUI MenuUI =>_menuUI;
 
     [Header("Sounds")]
     [SerializeField] private AudioSource _audioSource;
@@ -31,15 +36,17 @@ public class HUDManager : MonoBehaviour
     {
         Instance = this;
 
-        if (Application.isMobilePlatform)
-            _mobileControls.Initialize();
-        else
+        _menuUI.Initialize();
+        _mobileControls.Initialize();
+        if (_mobileControls.gameObject.activeSelf)
             _mobileControls.gameObject.SetActive(false);
 
-        _upgradesUI.Initialize();
-        _playerInfoUI.Initialize();
         _darkBackground.Initialize();
+        _upgradesUI.Initialize();
+#if UNITY_EDITOR
         _pauseUI.Initialize();
+        _playerInfoUI.Initialize();
+#endif
 
         GameManager.Instance.OnPauseChanged += pause =>
         {
@@ -52,6 +59,36 @@ public class HUDManager : MonoBehaviour
                 _darkBackground.Hide();
             }
         };
+
+        WorldManager.Instance.OnGameEnded += HandleGameEnded;
+        WorldManager.Instance.OnGameStarted += HandleGameStarted;
+        HandleGameEnded();
+    }
+
+    private void HandleGameStarted()
+    {
+#if UNITY_EDITOR
+        _pauseUI.Show();
+#endif
+        if (IsTouchInput())
+        {
+            if (!_mobileControls.gameObject.activeSelf)
+                _mobileControls.gameObject.SetActive(true);
+        }
+    }
+
+    private void HandleGameEnded()
+    {
+#if UNITY_EDITOR
+        _pauseUI.Hide();
+#endif
+        _upgradesUI.Hide();
+
+        if (IsTouchInput())
+        {
+            if (_mobileControls.gameObject.activeSelf)
+                _mobileControls.gameObject.SetActive(false);
+        }
     }
 
     public BarUI CreateHealthbar(bool smallBar = false)
@@ -106,5 +143,11 @@ public class HUDManager : MonoBehaviour
     public void PlayButtonSound()
     {
         PlaySound(UISound.Button);
+    }
+
+    public bool IsTouchInput()
+    {
+        return Application.isMobilePlatform ||
+              (Application.isEditor && TouchSimulation.instance != null && TouchSimulation.instance.enabled);
     }
 }

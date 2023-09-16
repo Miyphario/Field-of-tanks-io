@@ -32,6 +32,10 @@
 		{
 			"key": "up.BulletSpeed",
 			"value": "Bullet Speed"
+		},
+		{
+			"key": "btn.Play",
+			"value": "Play"
 		}
 	]
 }

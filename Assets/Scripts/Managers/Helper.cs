@@ -15,30 +15,55 @@ public static class Helper
         }
     }
 
+    public static void DisableAllExcept(Transform parent, GameObject gameObjectExcept)
+    {
+        ToggleAllExcept(parent, gameObjectExcept, false);
+    }
+
     public static void EnableAllExcept(Transform parent, GameObject gameObjectExcept)
+    {
+        ToggleAllExcept(parent, gameObjectExcept, true);
+    }
+
+    private static void ToggleAllExcept(Transform parent, GameObject gameObjectExcept, bool enable)
     {
         for (int i = parent.childCount - 1; i >= 0; i--)
         {
             GameObject child = parent.GetChild(i).gameObject;
             if (child == gameObjectExcept) continue;
 
-            if (!child.activeSelf)
-                child.SetActive(true);
+            if (child.activeSelf != enable)
+                child.SetActive(enable);
         }
+    }
+
+    public static void DisableAll(Transform parent)
+    {
+        ToggleAll(parent, false);
+    }
+
+    public static void DisableAll(GameObject gameObject)
+    {
+        DisableAll(gameObject.transform);
     }
 
     public static void EnableAll(Transform parent)
     {
-        for (int i = parent.childCount - 1; i >= 0; i--)
-        {
-            GameObject child = parent.GetChild(i).gameObject;
-            if (!child.activeSelf)
-                child.SetActive(true);
-        }
+        ToggleAll(parent, true);
     }
 
     public static void EnableAll(GameObject gameObject)
     {
-        EnableAll(gameObject.transform);   
+        EnableAll(gameObject.transform);
+    }
+
+    private static void ToggleAll(Transform parent, bool enable)
+    {
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            GameObject child = parent.GetChild(i).gameObject;
+            if (child.activeSelf != enable)
+                child.SetActive(enable);
+        }
     }
 }

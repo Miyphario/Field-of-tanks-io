@@ -25,6 +25,7 @@ public class PlayerController : TankController
             DisabledInput = true;
             _moveInput = Vector2.zero;
             _currentMoveInput = Vector2.zero;
+            _lookInput = Vector2.zero;
             ShootEnd();
         };
         GameManager.Instance.OnPauseChanged += HandlePauseToggled;
@@ -39,6 +40,13 @@ public class PlayerController : TankController
     {
         base.Start();
         StartInput();
+    }
+
+    public void Initialize()
+    {
+        if (_shootLine.activeSelf)
+            _shootLine.SetActive(false);
+        DisabledInput = false;
     }
 
     private void StartInput()

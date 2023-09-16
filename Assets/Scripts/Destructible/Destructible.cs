@@ -50,6 +50,8 @@ public class Destructible : MonoBehaviour
 
     public bool TakeDamage(float damage, Tank attacker)
     {
+        if (_health <= 0) return false;
+        
         if (_health - damage > 0)
         {
             _health -= damage;
@@ -60,7 +62,6 @@ public class Destructible : MonoBehaviour
         else
         {
             _health = 0;
-            _healthbar.Dispose();
             OnDestroyed?.Invoke();
             if (attacker != null)
             {
@@ -72,6 +73,11 @@ public class Destructible : MonoBehaviour
         }
 
         return false;
+    }
+
+    public bool TakeDamage(float damage)
+    {
+        return TakeDamage(damage, null);
     }
 
     public void Push(Vector3 position, float force)
@@ -147,6 +153,7 @@ public class Destructible : MonoBehaviour
 
     public void DestroyMe()
     {
+        _healthbar.Dispose();
         GetComponent<Collider2D>().enabled = false;
         Helper.DisableAllExcept(transform, _audioSource);
         if (NearFromCamera())

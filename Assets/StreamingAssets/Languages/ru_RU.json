@@ -32,6 +32,10 @@
 		{
 			"key": "up.BulletSpeed",
 			"value": "Скорость снаряда"
+		},
+		{
+			"key": "btn.Play",
+			"value": "Играть"
 		}
 	]
 }

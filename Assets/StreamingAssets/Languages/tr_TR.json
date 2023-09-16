@@ -32,6 +32,10 @@
 		{
 			"key": "up.BulletSpeed",
 			"value": "Mermi hızı"
+		},
+		{
+			"key": "btn.Play",
+			"value": "Oynamak"
 		}
 	]
 }

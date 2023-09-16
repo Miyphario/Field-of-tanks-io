@@ -55,6 +55,9 @@ public class MobileControls : MonoBehaviour
         ETouch.Touch.onFingerDown -= HandleFingerDown;
         ETouch.Touch.onFingerMove -= HandleFingerMove;
         EnhancedTouchSupport.Disable();
+
+        HandleFingerUp(_lookFinger);
+        HandleFingerUp(_movementFinger);
     }
 
     private void HandleFingerUp(Finger finger)

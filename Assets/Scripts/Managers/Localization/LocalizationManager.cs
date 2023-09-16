@@ -12,16 +12,17 @@ static class LocalizationManager
     [DllImport("__Internal")]
     private static extern string GetLang();
 
-    private static string currentLanguage;
-    public static string CurrentLanguage => currentLanguage;
+    private static string _currentLanguage;
+    public static string CurrentLanguage => _currentLanguage;
     public static string LanguageName { get; private set; }
 
-    private static List<LocalizationLanguage> installedLanguages = new();
-    public static IReadOnlyList<LocalizationLanguage> InstalledLanguages => installedLanguages;
+    private static List<LocalizationLanguage> _installedLanguages = new();
+    public static IReadOnlyList<LocalizationLanguage> InstalledLanguages => _installedLanguages;
 
-    private static readonly Dictionary<string, string> localizedText = new();
+    private static readonly Dictionary<string, string> _localizedText = new();
 
-    private static bool isReady;
+    private static bool _isReady;
+    private static bool _isLoading;
     public static event Action OnLanguageChanged;
 
     public static void Initialize()
@@ -34,6 +35,9 @@ static class LocalizationManager
 
     private static IEnumerator GetInstalledLanguagesIE()
     {
+        if (_isLoading) yield break;
+
+        _isLoading = true;
         string path = Path.Combine(Application.streamingAssetsPath, "Languages");
 
         if (Directory.Exists(path) || Application.platform == RuntimePlatform.WebGLPlayer || Application.platform == RuntimePlatform.Android)
@@ -77,7 +81,7 @@ static class LocalizationManager
                     string langCode = Path.GetFileNameWithoutExtension(file);
 
                     LocalizationLanguage lang = new() { name = loadedData.languageName, code = langCode };
-                    installedLanguages.Add(lang);
+                    _installedLanguages.Add(lang);
                     Debug.Log($"Language {lang.name} is installed!");
                 }
             }
@@ -127,13 +131,16 @@ static class LocalizationManager
         else
         {
             Debug.LogError($"There are not files in current path: {path}");
+            _isLoading = false;
             yield break;
         }
+
+        _isLoading = false;
     }
 
     public static int GetLanguageIndex(string langName)
     {
-        return installedLanguages.FindIndex(x => x.name == langName);
+        return _installedLanguages.FindIndex(x => x.name == langName);
     }
 
     private static string GetLangFromText(string text)
@@ -146,7 +153,7 @@ static class LocalizationManager
         else
         {
             // For browser games and GetLang method when return only 2 first symbols
-            foreach (var installLang in installedLanguages)
+            foreach (var installLang in _installedLanguages)
             {
                 if (text.StartsWith(installLang.code[..2]))
                     return installLang.code;
@@ -163,7 +170,7 @@ static class LocalizationManager
 
     public static void ChangeLanguageByName(string langName)
     {
-        foreach (var lang in installedLanguages)
+        foreach (var lang in _installedLanguages)
         {
             if (lang.name == langName)
             {
@@ -175,9 +182,9 @@ static class LocalizationManager
 
     public static IEnumerator LoadLocalizedTextIE(string langName)
     {
-        if (currentLanguage == langName) yield break;
+        if (_currentLanguage == langName) yield break;
 
-        isReady = false;
+        _isReady = false;
         string path = Path.Combine(Application.streamingAssetsPath, "Languages");
         path = Path.Combine(path, $"{langName}.json");
 
@@ -216,14 +223,14 @@ static class LocalizationManager
 
             LanguageName = loadedData.languageName;
 
-            localizedText?.Clear();
+            _localizedText?.Clear();
             for (int i = 0; i < loadedData.items.Length; i++)
             {
-                localizedText.Add(loadedData.items[i].key, loadedData.items[i].value);
+                _localizedText.Add(loadedData.items[i].key, loadedData.items[i].value);
             }
 
-            currentLanguage = langName;
-            isReady = true;
+            _currentLanguage = langName;
+            _isReady = true;
 
             OnLanguageChanged?.Invoke();
         }
@@ -235,24 +242,25 @@ static class LocalizationManager
 
     public static string GetLocalizedText(string key)
     {
-        if (isReady)
+        if (_isReady)
         {
-            if (localizedText.ContainsKey(key))
+            if (_localizedText.ContainsKey(key))
             {
-                if (localizedText[key] == null || localizedText[key] == "")
+                if (_localizedText[key] == null || _localizedText[key] == "")
                     return key;
 
-                return localizedText[key];
+                return _localizedText[key];
             }
             else
             {
-                Debug.LogError($"Key \"{key}\" is not found in {currentLanguage}.json file!");
+                Debug.LogError($"Key \"{key}\" is not found in {_currentLanguage}.json file!");
                 return key;
             }
         }
         else
         {
-            Initialize();
+            if (!_isLoading)
+                Initialize();
             return key;
         }
     }
