@@ -169,7 +169,7 @@ public class EnemyController : TankController
             }
 
             direction = Vector2.ClampMagnitude(direction, 1f);
-            direction = WorldManager.Instance.ClampMoveInput(_rb.position, direction);
+            WorldManager.Instance.ClampMoveInput(_rb.position, ref direction);
 
             _rb.velocity = direction * Tank.Speed;
         }

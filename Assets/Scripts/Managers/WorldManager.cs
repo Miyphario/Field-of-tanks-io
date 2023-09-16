@@ -67,26 +67,7 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(DestructibleSpawningIE());
     }
 
-    //public void StartHost()
-    //{
-    //    NetworkManager.Singleton.StartHost();
-
-    //    HostPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<Player>();
-    //}
-
-    //public void StartClient()
-    //{
-    //    NetworkManager.Singleton.StartClient();
-
-    //    HostPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject().GetComponent<Player>();
-    //}
-
-    //public void StartServer()
-    //{
-    //    NetworkManager.Singleton.StartServer();
-    //}
-
-    public Vector2 RandomPointAround(Vector2 point, float distance, float objectSize)
+    public Vector2 RandomPointAround(in Vector2 point, float distance, float objectSize)
     {
         Vector2 pos = new(
             Random.Range(-distance, distance),
@@ -104,7 +85,7 @@ public class WorldManager : MonoBehaviour
         return pos;
     }
 
-    public Vector2 ClampMoveInput(Vector2 position, Vector2 direction)
+    public void ClampMoveInput(in Vector2 position, ref Vector2 direction)
     {
         float objectSize = 1f;
 
@@ -113,8 +94,6 @@ public class WorldManager : MonoBehaviour
 
         float maxY = _worldSize.y / 2f - objectSize;
         if ((position.y >= maxY && direction.y > 0f) || (position.y <= -maxY && direction.y < 0f)) direction.y = 0f;
-
-        return direction;
     }
 
     public Vector2 GetMaxDistanceToCamera(float objectSize)
@@ -122,11 +101,16 @@ public class WorldManager : MonoBehaviour
         return new(_maxDistanceToCamera.x + objectSize, _maxDistanceToCamera.y + objectSize);
     }
 
-    public bool IsFarFromCamera(Vector2 position, float objectSize)
+    public bool IsFarFromCamera(in Vector2 position, float objectSize)
+    {
+        return IsFarFromCamera(position, objectSize, _maxDistanceToCamera);
+    }
+
+    public bool IsFarFromCamera(in Vector2 position, float objectSize, in Vector2 maxDistance)
     {
         Vector2 camPos = GameManager.Instance.MainCamera.transform.position;
         Vector2 dist = new(Mathf.Abs(position.x - camPos.x), Mathf.Abs(position.y - camPos.y));
-        Vector2 maxDist = GetMaxDistanceToCamera(objectSize);
+        Vector2 maxDist = new(maxDistance.x + objectSize, maxDistance.y + objectSize);
         return dist.x > maxDist.x || dist.y > maxDist.y;
     }
 

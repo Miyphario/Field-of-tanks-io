@@ -37,8 +37,7 @@ public enum UpgradeMenu
 
 public enum ParticlesType
 {
-    TankExplode, Shoot,
-    BigObjectDestroy, MediumObjectDestroy, SmallObjectDestroy
+    TankExplode, Shoot
 }
 
 [Serializable]

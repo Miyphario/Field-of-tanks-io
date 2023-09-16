@@ -110,7 +110,7 @@ public class PlayerController : TankController
     private void Update()
     {
         _currentMoveInput = Vector2.SmoothDamp(_currentMoveInput, _moveInput, ref _smoothInput, _rb.drag / 60f);
-        _currentMoveInput = WorldManager.Instance.ClampMoveInput(_rb.position, _currentMoveInput);
+        WorldManager.Instance.ClampMoveInput(_rb.position, ref _currentMoveInput);
 
         if (DisabledInput) return;
         Vector2 rotDirection;

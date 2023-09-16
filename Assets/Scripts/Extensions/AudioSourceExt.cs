@@ -25,6 +25,8 @@ public static class AudioSourceExt
 
     public static float GetClipRemainingTime(this AudioSource source)
     {
+        if (source.clip == null) return 0f;
+        
         float remainingTime = (source.clip.length - source.time) / source.pitch;
         return source.IsReversePitch() ?
                (source.clip.length + remainingTime) :

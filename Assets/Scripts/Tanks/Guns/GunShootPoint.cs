@@ -33,10 +33,13 @@ public class GunShootPoint : MonoBehaviour
     {
         Bullet bul = WorldManager.Instance.BulletsPool.GetFromPool(_shootPoint.position, transform.rotation).GetComponent<Bullet>();
         bul.Initialize(Damage, BulletSpeed, _bulletSize, _gun.Owner);
-        _audioSource.pitch = Random.Range(0.9f, 1.1f);
-        _audioSource.volume = Random.Range(0.7f, 0.8f);
-        _audioSource.PlayOneShot(_audioSource.clip);
-        PrefabManager.Instance.CreateParticles(ParticlesType.Shoot, _shootPoint.transform.position, transform.rotation);
+        if (!WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f))
+        {
+            _audioSource.pitch = Random.Range(0.9f, 1.1f);
+            _audioSource.volume = Random.Range(0.7f, 0.8f);
+            _audioSource.PlayOneShot(_audioSource.clip);
+            PrefabManager.Instance.CreateParticles(ParticlesType.Shoot, _shootPoint.transform.position, transform.rotation);
+        }
     }
 
     private IEnumerator ShootIE()

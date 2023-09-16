@@ -132,7 +132,7 @@ MonoBehaviour:
   _minHealthRestore: 8
   _maxHealthRestore: 14
   _audioSource: {fileID: 2325387261546710658}
-  _particles: 2
+  _destroyParticles: {fileID: 8341560808684429317, guid: 9c06a9d4f67afa448b48d37e7607bf0c, type: 3}
 --- !u!1 &1443081780713780015
 GameObject:
   m_ObjectHideFlags: 0

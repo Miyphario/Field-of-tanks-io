@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -110,9 +111,18 @@ public class Tank : MonoBehaviour
         StopAllCoroutines();
         GetComponent<Collider2D>().enabled = false;
         Helper.DisableAllExcept(transform, _audioSource);
-        PlayDestroySound();
-        PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+        if (NearFromCamera())
+        {
+            PlayDestroySound();
+            PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+        }
+
         StartCoroutine(DestroyMeIE());
+    }
+
+    private bool NearFromCamera()
+    {
+        return !WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f);
     }
 
     protected virtual void DestroySelf()

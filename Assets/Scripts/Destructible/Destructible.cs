@@ -30,7 +30,7 @@ public class Destructible : MonoBehaviour
     public event Action OnDestroyed;
 
     [Header("Visual")]
-    [SerializeField] private ParticlesType _particles;
+    [SerializeField] private GameObject _destroyParticles;
 
     private void Awake()
     {
@@ -54,7 +54,8 @@ public class Destructible : MonoBehaviour
         {
             _health -= damage;
             _healthbar.SetValue(_health);
-            PlayHitSound();
+            if (NearFromCamera())
+                PlayHitSound();
         }
         else
         {
@@ -148,9 +149,18 @@ public class Destructible : MonoBehaviour
     {
         GetComponent<Collider2D>().enabled = false;
         Helper.DisableAllExcept(transform, _audioSource);
-        PlayDestroySound();
-        PrefabManager.Instance.CreateParticles(_particles, transform.position, Quaternion.identity);
+        if (NearFromCamera())
+        {
+            PlayDestroySound();
+            Instantiate(_destroyParticles, transform.position, transform.rotation);
+        }
+        
         StartCoroutine(DestroyMeIE());
+    }
+
+    private bool NearFromCamera()
+    {
+        return !WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f);
     }
 
     private IEnumerator DestroyMeIE()
