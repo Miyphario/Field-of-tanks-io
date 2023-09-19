@@ -36,6 +36,14 @@
 		{
 			"key": "btn.Play",
 			"value": "Play"
+		},
+		{
+			"key": "btn.Volume",
+			"value": "Volume"
+		},
+		{
+			"key": "btn.BatterySave",
+			"value": "Battery saving"
 		}
 	]
 }

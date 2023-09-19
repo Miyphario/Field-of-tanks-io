@@ -42,7 +42,6 @@ public class EnemyController : TankController
     private float MaxEnemyDistance => _curDetectEnemyDistance + 3f;
     private Vector2 _moveDistance;
     private Vector2 _shootDistance;
-    private float _sightUpdateTime = 0.5f;
 
     private AIState _state = AIState.Idle;
     private float _retreatHealthPercent = 20f;
@@ -54,6 +53,8 @@ public class EnemyController : TankController
             return curHealthPerc <= _retreatHealthPercent;
         }
     }
+
+    private bool _isFarFromCamera;
 
     protected override void Awake()
     {
@@ -89,22 +90,23 @@ public class EnemyController : TankController
             _lookDirection = Vector2.zero;
             _rb.velocity = Vector2.zero;
             _target = null;
+            _isFarFromCamera = true;
         };
     }
 
     public void Initialize()
     {
         _accuracy = Random.Range(0.1f, 3f);
-        _minRotationSpeed = Random.Range(100f, 200f);
-        _maxRotationSpeed = Random.Range(200f, 300f) + _minRotationSpeed;
+        _minRotationSpeed = Random.Range(150f, 200f);
+        _maxRotationSpeed = Random.Range(200f, 350f) + _minRotationSpeed;
 
         _retreatHealthPercent = Random.Range(10f, 35f);
-        _sightUpdateTime = Random.Range(0.4f, 0.8f);
 
         _detectEnemyDistance = Random.Range(11f, 18f);
         _curDetectEnemyDistance = _detectEnemyDistance;
         _detectInvisibleDistance = Random.Range(2f, 4f);
 
+        // Don't touch this
         _moveDistance = new(Random.Range(4f, 12f), Random.Range(1.5f, 3f));
         _shootDistance = new(_moveDistance.x + 3f, _moveDistance.y + 3f);
         
@@ -132,9 +134,14 @@ public class EnemyController : TankController
     {
         if (DisabledInput) return;
 
-        if (_lookDirection != Vector2.zero)
+        Quaternion toRot = QuaternionExt.RotationToDirection(_lookDirection);
+
+        if (_isFarFromCamera || _lookDirection == Vector2.zero)
         {
-            Quaternion toRot = Quaternion.LookRotation(Vector3.forward, _lookDirection);
+            transform.rotation = toRot;
+        }
+        else
+        {
             transform.rotation = Quaternion.RotateTowards(transform.rotation, toRot, RotationSpeed * Time.deltaTime);
         }
     }
@@ -178,12 +185,17 @@ public class EnemyController : TankController
     }
 
     private IEnumerator LogicIE()
-    {
-        float waitTime = Random.Range(0.15f, 0.3f);
+    {  
         Vector2 wanderingDistance = new(1, 1);
 
         while (true)
         {
+            float waitTime;
+            if (!_isFarFromCamera)
+                waitTime = 0.2f;
+            else
+                waitTime = 1f;
+            
             if (_target == null)
             {
                 Destructible dest = FindDestructible();
@@ -257,6 +269,8 @@ public class EnemyController : TankController
     {
         while (true)
         {
+            _isFarFromCamera = WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f);
+
             if (_target != null)
             {
                 _distanceToTarget = DistanceToPoint(_target.transform.position);
@@ -276,9 +290,12 @@ public class EnemyController : TankController
             float dist;
             Tank tar = _target;
             float curDist = _curDetectEnemyDistance;
-            foreach (Tank tank in WorldManager.Instance.Tanks)
+            for (int i = WorldManager.Instance.Tanks.Count - 1; i >= 0; i--)
             {
+                Tank tank = WorldManager.Instance.Tanks[i];
+
                 if (tank.Health <= 0f) continue;
+                if (tank == null) continue;
                 if (tank.TeamID == Tank.TeamID || tank == Tank || !tank.gameObject.activeSelf) continue;
                 if (tank == _target) continue;
 
@@ -305,7 +322,10 @@ public class EnemyController : TankController
                 OnTargetChanged?.Invoke(_target);
             }
 
-            yield return new WaitForSeconds(_sightUpdateTime);
+            if (_isFarFromCamera)
+                yield return new WaitForSeconds(0.3f);
+            else
+                yield return new WaitForSeconds(1f);
         }
     }
 

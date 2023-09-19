@@ -9,9 +9,8 @@ public static class Helper
             Transform child = parent.GetChild(i);
             if (child.TryGetComponent<T>(out var comp))
                 if (comp == componentExcept) continue;
-
-            if (child.gameObject.activeSelf)
-                child.gameObject.SetActive(false);
+            
+            child.gameObject.Toggle(false);
         }
     }
 
@@ -31,9 +30,7 @@ public static class Helper
         {
             GameObject child = parent.GetChild(i).gameObject;
             if (child == gameObjectExcept) continue;
-
-            if (child.activeSelf != enable)
-                child.SetActive(enable);
+            child.Toggle(enable);
         }
     }
 
@@ -62,8 +59,7 @@ public static class Helper
         for (int i = parent.childCount - 1; i >= 0; i--)
         {
             GameObject child = parent.GetChild(i).gameObject;
-            if (child.activeSelf != enable)
-                child.SetActive(enable);
+            child.Toggle(enable);
         }
     }
 }

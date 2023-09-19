@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class Gun : MonoBehaviour
@@ -6,10 +7,9 @@ public class Gun : MonoBehaviour
     private bool _isShooting;
     public bool IsShooting => _isShooting;
 
-    [SerializeField] private GunShootPoint[] _shootPoints;
+    private List<GunShootPoint> _shootPoints = new();
 
-    [SerializeField, Header("UI")]
-    private Sprite _uiSprite;
+    [SerializeField] private Sprite _uiSprite;
     public Sprite UISprite => _uiSprite;
 
     private Tank _owner;
@@ -18,9 +18,13 @@ public class Gun : MonoBehaviour
     public void Initialize(Tank owner)
     {
         _owner = owner;
-        foreach (var point in _shootPoints)
+        for (int i = transform.childCount - 1; i >= 0; i--)
         {
-            point.Initialize(this);
+            if (transform.GetChild(i).TryGetComponent(out GunShootPoint shootPoint))
+            {
+                _shootPoints.Add(shootPoint);
+                _shootPoints[^1].Initialize(this);
+            }
         }
     }
 
@@ -48,8 +52,7 @@ public class Gun : MonoBehaviour
     {
         ShootEnd();
         StopAllCoroutines();
-        if (gameObject.activeSelf)
-            gameObject.SetActive(false);
+        gameObject.Toggle(false);
     }
 
     public Gun Change(Gun gun)

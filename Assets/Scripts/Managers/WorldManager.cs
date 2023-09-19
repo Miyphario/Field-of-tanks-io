@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -44,6 +45,7 @@ public class WorldManager : MonoBehaviour
     [SerializeField] private float _maxBushes;
 
     private bool _notReadyToSpawn;
+    public bool IsReady => !_notReadyToSpawn;
     private bool _isPlaying;
     private float _destroyTime = 0.05f;
     private float _destroyObjectsPerCycle = 15;
@@ -94,10 +96,8 @@ public class WorldManager : MonoBehaviour
         HostPlayer.Initialize(_curTeamID);
         _curTeamID++;
         _tanks.Add(HostPlayer);
-
-        if (!HostPlayer.gameObject.activeSelf)
-            HostPlayer.gameObject.SetActive(true);
-
+        HostPlayer.gameObject.Toggle(true);
+        
         OnPlayerCreated?.Invoke(HostPlayer);
         OnGameStarted?.Invoke();
 
@@ -238,6 +238,7 @@ public class WorldManager : MonoBehaviour
         {
             for (int i = 0; i < _destroyObjectsPerCycle; i++)
             {
+                if (_tanks[^1] == null || _tanks[^1].IsDestroyed()) continue;
                 _tanks[^1].TakeDamage(_tanks[^1].MaxHealth);
                 if (_tanks.Count <= 0) break;
             }
@@ -309,7 +310,7 @@ public class WorldManager : MonoBehaviour
                 Quaternion spawnRot = GetRandomRotation();
                 GameObject go = Instantiate(_bushesPrefab, spawnPos, spawnRot, _bushesParent);
                 go.transform.localScale = new(size, size, size);
-                go.SetActive(true);
+                go.Toggle(true);
                 curBush++;
 
                 if (curBush >= _maxBushes) yield break;

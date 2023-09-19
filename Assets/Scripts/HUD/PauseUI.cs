@@ -15,29 +15,20 @@ public class PauseUI : MonoBehaviour
 
     public void Initialize()
     {
-        if (_unpauseButton.gameObject.activeSelf)
-            _unpauseButton.gameObject.SetActive(false);
-        
-        if (!_pauseButton.gameObject.activeSelf)
-            _pauseButton.gameObject.SetActive(true);
+        _unpauseButton.gameObject.Toggle(false);
+        _pauseButton.gameObject.Toggle(true);
 
         GameManager.Instance.OnPauseChanged += pause =>
         {
             if (pause)
             {
-                if (!_unpauseButton.gameObject.activeSelf)
-                    _unpauseButton.gameObject.SetActive(true);
-                
-                if (_pauseButton.gameObject.activeSelf)
-                    _pauseButton.gameObject.SetActive(false);
+                _unpauseButton.gameObject.Toggle(true);
+                _pauseButton.gameObject.Toggle(false);
             }
             else
             {
-                if (_unpauseButton.gameObject.activeSelf)
-                    _unpauseButton.gameObject.SetActive(false);
-                
-                if (!_pauseButton.gameObject.activeSelf)
-                    _pauseButton.gameObject.SetActive(true);
+                _unpauseButton.gameObject.Toggle(false);
+                _pauseButton.gameObject.Toggle(true);
             }
         };
     }

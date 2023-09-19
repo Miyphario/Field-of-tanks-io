@@ -55,8 +55,6 @@ public class UpgradesUI : MonoBehaviour
 
         RectTransform backButtonRect = _backButton.GetComponent<RectTransform>();
         _defaultBackButtonPosition = backButtonRect.anchoredPosition;
-
-        Hide();
     }
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
@@ -66,7 +64,7 @@ public class UpgradesUI : MonoBehaviour
         switch (menu)
         {
             case UpgradeMenu.None:
-                SetActiveButtons(0);
+                ShowButtons(0);
                 break;
 
             case UpgradeMenu.Base:
@@ -78,8 +76,8 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonText.GetComponent<LocalizationText>().SetKey("up.Gun");
                 _secondUpgradeButton.interactable = true;
 
-                SetActiveButtons(2);
-                SetBackButtonActive(false);
+                ShowButtons(2);
+                ToggleBackButton(false);
                 break;
 
             case UpgradeMenu.Tank:
@@ -119,8 +117,8 @@ public class UpgradesUI : MonoBehaviour
                     _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
-                SetActiveButtons(3);
-                SetBackButtonActive(true);
+                ShowButtons(3);
+                ToggleBackButton(true);
                 break;
 
             case UpgradeMenu.Gun:
@@ -160,8 +158,8 @@ public class UpgradesUI : MonoBehaviour
                     _thirdButtonText.GetComponent<LocalizationText>().SetKey("up.Max");
                 }
 
-                SetActiveButtons(3);
-                SetBackButtonActive(true);
+                ShowButtons(3);
+                ToggleBackButton(true);
                 break;
 
             case UpgradeMenu.NewGun:
@@ -176,13 +174,13 @@ public class UpgradesUI : MonoBehaviour
                 _secondButtonText.GetComponent<LocalizationText>().SetKey(string.Empty);
                 _secondUpgradeButton.interactable = true;
 
-                SetActiveButtons(2);
-                SetBackButtonActive(false);
+                ShowButtons(2);
+                ToggleBackButton(false);
                 break;
         }
     }
 
-    public void SetActiveButtons(int count, bool force = false)
+    public void ShowButtons(int count, bool force = false)
     {
         if (count == 0)
         {
@@ -197,30 +195,21 @@ public class UpgradesUI : MonoBehaviour
         switch (count)
         {
             case 1:
-                if (!_firstUpgradeButton.gameObject.activeSelf)
-                    _firstUpgradeButton.gameObject.SetActive(true);
-                if (_secondUpgradeButton.gameObject.activeSelf)
-                    _secondUpgradeButton.gameObject.SetActive(false);
-                if (_thirdUpgradeButton.gameObject.activeSelf)
-                    _thirdUpgradeButton.gameObject.SetActive(false);
+                _firstUpgradeButton.gameObject.Toggle(true);
+                _secondUpgradeButton.gameObject.Toggle(false);
+                _thirdUpgradeButton.gameObject.Toggle(false);
                 break;
 
             case 2:
-                if (!_firstUpgradeButton.gameObject.activeSelf)
-                    _firstUpgradeButton.gameObject.SetActive(true);
-                if (!_secondUpgradeButton.gameObject.activeSelf)
-                    _secondUpgradeButton.gameObject.SetActive(true);
-                if (_thirdUpgradeButton.gameObject.activeSelf)
-                    _thirdUpgradeButton.gameObject.SetActive(false);
+                _firstUpgradeButton.gameObject.Toggle(true);
+                _secondUpgradeButton.gameObject.Toggle(true);
+                _thirdUpgradeButton.gameObject.Toggle(false);
                 break;
 
             case 3:
-                if (!_firstUpgradeButton.gameObject.activeSelf)
-                    _firstUpgradeButton.gameObject.SetActive(true);
-                if (!_secondUpgradeButton.gameObject.activeSelf)
-                    _secondUpgradeButton.gameObject.SetActive(true);
-                if (!_thirdUpgradeButton.gameObject.activeSelf)
-                    _thirdUpgradeButton.gameObject.SetActive(true);
+                _firstUpgradeButton.gameObject.Toggle(true);
+                _secondUpgradeButton.gameObject.Toggle(true);
+                _thirdUpgradeButton.gameObject.Toggle(true);
                 break;
         }
 
@@ -240,7 +229,7 @@ public class UpgradesUI : MonoBehaviour
         }
     }
 
-    private void SetBackButtonActive(bool active, bool force = false)
+    private void ToggleBackButton(bool active, bool force = false)
     {
         if (!force && _backButton.gameObject.activeSelf == active) return;
 
@@ -250,23 +239,25 @@ public class UpgradesUI : MonoBehaviour
 
         if (active)
         {
-            if (!_backButton.gameObject.activeSelf)
-                _backButton.gameObject.SetActive(true);
-
+            _backButton.gameObject.Toggle(true);
             LeanTween.move(backButtonRect, _defaultBackButtonPosition, animTime).setIgnoreTimeScale(true).setEase(_animType);
         }
         else
         {
+            if (force)
+            {
+                _backButton.gameObject.Toggle(false);
+            }
+
             LeanTween.move(backButtonRect, _animBackButtonPosition, animTime).setIgnoreTimeScale(true).setEase(_animType).
             setOnComplete(() => 
             {
-                if (_backButton.gameObject.activeSelf)
-                    _backButton.gameObject.SetActive(false);
+                _backButton.gameObject.Toggle(false);
             });
         }
     }
 
-    private void ToggleMenu(bool enable, bool force = false)
+    public void ToggleMenu(bool enable, bool force = false)
     {
         if (!force && _menuRect.gameObject.activeSelf == enable) return;
 
@@ -275,26 +266,22 @@ public class UpgradesUI : MonoBehaviour
 
         if (enable)
         {
-            if (!_menuRect.gameObject.activeSelf)
-                _menuRect.gameObject.SetActive(true);
-
+            _menuRect.gameObject.Toggle(true);
             LeanTween.move(_menuRect, _defaultMenuPosition, animTime).setIgnoreTimeScale(true).setEase(_animType);
         }
         else
         {
-            SetBackButtonActive(false);
+            if (force)
+            {
+                _menuRect.gameObject.Toggle(false);
+            }
+
+            ToggleBackButton(enable, force);
             LeanTween.move(_menuRect, _animMenuPosition, animTime).setIgnoreTimeScale(true).setEase(_animType).
             setOnComplete(() => 
             {
-                if (_menuRect.gameObject.activeSelf)
-                    _menuRect.gameObject.SetActive(false);
+                _menuRect.gameObject.Toggle(false);
             });
         }
-    }
-
-    public void Hide()
-    {
-        SetActiveButtons(0, true);
-        SetBackButtonActive(false, true);
     }
 }

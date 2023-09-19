@@ -48,11 +48,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a33fe59ed319f91498c528e232163e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shootPoints:
-  - {fileID: 701267508188374439}
-  - {fileID: 1540539437144076962}
-  - {fileID: 3980723710829386747}
-  - {fileID: 1340940581579305093}
   _uiSprite: {fileID: 21300000, guid: 3942b532fb2218e40ba92da8c891ee90, type: 3}
 --- !u!1001 &598673642968540043
 PrefabInstance:
@@ -111,17 +106,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
---- !u!114 &701267508188374439 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
-  m_PrefabInstance: {fileID: 598673642968540043}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83bcefdf6f003c4aad4eb7faf6d2f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &5580844362979565589 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4989371426007155614, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
@@ -135,6 +119,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2926577497400679920}
     m_Modifications:
+    - target: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
+      propertyPath: _audioSource
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: m_Name
       value: MediumShootPoint (3)
@@ -180,21 +168,11 @@ PrefabInstance:
       value: 90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8528931485300612804, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
---- !u!114 &1340940581579305093 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
-  m_PrefabInstance: {fileID: 1400188262322058921}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83bcefdf6f003c4aad4eb7faf6d2f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &6220519121067750711 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4989371426007155614, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
@@ -208,6 +186,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2926577497400679920}
     m_Modifications:
+    - target: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
+      propertyPath: _audioSource
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: m_Name
       value: MediumShootPoint (1)
@@ -253,21 +235,11 @@ PrefabInstance:
       value: 180
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8528931485300612804, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
---- !u!114 &1540539437144076962 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
-  m_PrefabInstance: {fileID: 1482974968074728590}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83bcefdf6f003c4aad4eb7faf6d2f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &5884334447406872336 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4989371426007155614, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
@@ -281,6 +253,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 2926577497400679920}
     m_Modifications:
+    - target: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
+      propertyPath: _audioSource
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 2149995494848330343, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
       propertyPath: m_Name
       value: MediumShootPoint (2)
@@ -326,21 +302,11 @@ PrefabInstance:
       value: -90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8528931485300612804, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
---- !u!114 &3980723710829386747 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 141174634145908268, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}
-  m_PrefabInstance: {fileID: 3948480993356537303}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83bcefdf6f003c4aad4eb7faf6d2f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &8355897407350890057 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4989371426007155614, guid: 38ee4cb52b522364da2d8c6a491fb8be, type: 3}

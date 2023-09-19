@@ -10,17 +10,14 @@ public class BackgroundUI : MonoBehaviour
     public void Initialize()
     {
         _rectTransform = GetComponent<RectTransform>();
-
-        if (gameObject.activeSelf)
-            gameObject.SetActive(false);
+        gameObject.Toggle(false);
         GetComponent<Image>().color = _disabledColor;
     }
 
     public void Show()
     {
         LeanTween.cancel(_rectTransform);
-        if (!gameObject.activeSelf)
-            gameObject.SetActive(true);
+        gameObject.Toggle(true);
         LeanTween.color(_rectTransform, _defaultColor, 0.5f).setIgnoreTimeScale(true);
     }
 
@@ -29,8 +26,7 @@ public class BackgroundUI : MonoBehaviour
         LeanTween.cancel(_rectTransform);
         LeanTween.color(_rectTransform, _disabledColor, 0.25f).setIgnoreTimeScale(true).setOnComplete(() => 
         {
-            if (gameObject.activeSelf)
-                gameObject.SetActive(false);
+            gameObject.Toggle(false);
         });
     }
 

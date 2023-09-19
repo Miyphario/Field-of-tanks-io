@@ -66,8 +66,7 @@ public class MobileControls : MonoBehaviour
         {
             _movementFinger = null;
             _movementStick.Knob.anchoredPosition = Vector2.zero;
-            if (_movementStick.gameObject.activeSelf)
-                _movementStick.gameObject.SetActive(false);
+            _movementStick.gameObject.Toggle(false);
             _movementAmount = Vector2.zero;
             OnMoveEnded?.Invoke(_movementAmount);
         }
@@ -75,8 +74,7 @@ public class MobileControls : MonoBehaviour
         {
             _lookFinger = null;
             _lookStick.Knob.anchoredPosition = Vector2.zero;
-            if (_lookStick.gameObject.activeSelf)
-                _lookStick.gameObject.SetActive(false);
+            _lookStick.gameObject.Toggle(false);
             _lookAmount = Vector2.zero;
             OnLookEnded?.Invoke();
         }
@@ -125,8 +123,7 @@ public class MobileControls : MonoBehaviour
         {
             _movementFinger = finger;
             _movementAmount = Vector2.zero;
-            if (!_movementStick.gameObject.activeSelf)
-                _movementStick.gameObject.SetActive(true);
+            _movementStick.gameObject.Toggle(true);
             _movementStick.RectTransform.sizeDelta = _stickSize;
             _movementStick.RectTransform.anchoredPosition = ClampStartPosition(finger.screenPosition);
             OnMoveStarted?.Invoke();
@@ -135,8 +132,7 @@ public class MobileControls : MonoBehaviour
         {
             _lookFinger = finger;
             _lookAmount = Vector2.zero;
-            if (!_lookStick.gameObject.activeSelf)
-                _lookStick.gameObject.SetActive(true);
+            _lookStick.gameObject.Toggle(true);
             _lookStick.RectTransform.sizeDelta = _stickSize;
             _lookStick.RectTransform.anchoredPosition = ClampStartPosition(finger.screenPosition);
             OnLookStarted?.Invoke();

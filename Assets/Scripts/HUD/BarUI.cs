@@ -30,8 +30,7 @@ public class BarUI : MonoBehaviour
         UpdatePosition();
 
         if (enable)
-            if (!gameObject.activeSelf)
-                gameObject.SetActive(true);
+            gameObject.Toggle(true);
     }
 
     private void Update()
@@ -58,13 +57,13 @@ public class BarUI : MonoBehaviour
         if (gameObject.activeSelf) return;
 
         UpdatePosition();
-        gameObject.SetActive(true);
+        gameObject.Toggle(true);
     }
 
     public void Disable()
     {
         if (!gameObject.activeSelf) return;
-        gameObject.SetActive(false);
+        gameObject.Toggle(false);
     }
 
     public void Dispose()
@@ -81,11 +80,7 @@ public class BarUI : MonoBehaviour
             Dispose();
             return;
         }
-
-        RectTransform canvasRect = HUDManager.Instance.CanvasRect;
-        Vector2 goalPos = GameManager.Instance.MainCamera.WorldToViewportPoint(_owner.transform.position + _offset);
-        Vector2 screenPos = new(goalPos.x * canvasRect.sizeDelta.x, goalPos.y * canvasRect.sizeDelta.y);
-
-        _rectTransform.anchoredPosition = screenPos;
+        
+        _rectTransform.anchoredPosition = HUDManager.Instance.GetScreenPosition(_owner.transform.position, _offset);
     }
 }

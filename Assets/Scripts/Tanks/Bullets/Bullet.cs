@@ -70,7 +70,7 @@ public class Bullet : MonoBehaviour, IPoolable
 
     public void AddToPool()
     {
-        WorldManager.Instance.BulletsPool.AddToPool(gameObject);
+        WorldManager.Instance.BulletsPool.AddToPool(this);
         _rb.velocity = Vector2.zero;
         _isAlive = false;
     }

@@ -1,6 +1,5 @@
 using UnityEngine;
 using TMPro;
-using UnityEngine.InputSystem;
 
 public class LocalizationText : MonoBehaviour
 {

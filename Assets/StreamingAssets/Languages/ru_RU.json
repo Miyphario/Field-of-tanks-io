@@ -36,6 +36,14 @@
 		{
 			"key": "btn.Play",
 			"value": "Играть"
+		},
+		{
+			"key": "btn.Volume",
+			"value": "Громкость"
+		},
+		{
+			"key": "btn.BatterySave",
+			"value": "Экономия батареи"
 		}
 	]
 }

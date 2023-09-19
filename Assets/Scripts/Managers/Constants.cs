@@ -11,7 +11,7 @@ public static class Constants
     public const float MAX_HEALTH_PER_LEVEL = 10f;
 
     // Max upgrade attributes
-    public const float MIN_FIRE_RATE = 0.16f;
+    public const float MIN_FIRE_RATE = 0.35f;
     public const float MAX_SPEED = 10f;
     public const float MAX_DAMAGE = 100f;
     public const float MAX_HEALTH = 500f;

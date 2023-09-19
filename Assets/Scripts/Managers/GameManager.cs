@@ -44,7 +44,9 @@ public class GameManager
         _camera = Camera.main;
 
         if (!Application.isMobilePlatform)
+        {
             Bootstrap.Instance.StartCoroutine(CheckControlsTypeIE());
+        }
         else
         {
             IsKeyboardControls = false;
@@ -101,5 +103,25 @@ public class GameManager
     public void TogglePause()
     {
         IsPaused = !IsPaused;
+    }
+
+    public void SetBatterySave(bool enable)
+    {
+        if (enable)
+        {
+            Application.targetFrameRate = 30;
+        }
+        else
+        {
+            if (Application.isMobilePlatform)
+                Application.targetFrameRate = 60;
+            else
+                Application.targetFrameRate = 0;
+        }
+    }
+
+    public bool GetBatterySave()
+    {
+        return Application.targetFrameRate == 30;
     }
 }

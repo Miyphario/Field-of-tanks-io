@@ -74,9 +74,7 @@ public class Player : Tank
 
     protected override void DestroySelf()
     {
-        if (gameObject.activeSelf)
-            gameObject.SetActive(false);
-        
+        gameObject.Toggle(false);
         ResetToDefault();
     }
 

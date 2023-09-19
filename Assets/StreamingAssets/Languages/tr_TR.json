@@ -36,6 +36,14 @@
 		{
 			"key": "btn.Play",
 			"value": "Oynamak"
+		},
+		{
+			"key": "btn.Volume",
+			"value": "Ses"
+		},
+		{
+			"key": "btn.BatterySave",
+			"value": "Pil tasarrufu"
 		}
 	]
 }

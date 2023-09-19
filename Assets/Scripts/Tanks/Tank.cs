@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.Linq;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -81,7 +80,8 @@ public class Tank : MonoBehaviour
         else
         {
             Health = 0f;
-            OnDestroyed?.Invoke();
+            if (Controller != null)
+                OnDestroyed?.Invoke();
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();

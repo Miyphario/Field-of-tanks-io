@@ -24,14 +24,14 @@ public class Bootstrap : MonoBehaviour
 
         _ = new InputManager();
         _ = new GameManager();
+        LocalizationManager.Initialize();
 
         _prefabManager.Initialize();
+        _soundManager.Initialize();
         _worldManager.Initialize();
         _hudManager.Initialize();
         _cameraManager.Initialize();
-        _soundManager.Initialize();
         _screenshotManager.Initialize();
 
-        LocalizationManager.Initialize();
     }
 }

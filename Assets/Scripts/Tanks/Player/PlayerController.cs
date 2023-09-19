@@ -44,8 +44,7 @@ public class PlayerController : TankController
 
     public void Initialize()
     {
-        if (_shootLine.activeSelf)
-            _shootLine.SetActive(false);
+        _shootLine.Toggle(false);
         DisabledInput = false;
     }
 
@@ -66,7 +65,9 @@ public class PlayerController : TankController
         InputManager.Instance.OnSecondUpgrade += Tank.SelectUpgrade;
         InputManager.Instance.OnThirdUpgrade += Tank.SelectUpgrade;
         InputManager.Instance.OnBack += Tank.UpgradeMenuBack;
+#if UNITY_EDITOR
         InputManager.Instance.OnEscape += GameManager.Instance.TogglePause;
+#endif
 
         // Mobile controls
         if (Application.isMobilePlatform)
@@ -101,7 +102,10 @@ public class PlayerController : TankController
         InputManager.Instance.OnSecondUpgrade -= Tank.SelectUpgrade;
         InputManager.Instance.OnThirdUpgrade -= Tank.SelectUpgrade;
         InputManager.Instance.OnBack -= Tank.UpgradeMenuBack;
+
+#if UNITY_EDITOR
         InputManager.Instance.OnEscape -= GameManager.Instance.TogglePause;
+#endif
 
         // Mobile controls
         if (Application.isMobilePlatform)
@@ -134,8 +138,9 @@ public class PlayerController : TankController
             else
                 rotDirection = _lookInput;
         }
-
-        transform.rotation = transform.rotation.RotationToDirection(transform.rotation, rotDirection);
+        
+        Quaternion toRot = QuaternionExt.RotationToDirection(rotDirection);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, toRot, 1000f * Time.deltaTime);
     }
 
     private void FixedUpdate()
@@ -149,8 +154,7 @@ public class PlayerController : TankController
         if (DisabledInput) return;
 
         Tank.Gun.ShootStart();
-        if (!_shootLine.activeSelf)
-            _shootLine.SetActive(true);
+        _shootLine.Toggle(true);
     }
 
     private void ShootStartMouse()
@@ -164,8 +168,7 @@ public class PlayerController : TankController
     {
         Tank.Gun.ShootEnd();
         _isLooking = false;
-        if (_shootLine.activeSelf)
-            _shootLine.SetActive(false);
+        _shootLine.Toggle(false);
     }
 
     private void Look(Vector2 input)

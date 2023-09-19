@@ -42,19 +42,21 @@ public class MenuUI : MonoBehaviour
     {
         LeanTween.cancel(_buttonPlay.gameObject);
         LeanTween.cancel(_buttonSettings.gameObject);
+        _buttonPlay.interactable = false;
+        _buttonSettings.interactable = false;
 
         LeanTween.move(_buttonPlay.GetComponent<RectTransform>(), _buttonPlayAnimPos, _animSpeed + 0.12f).setIgnoreTimeScale(true).
         setEase(_animType).setOnComplete(() => 
         {
-            if (_buttonPlay.gameObject.activeSelf)
-                _buttonPlay.gameObject.SetActive(false);
+            _buttonPlay.gameObject.Toggle(false);
+            _buttonPlay.interactable = true;
         });
 
         LeanTween.move(_buttonSettings.GetComponent<RectTransform>(), _buttonSettingsAnimPos, _animSpeed).setIgnoreTimeScale(true).
         setEase(_animType).setOnComplete(() => 
         {
-            if (_buttonSettings.gameObject.activeSelf)
-                _buttonSettings.gameObject.SetActive(false);
+             _buttonSettings.gameObject.Toggle(false);
+            _buttonSettings.interactable = true;
         });
     }
 
@@ -62,16 +64,19 @@ public class MenuUI : MonoBehaviour
     {
         LeanTween.cancel(_buttonPlay.gameObject);
         LeanTween.cancel(_buttonSettings.gameObject);
-
-        if (!_buttonPlay.gameObject.activeSelf)
-            _buttonPlay.gameObject.SetActive(true);
         
-        if (!_buttonSettings.gameObject.activeSelf)
-            _buttonSettings.gameObject.SetActive(true);
+        _buttonPlay.interactable = false;
+        _buttonSettings.interactable = false;
+        _buttonPlay.gameObject.Toggle(true);
+        _buttonSettings.gameObject.Toggle(true);
 
         LeanTween.move(_buttonPlay.GetComponent<RectTransform>(), _buttonPlayDefaultPos, _animSpeed + 0.12f).setIgnoreTimeScale(true).
-        setEase(_animType);
+        setEase(_animType).setOnComplete(() =>
+        {
+            if (WorldManager.Instance.IsReady)
+                _buttonPlay.interactable = true;
+        });
         LeanTween.move(_buttonSettings.GetComponent<RectTransform>(), _buttonSettingsDefaultPos, _animSpeed).setIgnoreTimeScale(true).
-        setEase(_animType);
+        setEase(_animType).setOnComplete(() => _buttonSettings.interactable = true);
     }
 }

@@ -95,7 +95,7 @@ public class Enemy : Tank, IPoolable
 
     public void AddToPool()
     {
-        WorldManager.Instance.EnemiesPool.AddToPool(gameObject);
+        WorldManager.Instance.EnemiesPool.AddToPool(this);
         Helper.EnableAll(transform);
         ResetToDefault();
         _isAlive = false;

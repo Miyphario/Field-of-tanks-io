@@ -1,17 +1,17 @@
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.EnhancedTouch;
 
 public class HUDManager : MonoBehaviour
 {
     [SerializeField] private BackgroundUI _darkBackground;
     public static HUDManager Instance { get; private set; }
-    public RectTransform CanvasRect => _canvasRect;
     public float HealthbarRenderDistance => GameManager.Instance.MainCamera.orthographicSize + 10f;
     [SerializeField] private RectTransform _canvasRect;
+    public RectTransform CanvasRect => _canvasRect;
+    [SerializeField] private TextMeshProUGUI _versionText;
 
     [Header("Bars")]
     [SerializeField] private RectTransform _tankBarsTransform;
@@ -21,12 +21,13 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private UpgradesUI _upgradesUI;
     [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
+    [SerializeField] private MenuUI _menuUI;
+    public MenuUI MenuUI =>_menuUI;
+    [SerializeField] private SettingsUI _settingsUI;
 #if UNITY_EDITOR
     [SerializeField] private PlayerInfoUI _playerInfoUI;
     [SerializeField] private PauseUI _pauseUI;
 #endif
-    [SerializeField] private MenuUI _menuUI;
-    public MenuUI MenuUI =>_menuUI;
 
     [Header("Sounds")]
     [SerializeField] private AudioSource _audioSource;
@@ -36,13 +37,14 @@ public class HUDManager : MonoBehaviour
     {
         Instance = this;
 
+        _darkBackground.Initialize();
+
         _menuUI.Initialize();
         _mobileControls.Initialize();
-        if (_mobileControls.gameObject.activeSelf)
-            _mobileControls.gameObject.SetActive(false);
+        _mobileControls.gameObject.Toggle(false);
 
-        _darkBackground.Initialize();
         _upgradesUI.Initialize();
+        _settingsUI.Initialize();
 #if UNITY_EDITOR
         _pauseUI.Initialize();
         _playerInfoUI.Initialize();
@@ -62,6 +64,12 @@ public class HUDManager : MonoBehaviour
 
         WorldManager.Instance.OnGameEnded += HandleGameEnded;
         WorldManager.Instance.OnGameStarted += HandleGameStarted;
+
+        _versionText.text = Application.version;
+    }
+
+    private void Start()
+    {
         HandleGameEnded();
     }
 
@@ -72,9 +80,10 @@ public class HUDManager : MonoBehaviour
 #endif
         if (IsTouchInput())
         {
-            if (!_mobileControls.gameObject.activeSelf)
-                _mobileControls.gameObject.SetActive(true);
+            _mobileControls.gameObject.Toggle(true);
         }
+
+        _versionText.gameObject.Toggle(false);
     }
 
     private void HandleGameEnded()
@@ -82,13 +91,14 @@ public class HUDManager : MonoBehaviour
 #if UNITY_EDITOR
         _pauseUI.Hide();
 #endif
-        _upgradesUI.Hide();
+        _upgradesUI.ToggleMenu(false, true);
 
         if (IsTouchInput())
         {
-            if (_mobileControls.gameObject.activeSelf)
-                _mobileControls.gameObject.SetActive(false);
+            _mobileControls.gameObject.Toggle(false);
         }
+
+        _versionText.gameObject.Toggle(true);
     }
 
     public BarUI CreateHealthbar(bool smallBar = false)
@@ -149,5 +159,11 @@ public class HUDManager : MonoBehaviour
     {
         return Application.isMobilePlatform ||
               (Application.isEditor && TouchSimulation.instance != null && TouchSimulation.instance.enabled);
+    }
+
+    public Vector2 GetScreenPosition(Vector2 objectPosition, in Vector2 offset)
+    {
+        objectPosition = GameManager.Instance.MainCamera.WorldToViewportPoint(objectPosition + offset);
+        return new(objectPosition.x * CanvasRect.sizeDelta.x, objectPosition.y * CanvasRect.sizeDelta.y);
     }
 }
