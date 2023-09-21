@@ -105,8 +105,8 @@ public class Tank : MonoBehaviour
 
     private void DestroyMe()
     {
-        _healthbar.Disable();
         StopAllCoroutines();
+        _healthbar.Disable();
         GetComponent<Collider2D>().enabled = false;
         Helper.DisableAllExcept(transform, _audioSource);
         if (NearFromCamera())

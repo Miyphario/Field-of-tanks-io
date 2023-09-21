@@ -36,6 +36,8 @@ public class GameManager
     public event Action<bool> OnPauseChanged;
     public event Action OnGameRestarting;
     public bool GameRestarting { get; private set; }
+    public bool GameTutorial { get; private set; } = true;
+    public event Action<SaveData> OnSaveLoaded;
 
     public GameManager()
     {
@@ -123,5 +125,37 @@ public class GameManager
     public bool GetBatterySave()
     {
         return Application.targetFrameRate == 30;
+    }
+
+    public void SaveGame()
+    {
+        SaveData data = new()
+        {
+            gameTutorial = GameTutorial,
+            batterySaving = GetBatterySave(),
+            masterVolume = SoundManager.Instance.GetMasterVolume()
+        };
+        SaveSystem.Save(data);
+    }
+
+    public void LoadGame()
+    {
+        SaveData data = SaveSystem.LoadData();
+        SetupGameSave(data);
+    }
+
+    public void LoadGame(string json)
+    {
+        SaveData data = SaveSystem.LoadData(json);
+        SetupGameSave(data);
+    }
+
+    private void SetupGameSave(SaveData data)
+    {
+        if (data == null) return;
+
+        GameTutorial = data.gameTutorial;
+        SetBatterySave(data.batterySaving);
+        OnSaveLoaded?.Invoke(data);
     }
 }

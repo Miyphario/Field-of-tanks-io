@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
@@ -11,6 +12,7 @@ public class Bootstrap : MonoBehaviour
     [SerializeField] private PrefabManager _prefabManager;
     [SerializeField] private ScreenshotManager _screenshotManager;
     [SerializeField] private SoundManager _soundManager;
+    [SerializeField] private Yandex _yandex;
 
     private void Awake()
     {
@@ -25,6 +27,7 @@ public class Bootstrap : MonoBehaviour
         _ = new InputManager();
         _ = new GameManager();
         LocalizationManager.Initialize();
+        AdsManager.Initialize();
 
         _prefabManager.Initialize();
         _soundManager.Initialize();
@@ -32,6 +35,6 @@ public class Bootstrap : MonoBehaviour
         _hudManager.Initialize();
         _cameraManager.Initialize();
         _screenshotManager.Initialize();
-
+        _yandex.Initialize();
     }
 }

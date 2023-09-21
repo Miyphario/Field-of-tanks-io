@@ -11,7 +11,12 @@ public class ObjectsPool : MonoBehaviour
 
     public void AddToPool(IPoolable obj)
     {
-        obj.gameObject.Toggle(false);
+        AddToPool(obj.gameObject);
+    }
+
+    public void AddToPool(GameObject gameObject)
+    {
+        gameObject.Toggle(false);
         _inactiveObjects++;
         if (_inactiveObjects >= _maxInactiveObjects)
             _destroyInactiveRoutine ??= StartCoroutine(DestroyInactive());
@@ -40,6 +45,22 @@ public class ObjectsPool : MonoBehaviour
         obj.Toggle(true);
 
         return obj;
+    }
+
+    public IEnumerator ClearIE(int objectsPerCycle, float destroyTime)
+    {
+        int index = transform.childCount - 1;
+        while (index >= 0)
+        {
+            for (int i = 0; i < objectsPerCycle; i++)
+            {
+                AddToPool(transform.GetChild(index).gameObject);
+                index--;
+                if (index < 0) break;
+            }
+
+            yield return new WaitForSeconds(destroyTime);
+        }
     }
 
     private IEnumerator DestroyInactive()

@@ -14,6 +14,7 @@ public class SettingsUI : MonoBehaviour
     private Vector2 _defaultBackButtonPos;
     [SerializeField] private LeanTweenType _animType;
     [SerializeField] private float _animSpeed = 0.5f;
+    private bool _saveLoaded;
 
     private void Awake()
     {
@@ -28,6 +29,13 @@ public class SettingsUI : MonoBehaviour
         _defaultSettingsLayoutPos = _settingsLayout.anchoredPosition;
         _defaultBackButtonPos = _backButton.GetComponent<RectTransform>().anchoredPosition;
         SetSettings();
+        GameManager.Instance.OnSaveLoaded += HandleSaveLoaded;
+    }
+
+    private void HandleSaveLoaded(SaveData data)
+    {
+        SetSettings();
+        _saveLoaded = true;
     }
 
     public void Show()
@@ -74,7 +82,23 @@ public class SettingsUI : MonoBehaviour
         });
     }
 
-    public void SetBatterySave(bool enable) => GameManager.Instance.SetBatterySave(enable);
+    public void SetBatterySave(bool enable)
+    {
+        GameManager.Instance.SetBatterySave(enable);
+
+        if (_saveLoaded)
+            DelayedSaveGame();
+    }
+
+    public void SetMasterVolume(float value)
+    {
+        SoundManager.Instance.SetMasterVolume(value);
+
+        if (_saveLoaded)
+            DelayedSaveGame();
+    }
+
+    public void DelayedSaveGame() => WorldManager.Instance.SaveGame(1f);
 
     private void SetSettings()
     {

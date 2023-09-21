@@ -44,6 +44,10 @@
 		{
 			"key": "btn.BatterySave",
 			"value": "Pil tasarrufu"
+		},
+		{
+			"key": "btn.RateGame",
+			"value": "Oyunu değerlendirin"
 		}
 	]
 }

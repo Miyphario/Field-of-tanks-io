@@ -82,8 +82,8 @@ public class EnemyController : TankController
 
         Tank.OnDestroyed += () =>
         {
-            DisabledInput = true;
             StopAllCoroutines();
+            DisabledInput = true;
             StopFlex();
             _isMoving = false;
             _moveDirection = Vector2.zero;

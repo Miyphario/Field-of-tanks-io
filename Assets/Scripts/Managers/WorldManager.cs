@@ -48,11 +48,13 @@ public class WorldManager : MonoBehaviour
     public bool IsReady => !_notReadyToSpawn;
     private bool _isPlaying;
     private float _destroyTime = 0.05f;
-    private float _destroyObjectsPerCycle = 15;
+    private int _destroyObjectsPerCycle = 15;
     public bool IsPlaying => _isPlaying;
     public event Action<bool> OnReadyToSpawn;
     public event Action OnGameStarted;
     public event Action OnGameEnded;
+    private float _timeToSaveGame = -1f;
+    private bool _gameSaving;
 
     public void Initialize()
     {
@@ -69,11 +71,12 @@ public class WorldManager : MonoBehaviour
 
     private void Start()
     {
+        GameManager.Instance.LoadGame();
+
         StartCoroutine(BushesSpawnIE());
         StartCoroutine(DestructibleSpawnIE());
         _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
     }
-
     public bool StartGame()
     {
         if (_isPlaying || _notReadyToSpawn) return false;
@@ -86,6 +89,8 @@ public class WorldManager : MonoBehaviour
             {
                 _tanks.Remove(HostPlayer);
                 _isPlaying = false;
+                AdsManager.ShowAds();
+                GameManager.Instance.SaveGame();
                 Restart();
                 OnGameEnded?.Invoke();
             };
@@ -106,6 +111,33 @@ public class WorldManager : MonoBehaviour
         return _isPlaying;
     }
 
+    public void SaveGame(float delay)
+    {
+        _gameSaving = true;
+        _timeToSaveGame = delay;
+    }
+
+    public void LoadGame(string json)
+    {
+        GameManager.Instance.LoadGame(json);
+    }
+
+    private void Update()
+    {
+        if (_gameSaving)
+        {
+            if (_timeToSaveGame > 0f)
+            {
+                _timeToSaveGame -= Time.deltaTime;
+            }
+            else
+            {
+                _gameSaving = false;
+                GameManager.Instance.SaveGame();
+            }
+        }
+    }
+
     public void Restart()
     {
         if (_notReadyToSpawn) return;
@@ -120,7 +152,6 @@ public class WorldManager : MonoBehaviour
             if (_notReadyToSpawn)
                 OnReadyToSpawn?.Invoke(!_notReadyToSpawn);
             _notReadyToSpawn = false;
-
             StartCoroutine(BushesSpawnIE());
             StartCoroutine(DestructibleSpawnIE());
             _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
@@ -232,28 +263,6 @@ public class WorldManager : MonoBehaviour
         }
     }
 
-    private IEnumerator DestroyEnemiesIE(Action actionAfterDestroy)
-    {
-        while (_tanks.Count > 0)
-        {
-            for (int i = 0; i < _destroyObjectsPerCycle; i++)
-            {
-                if (_tanks[^1] == null || _tanks[^1].IsDestroyed()) continue;
-                _tanks[^1].TakeDamage(_tanks[^1].MaxHealth);
-                if (_tanks.Count <= 0) break;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        actionAfterDestroy?.Invoke();
-    }
-
-    private IEnumerator DestroyEnemiesIE()
-    {
-        yield return DestroyEnemiesIE(null);
-    }
-
     private IEnumerator DestructibleSpawnIE()
     {
         while (true)
@@ -336,9 +345,10 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator DestroyAllIE(Action actionAfterDestroy)
     {
-        yield return DestroyBushesIE();
+        yield return EnemiesPool.ClearIE(_destroyObjectsPerCycle, _destroyTime);
+        yield return BulletsPool.ClearIE(_destroyObjectsPerCycle, _destroyTime);
         yield return DestroyDestructiblesIE();
-        yield return DestroyEnemiesIE();
+        yield return DestroyBushesIE();
 
         actionAfterDestroy?.Invoke();
     }

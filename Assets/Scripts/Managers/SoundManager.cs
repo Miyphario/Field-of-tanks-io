@@ -1,9 +1,11 @@
 using UnityEngine;
 using UnityEngine.Audio;
+using Random = UnityEngine.Random;
 
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
+    public bool Silent { get; set; }
 
     [SerializeField] private AudioMixer _mixer;
     private const string MASTER_VOLUME = "MasterVolume";
@@ -17,9 +19,19 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioClip[] _destroyTank;
     public AudioClip DestroyTank => _destroyTank[Random.Range(0, _destroyTank.Length)];
 
+
     public void Initialize()
     {
         Instance = this;
+
+        GameManager.Instance.OnSaveLoaded += HandleSaveLoaded;
+    }
+
+    private void HandleSaveLoaded(SaveData data)
+    {
+        if (data == null) return;
+
+        SetMasterVolume(data.masterVolume);
     }
 
     public void SetMasterVolume(float volume)

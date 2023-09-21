@@ -44,6 +44,10 @@
 		{
 			"key": "btn.BatterySave",
 			"value": "Экономия батареи"
+		},
+		{
+			"key": "btn.RateGame",
+			"value": "Оценить игру"
 		}
 	]
 }

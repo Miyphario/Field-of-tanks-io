@@ -9,6 +9,9 @@ public class MenuUI : MonoBehaviour
     [SerializeField] private Button _buttonSettings;
     [SerializeField] private Vector2 _buttonSettingsAnimPos;
     private Vector2 _buttonSettingsDefaultPos;
+    [SerializeField] private Button _buttonRateGame;
+    [SerializeField] private Vector2 _buttonRateGameAnimPos;
+    private Vector2 _buttonRateGameDefaultPos;
 
     [SerializeField] private LeanTweenType _animType;
     [SerializeField] private float _animSpeed = 0.5f;
@@ -17,9 +20,12 @@ public class MenuUI : MonoBehaviour
     {
         _buttonPlayDefaultPos = _buttonPlay.GetComponent<RectTransform>().anchoredPosition;
         _buttonSettingsDefaultPos = _buttonSettings.GetComponent<RectTransform>().anchoredPosition;
+        _buttonRateGameDefaultPos = _buttonRateGame.GetComponent<RectTransform>().anchoredPosition;
 
         WorldManager.Instance.OnGameEnded += HandleGameEnded;
         WorldManager.Instance.OnReadyToSpawn += HandleReadyToSpawn;
+
+        ToggleRateGameButton(false, true);
     }
 
     private void HandleGameEnded()
@@ -49,15 +55,15 @@ public class MenuUI : MonoBehaviour
         setEase(_animType).setOnComplete(() => 
         {
             _buttonPlay.gameObject.Toggle(false);
-            _buttonPlay.interactable = true;
         });
 
         LeanTween.move(_buttonSettings.GetComponent<RectTransform>(), _buttonSettingsAnimPos, _animSpeed).setIgnoreTimeScale(true).
         setEase(_animType).setOnComplete(() => 
         {
-             _buttonSettings.gameObject.Toggle(false);
-            _buttonSettings.interactable = true;
+            _buttonSettings.gameObject.Toggle(false);
         });
+
+        ToggleRateGameButton(false);
     }
 
     public void Show()
@@ -78,5 +84,32 @@ public class MenuUI : MonoBehaviour
         });
         LeanTween.move(_buttonSettings.GetComponent<RectTransform>(), _buttonSettingsDefaultPos, _animSpeed).setIgnoreTimeScale(true).
         setEase(_animType).setOnComplete(() => _buttonSettings.interactable = true);
+
+        ToggleRateGameButton(true);
+    }
+
+    public void ToggleRateGameButton(bool enable, bool force = false)
+    {
+        bool canShow = Yandex.Instance != null && !Yandex.Instance.CannotRateGame && Yandex.Instance.ButtonRateGameEnabled;
+        if (enable)
+        {
+            if (canShow)
+            {
+                LeanTween.cancel(_buttonRateGame.gameObject);
+                _buttonRateGame.interactable = false;
+                _buttonRateGame.gameObject.Toggle(true);
+                LeanTween.move(_buttonRateGame.GetComponent<RectTransform>(), _buttonRateGameDefaultPos, _animSpeed).setIgnoreTimeScale(true)
+                .setEase(_animType).setOnComplete(() => _buttonRateGame.interactable = true);
+            }
+        }
+        else
+        {
+            LeanTween.cancel(_buttonRateGame.gameObject);
+            _buttonRateGame.interactable = false;
+            if (force)
+                _buttonRateGame.gameObject.Toggle(false);
+            LeanTween.move(_buttonRateGame.GetComponent<RectTransform>(), _buttonRateGameAnimPos, _animSpeed).setIgnoreTimeScale(true)
+            .setEase(_animType).setOnComplete(() => _buttonRateGame.gameObject.Toggle(false));
+        }
     }
 }
