@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -56,6 +55,8 @@ public class WorldManager : MonoBehaviour
     private float _timeToSaveGame = -1f;
     private bool _gameSaving;
 
+    private Coroutine _focusVolumeRoutine;
+
     public void Initialize()
     {
         if (Instance == null)
@@ -77,6 +78,7 @@ public class WorldManager : MonoBehaviour
         StartCoroutine(DestructibleSpawnIE());
         _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
     }
+
     public bool StartGame()
     {
         if (_isPlaying || _notReadyToSpawn) return false;
@@ -85,14 +87,13 @@ public class WorldManager : MonoBehaviour
         if (HostPlayer == null)
         {
             HostPlayer = Instantiate(_playerPrefab).GetComponent<Player>();
-            HostPlayer.OnDestroyed += () => 
+            HostPlayer.OnDestroyed += tank => 
             {
                 _tanks.Remove(HostPlayer);
-                _isPlaying = false;
-                AdsManager.ShowAds();
                 GameManager.Instance.SaveGame();
                 Restart();
                 OnGameEnded?.Invoke();
+                _isPlaying = false;
             };
         }
 
@@ -152,6 +153,7 @@ public class WorldManager : MonoBehaviour
             if (_notReadyToSpawn)
                 OnReadyToSpawn?.Invoke(!_notReadyToSpawn);
             _notReadyToSpawn = false;
+
             StartCoroutine(BushesSpawnIE());
             StartCoroutine(DestructibleSpawnIE());
             _enemiesSpawnRoutine = StartCoroutine(EnemySpawnIE());
@@ -251,9 +253,8 @@ public class WorldManager : MonoBehaviour
                         maxLvl = 30;
                     startLevel = Random.Range(0, maxLvl);
                 }
-                if (tank.TeamID <= 0)
-                    tank.OnDestroyed += () => _tanks.Remove(tank);
-
+                
+                tank.OnAddedToPool += () => HandleTankDestroyed(tank);
                 tank.Initialize(teamId);
                 _curTeamID++;
                 tank.AddLevel(startLevel);
@@ -261,6 +262,11 @@ public class WorldManager : MonoBehaviour
                 yield return new WaitForSeconds(Random.Range(0.25f, 1f));
             }
         }
+    }
+
+    private void HandleTankDestroyed(Tank tank)
+    {
+        _tanks.Remove(tank);
     }
 
     private IEnumerator DestructibleSpawnIE()
@@ -283,7 +289,7 @@ public class WorldManager : MonoBehaviour
 
                     Destructible dest = Instantiate(prefab, spawnPos, spawnRot).GetComponent<Destructible>();
                     _destructibles.Add(dest);
-                    dest.OnDestroyed += () => _destructibles.Remove(dest);
+                    dest.OnDestroyed += destruct => _destructibles.Remove(destruct);
 
                     if (_destructibles.Count >= _maxDestructibles) break;
                 }
@@ -345,12 +351,38 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator DestroyAllIE(Action actionAfterDestroy)
     {
-        yield return EnemiesPool.ClearIE(_destroyObjectsPerCycle, _destroyTime);
-        yield return BulletsPool.ClearIE(_destroyObjectsPerCycle, _destroyTime);
+        yield return EnemiesPool.CleanupIE(_destroyObjectsPerCycle, _destroyTime);
+        yield return BulletsPool.CleanupIE(_destroyObjectsPerCycle, _destroyTime);
         yield return DestroyDestructiblesIE();
         yield return DestroyBushesIE();
 
         actionAfterDestroy?.Invoke();
+    }
+
+    private void OnApplicationFocus(bool focus)
+    {
+        if (_focusVolumeRoutine != null)
+            StopCoroutine(_focusVolumeRoutine);
+
+        _focusVolumeRoutine = StartCoroutine(SetFocusVolumeIE(focus));
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        OnApplicationFocus(!pause);
+    }
+
+    private IEnumerator SetFocusVolumeIE(bool focus)
+    {
+        float toVolume = focus ? 1.0f : 0.0f;
+        while (Mathf.Abs(AudioListener.volume - toVolume) > 0.03f)
+        {
+            AudioListener.volume = Mathf.Lerp(AudioListener.volume, toVolume, 0.3f);
+            yield return new WaitForSeconds(0.05f);
+        }
+
+        AudioListener.volume = toVolume;
+        _focusVolumeRoutine = null;
     }
 
     private void OnDrawGizmos()

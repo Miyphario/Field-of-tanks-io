@@ -11,15 +11,8 @@ public class ObjectsPool : MonoBehaviour
 
     public void AddToPool(IPoolable obj)
     {
-        AddToPool(obj.gameObject);
-    }
-
-    public void AddToPool(GameObject gameObject)
-    {
-        gameObject.Toggle(false);
+        obj.gameObject.Toggle(false);
         _inactiveObjects++;
-        if (_inactiveObjects >= _maxInactiveObjects)
-            _destroyInactiveRoutine ??= StartCoroutine(DestroyInactive());
     }
 
     public GameObject GetFromPool(Vector3 position, Quaternion rotation)
@@ -47,23 +40,46 @@ public class ObjectsPool : MonoBehaviour
         return obj;
     }
 
-    public IEnumerator ClearIE(int objectsPerCycle, float destroyTime)
+    public void DestroyInactive()
+    {
+        if (_inactiveObjects >= _maxInactiveObjects)
+            _destroyInactiveRoutine ??= StartCoroutine(DestroyInactiveIE());
+    }
+
+    public IEnumerator CleanupIE(int objectsPerCycle, float destroyTime)
     {
         int index = transform.childCount - 1;
         while (index >= 0)
         {
             for (int i = 0; i < objectsPerCycle; i++)
             {
-                AddToPool(transform.GetChild(index).gameObject);
-                index--;
                 if (index < 0) break;
+
+                if (index >= transform.childCount)
+                {
+                    index--;
+                    continue;
+                }
+
+                Transform child = transform.GetChild(index);
+                if (child == null)
+                {
+                    index--;
+                    continue;
+                }
+
+                IPoolable obj = child.GetComponent<IPoolable>();
+                obj.AddToPool();
+                index--;
             }
 
             yield return new WaitForSeconds(destroyTime);
         }
+
+        DestroyInactive();
     }
 
-    private IEnumerator DestroyInactive()
+    private IEnumerator DestroyInactiveIE()
     {
         for (int i = transform.childCount - 1; i >= 0; i--)
         {

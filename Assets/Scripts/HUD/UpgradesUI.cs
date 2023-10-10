@@ -18,6 +18,12 @@ public class UpgradesUI : MonoBehaviour
 
     [SerializeField] private Button _backButton;
 
+    [Header("Keys")]
+    [SerializeField] private KeyUI _keyFirstUpgrade;
+    [SerializeField] private KeyUI _keySecondUpgrade;
+    [SerializeField] private KeyUI _keyThirdUpgrade;
+    [SerializeField] private KeyUI _keyBackUpgrade;
+
     [Header("Images")]
     [SerializeField]
     private Sprite _tankSprite;
@@ -55,6 +61,13 @@ public class UpgradesUI : MonoBehaviour
 
         RectTransform backButtonRect = _backButton.GetComponent<RectTransform>();
         _defaultBackButtonPosition = backButtonRect.anchoredPosition;
+
+        GameManager.Instance.OnInputChanged += HandleInputChanged;
+    }
+
+    private void Start()
+    {
+        HandleInputChanged(GameManager.Instance.CurrentInputControl);
     }
 
     private void HandlePlayerMenuSelected(UpgradeMenu menu)
@@ -195,21 +208,21 @@ public class UpgradesUI : MonoBehaviour
         switch (count)
         {
             case 1:
-                _firstUpgradeButton.gameObject.Toggle(true);
-                _secondUpgradeButton.gameObject.Toggle(false);
-                _thirdUpgradeButton.gameObject.Toggle(false);
+                _firstUpgradeButton.transform.parent.gameObject.Toggle(true);
+                _secondUpgradeButton.transform.parent.gameObject.Toggle(false);
+                _thirdUpgradeButton.transform.parent.gameObject.Toggle(false);
                 break;
 
             case 2:
-                _firstUpgradeButton.gameObject.Toggle(true);
-                _secondUpgradeButton.gameObject.Toggle(true);
-                _thirdUpgradeButton.gameObject.Toggle(false);
+                _firstUpgradeButton.transform.parent.gameObject.Toggle(true);
+                _secondUpgradeButton.transform.parent.gameObject.Toggle(true);
+                _thirdUpgradeButton.transform.parent.gameObject.Toggle(false);
                 break;
 
             case 3:
-                _firstUpgradeButton.gameObject.Toggle(true);
-                _secondUpgradeButton.gameObject.Toggle(true);
-                _thirdUpgradeButton.gameObject.Toggle(true);
+                _firstUpgradeButton.transform.parent.gameObject.Toggle(true);
+                _secondUpgradeButton.transform.parent.gameObject.Toggle(true);
+                _thirdUpgradeButton.transform.parent.gameObject.Toggle(true);
                 break;
         }
 
@@ -283,5 +296,43 @@ public class UpgradesUI : MonoBehaviour
                 _menuRect.gameObject.Toggle(false);
             });
         }
+    }
+
+    private void HandleInputChanged(InputControl control)
+    {
+        if (control == InputControl.Touch)
+        {
+            _keyFirstUpgrade.gameObject.Toggle(false);
+            _keySecondUpgrade.gameObject.Toggle(false);
+            _keyThirdUpgrade.gameObject.Toggle(false);
+            _keyBackUpgrade.gameObject.Toggle(false);
+            return;
+        }
+
+        switch (control)
+        {
+            case InputControl.Keyboard:
+                {
+                    _keyFirstUpgrade.Change(KeyCode.Alpha1);
+                    _keySecondUpgrade.Change(KeyCode.Alpha2);
+                    _keyThirdUpgrade.Change(KeyCode.Alpha3);
+                    _keyBackUpgrade.Change(KeyCode.Tab);
+                }
+                break;
+
+            case InputControl.Gamepad:
+                {
+                    _keyFirstUpgrade.Change(GamepadButton.X);
+                    _keySecondUpgrade.Change(GamepadButton.Y);
+                    _keyThirdUpgrade.Change(GamepadButton.B);
+                    _keyBackUpgrade.Change(GamepadButton.LB);
+                }
+                break;
+        }
+
+        _keyFirstUpgrade.gameObject.Toggle(true);
+        _keySecondUpgrade.gameObject.Toggle(true);
+        _keyThirdUpgrade.gameObject.Toggle(true);
+        _keyBackUpgrade.gameObject.Toggle(true);
     }
 }

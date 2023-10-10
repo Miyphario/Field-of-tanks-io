@@ -11,6 +11,7 @@ public class GunShootPoint : MonoBehaviour
     [SerializeField] private float _bulletSpeed;
     [SerializeField] private float _fireRate;
     [SerializeField] private float _bulletSize;
+    [SerializeField] private float _spread;
     [SerializeField] private Transform _shootPoint;
     [SerializeField] private AudioSource _audioSource;
     private bool _canShoot = true;
@@ -31,16 +32,28 @@ public class GunShootPoint : MonoBehaviour
 
     private void CreateBullet()
     {
-        Bullet bul = WorldManager.Instance.BulletsPool.GetFromPool(_shootPoint.position, transform.rotation).GetComponent<Bullet>();
-        bul.Initialize(Damage, BulletSpeed, _bulletSize, _gun.Owner);
-        if (_audioSource != null)
+        Bullet bul;
+        if (_spread != 0f)
         {
-            if (!WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f))
+            float spread = Random.Range(-_spread, _spread);
+            Quaternion rot = transform.rotation * Quaternion.Euler(0f, 0f, spread);
+            bul = WorldManager.Instance.BulletsPool.GetFromPool(_shootPoint.position, rot).GetComponent<Bullet>();
+        }
+        else
+        {
+            bul = WorldManager.Instance.BulletsPool.GetFromPool(_shootPoint.position, transform.rotation).GetComponent<Bullet>();
+        }
+        
+        bul.Initialize(Damage, BulletSpeed, _bulletSize, _gun.Owner);
+        if (!WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x * 5f))
+        {
+            PrefabManager.Instance.CreateParticles(ParticlesType.Shoot, _shootPoint.transform.position, transform.rotation);
+
+            if (_audioSource != null)
             {
                 _audioSource.pitch = Random.Range(0.9f, 1.1f);
                 _audioSource.volume = Random.Range(0.7f, 0.8f);
                 _audioSource.PlayOneShot(_audioSource.clip);
-                PrefabManager.Instance.CreateParticles(ParticlesType.Shoot, _shootPoint.transform.position, transform.rotation);
             }
         }
     }

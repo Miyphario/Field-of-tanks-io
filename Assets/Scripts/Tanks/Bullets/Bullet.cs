@@ -1,6 +1,6 @@
+using System;
 using System.Collections;
 using UnityEngine;
-using Unity.VisualScripting;
 
 public class Bullet : MonoBehaviour, IPoolable
 {
@@ -12,6 +12,9 @@ public class Bullet : MonoBehaviour, IPoolable
     private int _teamID;
 
     private bool _isAlive = true;
+
+    public event Action OnAddedToPool;
+
     public bool IsAlive => _isAlive;
 
     private void Awake()
@@ -73,5 +76,6 @@ public class Bullet : MonoBehaviour, IPoolable
         WorldManager.Instance.BulletsPool.AddToPool(this);
         _rb.velocity = Vector2.zero;
         _isAlive = false;
+        OnAddedToPool?.Invoke();
     }
 }

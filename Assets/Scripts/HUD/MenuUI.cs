@@ -22,15 +22,9 @@ public class MenuUI : MonoBehaviour
         _buttonSettingsDefaultPos = _buttonSettings.GetComponent<RectTransform>().anchoredPosition;
         _buttonRateGameDefaultPos = _buttonRateGame.GetComponent<RectTransform>().anchoredPosition;
 
-        WorldManager.Instance.OnGameEnded += HandleGameEnded;
         WorldManager.Instance.OnReadyToSpawn += HandleReadyToSpawn;
 
         ToggleRateGameButton(false, true);
-    }
-
-    private void HandleGameEnded()
-    {
-        Show();
     }
 
     private void HandleReadyToSpawn(bool notReady)

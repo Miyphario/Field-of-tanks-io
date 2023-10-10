@@ -46,8 +46,38 @@
 			"value": "Экономия батареи"
 		},
 		{
+			"key": "btn.ResetTutor",
+			"value": "Сбросить обучение"
+		},
+		{
 			"key": "btn.RateGame",
 			"value": "Оценить игру"
+		},
+
+		{
+			"key": "tutor.MoveArea",
+			"value": "Область передвижения"
+		},
+		{
+			"key": "tutor.LookArea",
+			"value": "Область обзора"
+		},
+		{
+			"key": "tutor.Movement",
+			"value": "Передвижение"
+		},
+		{
+			"key": "tutor.Looking",
+			"value": "Обзор"
+		},
+		{
+			"key": "tutor.Shoot",
+			"value": "Стрелять"
+		},
+		
+		{
+			"key": "scr.GameOver",
+			"value": "Конец Игры"
 		}
 	]
 }

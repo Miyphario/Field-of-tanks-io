@@ -27,7 +27,7 @@ public class Destructible : MonoBehaviour
     [Header("Audio")]
     [SerializeField] private AudioSource _audioSource;
 
-    public event Action OnDestroyed;
+    public event Action<Destructible> OnDestroyed;
 
     [Header("Visual")]
     [SerializeField] private GameObject _destroyParticles;
@@ -62,7 +62,7 @@ public class Destructible : MonoBehaviour
         else
         {
             _health = 0;
-            OnDestroyed?.Invoke();
+            OnDestroyed?.Invoke(this);
             if (attacker != null)
             {
                 attacker.AddXP(_rewardXp);
@@ -123,7 +123,7 @@ public class Destructible : MonoBehaviour
             }
 
             if (push)
-                Push(finalPos, 300f);
+                Push(finalPos, 600f);
 
             if (WorldManager.Instance.IsFarFromCamera(transform.position, transform.localScale.x))
             {
@@ -155,7 +155,7 @@ public class Destructible : MonoBehaviour
     {
         _healthbar.Dispose();
         GetComponent<Collider2D>().enabled = false;
-        Helper.DisableAllExcept(transform, _audioSource);
+        gameObject.DisableAllExcept(_audioSource);
         if (NearFromCamera())
         {
             PlayDestroySound();

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UnityEngine;
 
 public class ScreenshotManager : MonoBehaviour
@@ -32,11 +33,12 @@ public class ScreenshotManager : MonoBehaviour
             path = Application.dataPath;
         }
 
-        path += "/Screenshots/";
-        if (!System.IO.Directory.Exists(path))
-            System.IO.Directory.CreateDirectory(path);
+        path = Path.Combine(path, "Screenshots");
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
         
-        path += DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss") + ".png";
-        System.IO.File.WriteAllBytes(path, byteArray);
+        int fileCount = Directory.GetFiles(path).Length;
+        path = Path.Combine(path, DateTime.Now.ToString("dd-MM-yyyy HH-mm-ss") + $"_{fileCount}.png");
+        File.WriteAllBytes(path, byteArray);
     }
 }

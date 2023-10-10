@@ -18,7 +18,7 @@ public class SettingsUI : MonoBehaviour
 
     private void Awake()
     {
-        if (!Application.isMobilePlatform)
+        if (!Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer)
             _batterySaveToggle.transform.parent.gameObject.Toggle(false);
         
         Hide(true);
@@ -94,6 +94,15 @@ public class SettingsUI : MonoBehaviour
     {
         SoundManager.Instance.SetMasterVolume(value);
 
+        if (_saveLoaded)
+            DelayedSaveGame();
+    }
+
+    public void ResetTutorial()
+    {
+        if (GameManager.Instance.GameTutorial) return;
+
+        GameManager.Instance.GameTutorial = true;
         if (_saveLoaded)
             DelayedSaveGame();
     }

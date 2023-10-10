@@ -80,7 +80,7 @@ public class EnemyController : TankController
             }
         };
 
-        Tank.OnDestroyed += () =>
+        Tank.OnDestroyed += tank =>
         {
             StopAllCoroutines();
             DisabledInput = true;

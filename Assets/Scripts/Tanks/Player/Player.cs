@@ -44,7 +44,7 @@ public class Player : Tank
     {
         base.Initialize(teamID);
         _healthbar.Enable();
-        Helper.EnableAll(gameObject);
+        gameObject.EnableAll();
         Controller.Initialize();
     }
 

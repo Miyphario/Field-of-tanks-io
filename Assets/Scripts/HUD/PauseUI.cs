@@ -47,8 +47,8 @@ public class PauseUI : MonoBehaviour
     {
         GameObject exceptObj = GameManager.Instance.IsPaused ? _pauseButton.transform.parent.gameObject :
                                                                    _unpauseButton.transform.gameObject;
-        Helper.EnableAllExcept(transform, exceptObj);
+        gameObject.EnableAllExcept(exceptObj);
     }
 
-    public void Hide() => Helper.DisableAll(gameObject);
+    public void Hide() => gameObject.DisableAll();
 }

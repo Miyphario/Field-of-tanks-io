@@ -45,3 +45,15 @@ public enum UISound
 {
     Button, Exit
 }
+
+public enum InputControl
+{
+    Keyboard, Gamepad, Touch
+}
+
+public enum GamepadButton
+{
+    A,B,X,Y,LT,LB,RT,RB,Back,Start,Up,Right,Down,Left,
+    LS,LSUp,LSRight,LSDown,LSLeft,
+    RS,RSUp,RSRight,RSDown,RSLeft
+}

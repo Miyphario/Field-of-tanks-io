@@ -16,15 +16,6 @@ mergeInto(LibraryManager.library, {
         })
     },
 
-    CanRateGameExtern: function () {
-        if (player == null) return;
-
-        ysdk.feedback.canReview()
-        .then(({ value, reason }) => {
-            myGameInstance.SendMessage("Yandex", "CanRateGame", value);
-        })
-    },
-
     SaveGameExtern: function (data, flush) {
         if (player == null) return;
 
@@ -114,7 +105,7 @@ mergeInto(LibraryManager.library, {
         });
     },
 
-    GetLang: function () {
+    GetLangExtern: function () {
         var returnStr = ysdk.environment.i18n.lang;
         var bufferSize = lengthBytesUTF8(returnStr) + 1;
         var buffer = _malloc(bufferSize);

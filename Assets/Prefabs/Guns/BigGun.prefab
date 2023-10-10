@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a33fe59ed319f91498c528e232163e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shootPoints:
-  - {fileID: 3800815292521158617}
   _uiSprite: {fileID: 21300000, guid: 226cacffed7ac7f4f80568fbf599341e, type: 3}
 --- !u!1001 &7025777356719781962
 PrefabInstance:
@@ -62,7 +60,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1294755629947120161, guid: 71e6fa2c3268eaf4d917736d363fe8dd, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 1294755629947120161, guid: 71e6fa2c3268eaf4d917736d363fe8dd, type: 3}
       propertyPath: m_LocalPosition.z
@@ -105,17 +103,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 71e6fa2c3268eaf4d917736d363fe8dd, type: 3}
---- !u!114 &3800815292521158617 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6142811033764065171, guid: 71e6fa2c3268eaf4d917736d363fe8dd, type: 3}
-  m_PrefabInstance: {fileID: 7025777356719781962}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a83bcefdf6f003c4aad4eb7faf6d2f1e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &8104075979714761323 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1294755629947120161, guid: 71e6fa2c3268eaf4d917736d363fe8dd, type: 3}

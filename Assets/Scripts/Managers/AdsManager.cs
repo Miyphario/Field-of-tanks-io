@@ -1,32 +1,102 @@
+using System;
 using System.Collections;
-using System.Runtime.InteropServices;
+using Mycom.Target.Unity.Ads;
 using UnityEngine;
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+using System.Runtime.InteropServices;
+#endif
 
 public static class AdsManager
 {
-    [DllImport("__Internal")]
-    private static extern void ShowAdsExtern();
-    [DllImport("__Internal")]
-    private static extern void ShowAdvExtern();
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+     [DllImport("__Internal")]
+     private static extern void ShowAdsExtern();
+     [DllImport("__Internal")]
+     private static extern void ShowAdvExtern();
+#endif
 
     private static bool _canShowAds = true;
+    private static InterstitialAd _interstitialAd;
+    private static bool _adLoaded;
 
     public static void Initialize()
     {
+        if (Application.platform != RuntimePlatform.WebGLPlayer && !Application.isMobilePlatform) return;
         _canShowAds = true;
+
+        if (Application.platform != RuntimePlatform.Android && Application.platform != RuntimePlatform.IPhonePlayer) return;
+        //_interstitialAd = CreateInterstitialAd();
+        
+        //// Устанавливаем обработчики событий
+        //_interstitialAd.AdLoadCompleted += OnLoadCompleted;
+        //_interstitialAd.AdDismissed += OnAdDismissed;
+        //_interstitialAd.AdDisplayed += OnAdDisplayed;
+        //_interstitialAd.AdVideoCompleted += OnAdVideoCompleted;
+        //_interstitialAd.AdClicked += OnAdClicked;
+        //_interstitialAd.AdLoadFailed += OnAdLoadFailed;
+        
+        //// Запускаем загрузку данных
+        //_interstitialAd.Load();
+    }
+
+    private static InterstitialAd CreateInterstitialAd()
+    {
+        uint slotId = 0;
+    // #if UNITY_ANDROID
+    //     slotId = ANDROID_SLOT_ID;
+    // #elif UNITY_IOS
+    //     slotId = IOS_SLOT_ID;
+    // #endif
+    
+    
+        // Включение режима отладки
+        // InterstitialAd.IsDebugMode = true;
+        // Создаем экземпляр InterstitialAd
+        return new InterstitialAd(slotId);
+    }
+
+    private static void OnAdLoadFailed(object sender, ErrorEventArgs e)
+    {
+
+    }
+
+    private static void OnAdClicked(object sender, EventArgs e)
+    {
+
+    }
+
+    private static void OnAdVideoCompleted(object sender, EventArgs e)
+    {
+
+    }
+
+    private static void OnAdDisplayed(object sender, EventArgs e)
+    {
+
+    }
+
+    private static void OnAdDismissed(object sender, EventArgs e)
+    {
+
+    }
+
+    private static void OnLoadCompleted(object sender, EventArgs e)
+    {
+        _adLoaded = true;
     }
 
     public static void ShowAds()
     {
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-            if (_canShowAds)
-            {
-                ShowAdsExtern();
-                _canShowAds = false;
-                Bootstrap.Instance.StartCoroutine(RefreshAdsIE());
-            }
-        }
+        if (!_canShowAds) return;
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+        ShowAdsExtern();
+#elif (UNITY_IOS || UNITY_ANDROID)
+        if (!_adLoaded) return;
+        //_interstitialAd.Show();
+        _adLoaded = false;
+#endif
+        _canShowAds = false;
+        Bootstrap.Instance.StartCoroutine(RefreshAdsIE());
     }
 
     /* public void ShowAdv(ProductCoin productCoin)

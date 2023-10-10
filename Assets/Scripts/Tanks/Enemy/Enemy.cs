@@ -1,11 +1,16 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Enemy : Tank, IPoolable
 {
     public new EnemyController Controller => base.Controller as EnemyController;
 
     private bool _isAlive = true;
+
+    public event Action OnAddedToPool;
+
     public bool IsAlive => _isAlive;
 
     protected override void Awake()
@@ -96,9 +101,10 @@ public class Enemy : Tank, IPoolable
     public void AddToPool()
     {
         WorldManager.Instance.EnemiesPool.AddToPool(this);
-        Helper.EnableAll(transform);
+        gameObject.EnableAll();
         ResetToDefault();
         _isAlive = false;
+        OnAddedToPool?.Invoke();
     }
 
     private void HandleInvisible(bool invisible)

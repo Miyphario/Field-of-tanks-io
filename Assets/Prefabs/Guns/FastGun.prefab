@@ -45,8 +45,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a33fe59ed319f91498c528e232163e8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _shootPoints:
-  - {fileID: 0}
   _uiSprite: {fileID: 21300000, guid: ce2b0f6edba06b24c91a9c1fd50cd341, type: 3}
 --- !u!1001 &5581656607642661783
 PrefabInstance:
@@ -62,7 +60,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 645834256879828172, guid: e27063014eb3f05489bad0859075c175, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.7
+      value: 0.65
       objectReference: {fileID: 0}
     - target: {fileID: 645834256879828172, guid: e27063014eb3f05489bad0859075c175, type: 3}
       propertyPath: m_LocalPosition.z

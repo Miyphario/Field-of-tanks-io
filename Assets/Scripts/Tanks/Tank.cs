@@ -25,7 +25,7 @@ public class Tank : MonoBehaviour
 
     private int _teamID;
     public int TeamID => _teamID;
-    public event Action OnDestroyed;
+    public event Action<Tank> OnDestroyed;
 
     public virtual int XP { get; protected set; }
     public virtual int MaxXP { get; protected set; } = Constants.DEFAULT_MAX_XP;
@@ -80,8 +80,7 @@ public class Tank : MonoBehaviour
         else
         {
             Health = 0f;
-            if (Controller != null)
-                OnDestroyed?.Invoke();
+            OnDestroyed?.Invoke(this);
             if (attacker != null)
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
             DestroyMe();
@@ -108,14 +107,20 @@ public class Tank : MonoBehaviour
         StopAllCoroutines();
         _healthbar.Disable();
         GetComponent<Collider2D>().enabled = false;
-        Helper.DisableAllExcept(transform, _audioSource);
+        gameObject.DisableAllExcept(_audioSource);
         if (NearFromCamera())
         {
             PlayDestroySound();
             PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
         }
 
-        StartCoroutine(DestroyMeIE());
+        if (gameObject.activeSelf)
+            StartCoroutine(DestroyMeIE());
+        else
+        {
+            DestroySelf();
+            GetComponent<Collider2D>().enabled = true;
+        }
     }
 
     private bool NearFromCamera()
@@ -342,7 +347,8 @@ public class Tank : MonoBehaviour
             return;
 
         _canTouchDamage = false;
-        StartCoroutine(ReloadTouchDamageIE());
+        if (gameObject.activeSelf)
+            StartCoroutine(ReloadTouchDamageIE());
     }
     
     private void OnTriggerEnter2D(Collider2D col)

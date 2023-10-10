@@ -46,8 +46,38 @@
 			"value": "Pil tasarrufu"
 		},
 		{
+			"key": "btn.ResetTutor",
+			"value": "Eğitiminizi sıfırlayın"
+		},
+		{
 			"key": "btn.RateGame",
 			"value": "Oyunu değerlendirin"
+		},
+
+		{
+			"key": "tutor.MoveArea",
+			"value": "Hareket alanı"
+		},
+		{
+			"key": "tutor.LookArea",
+			"value": "Görüş alanı"
+		},
+		{
+			"key": "tutor.Movement",
+			"value": "Hareket"
+		},
+		{
+			"key": "tutor.Looking",
+			"value": "Manzara"
+		},
+		{
+			"key": "tutor.Shoot",
+			"value": "Ateş etmek"
+		},
+		
+		{
+			"key": "scr.GameOver",
+			"value": "Oyunun Sonu"
 		}
 	]
 }

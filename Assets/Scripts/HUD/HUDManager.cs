@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -24,6 +25,11 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private MenuUI _menuUI;
     public MenuUI MenuUI =>_menuUI;
     [SerializeField] private SettingsUI _settingsUI;
+    [SerializeField] private KeyUIManager _keyUIManager;
+    [SerializeField] private GameTutorialUI _gameTutorialUI;
+    [SerializeField] private RectTransform _gameOverText;
+    [SerializeField] private LeanTweenType _gameOverAnimType;
+    private Vector2 _defaultGameOverTextSize;
 #if UNITY_EDITOR
     [SerializeField] private PlayerInfoUI _playerInfoUI;
     [SerializeField] private PauseUI _pauseUI;
@@ -37,6 +43,10 @@ public class HUDManager : MonoBehaviour
     {
         Instance = this;
 
+        _defaultGameOverTextSize = _gameOverText.sizeDelta;
+        _gameOverText.sizeDelta = Vector2.zero;
+        _gameOverText.gameObject.Toggle(false);
+
         _darkBackground.Initialize();
 
         _menuUI.Initialize();
@@ -45,6 +55,8 @@ public class HUDManager : MonoBehaviour
 
         _upgradesUI.Initialize();
         _settingsUI.Initialize();
+        _keyUIManager.Initialize();
+        _gameTutorialUI.Initialize();
 #if UNITY_EDITOR
         _pauseUI.Initialize();
         _playerInfoUI.Initialize();
@@ -88,6 +100,20 @@ public class HUDManager : MonoBehaviour
 
     private void HandleGameEnded()
     {
+        HideHuds();
+        if (WorldManager.Instance.IsPlaying)
+        {
+            ShowGameOverScreen();
+        }
+        else
+        {
+            _versionText.gameObject.Toggle(true);
+            _menuUI.Show();
+        }
+    }
+
+    private void HideHuds()
+    {
 #if UNITY_EDITOR
         _pauseUI.Hide();
 #endif
@@ -97,8 +123,6 @@ public class HUDManager : MonoBehaviour
         {
             _mobileControls.gameObject.Toggle(false);
         }
-
-        _versionText.gameObject.Toggle(true);
     }
 
     public BarUI CreateHealthbar(bool smallBar = false)
@@ -165,5 +189,26 @@ public class HUDManager : MonoBehaviour
     {
         objectPosition = GameManager.Instance.MainCamera.WorldToViewportPoint(objectPosition + offset);
         return new(objectPosition.x * CanvasRect.sizeDelta.x, objectPosition.y * CanvasRect.sizeDelta.y);
+    }
+
+    public void ShowGameOverScreen()
+    {
+        LeanTween.cancel(_gameOverText);
+        _gameOverText.gameObject.Toggle(true);
+        LeanTween.size(_gameOverText, _defaultGameOverTextSize, 0.8f).setIgnoreTimeScale(true).setEase(_gameOverAnimType).setOnComplete(() =>
+        {
+            IEnumerator hide()
+            {
+                yield return new WaitForSeconds(2f);
+                LeanTween.size(_gameOverText, Vector2.zero, 0.6f).setIgnoreTimeScale(true).setEase(_gameOverAnimType).setOnComplete(() =>
+                {
+                    _gameOverText.gameObject.Toggle(false);
+                    AdsManager.ShowAds();
+                    HandleGameEnded();
+                });
+            }
+
+            StartCoroutine(hide());
+        });
     }
 }

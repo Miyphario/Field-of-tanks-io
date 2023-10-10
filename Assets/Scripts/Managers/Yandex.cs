@@ -1,32 +1,31 @@
-using System.Runtime.InteropServices;
 using UnityEngine;
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+using System.Runtime.InteropServices;
+#endif
 
 public class Yandex : MonoBehaviour
 {
     public static Yandex Instance { get; private set; }
-    
-    [DllImport("__Internal")]
-    private static extern void RateGameExtern();
-    [DllImport("__Internal")]
-    private static extern void CanRateGameExtern();
+
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+     [DllImport("__Internal")]
+     private static extern void RateGameExtern();
+#endif
 
     private bool _gameRated;
     public bool CannotRateGame { get; private set; }
     public bool ButtonRateGameEnabled { get; private set; }
-    private string _playerName;
+    public bool GameRated => _gameRated;
 
     public void Initialize()
     {
-        /* if (Application.platform != RuntimePlatform.WebGLPlayer)
-        {
-            DisableRateButton();
-            Destroy(gameObject);
-            return;
-        } */
-
         Instance = this;
 
-        //CanRateGameExtern();
+        GameManager.Instance.OnSaveLoaded += data =>
+        {
+            _gameRated = data.gameRated;
+        };
+
         WorldManager.Instance.OnGameEnded += HandleOnGameEnded;
     }
 
@@ -35,28 +34,26 @@ public class Yandex : MonoBehaviour
         if (CannotRateGame) return;
 
         ButtonRateGameEnabled = true;
-        HUDManager.Instance.MenuUI.ToggleRateGameButton(true);
-    }
-
-    public void SetPlayerName(string name)
-    {
-        _playerName = name;
     }
 
     public void RateGame()
     {
-        if (CannotRateGame) return;
+        if (CannotRateGame || _gameRated) return;
 
-        if (!_gameRated)
+        if (Application.platform == RuntimePlatform.WebGLPlayer)
+        {
+#if (UNITY_WEBGL && !UNITY_EDITOR)
             RateGameExtern();
+#endif
+        }
+        else
+        {
+            Application.OpenURL("market://details?id=" + Application.identifier);
+        }
         
         CannotRateGame = true;
-        
-    }
-
-    public void CanRateGame(bool canRate)
-    {
-        _gameRated = !canRate;
-        if (_gameRated) CannotRateGame = true;
+        _gameRated = true;
+        HUDManager.Instance.MenuUI.ToggleRateGameButton(false);
+        GameManager.Instance.SaveGame();
     }
 }

@@ -46,8 +46,38 @@
 			"value": "Battery saving"
 		},
 		{
+			"key": "btn.ResetTutor",
+			"value": "Reset the tutorial"
+		},
+		{
 			"key": "btn.RateGame",
 			"value": "Rate the game"
+		},
+
+		{
+			"key": "tutor.MoveArea",
+			"value": "Area of movement"
+		},
+		{
+			"key": "tutor.LookArea",
+			"value": "Field of view"
+		},
+		{
+			"key": "tutor.Movement",
+			"value": "Movement"
+		},
+		{
+			"key": "tutor.Looking",
+			"value": "View"
+		},
+		{
+			"key": "tutor.Shoot",
+			"value": "Shoot"
+		},
+		
+		{
+			"key": "scr.GameOver",
+			"value": "Game Over"
 		}
 	]
 }

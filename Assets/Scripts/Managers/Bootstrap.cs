@@ -1,4 +1,3 @@
-using Unity.VisualScripting;
 using UnityEngine;
 
 [DefaultExecutionOrder(-1)]
@@ -24,9 +23,9 @@ public class Bootstrap : MonoBehaviour
             return;
         }
 
+        LocalizationManager.Initialize();
         _ = new InputManager();
         _ = new GameManager();
-        LocalizationManager.Initialize();
         AdsManager.Initialize();
 
         _prefabManager.Initialize();

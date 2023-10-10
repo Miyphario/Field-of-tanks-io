@@ -20,7 +20,7 @@ public class PlayerController : TankController
     {
         base.Awake();
         
-        Tank.OnDestroyed += () => 
+        Tank.OnDestroyed += tank => 
         {
             DisabledInput = true;
             _moveInput = Vector2.zero;
@@ -50,26 +50,19 @@ public class PlayerController : TankController
 
     private void StartInput()
     {
-        InputManager.Instance.OnMove += Move;
-
-        InputManager.Instance.OnLookStarted += ShootStart;
-        InputManager.Instance.OnLook += Look;
-        InputManager.Instance.OnLookEnded += ShootEnd;
-
         InputManager.Instance.OnShootStarted += ShootStartMouse;
         InputManager.Instance.OnShootEnded += ShootEnd;
-
-        InputManager.Instance.OnMouseMove += MouseMove;
 
         InputManager.Instance.OnFirstUpgrade += Tank.SelectUpgrade;
         InputManager.Instance.OnSecondUpgrade += Tank.SelectUpgrade;
         InputManager.Instance.OnThirdUpgrade += Tank.SelectUpgrade;
         InputManager.Instance.OnBack += Tank.UpgradeMenuBack;
+
 #if UNITY_EDITOR
         InputManager.Instance.OnEscape += GameManager.Instance.TogglePause;
 #endif
 
-        // Mobile controls
+        // Touch
         if (Application.isMobilePlatform)
         {
             HUDManager.Instance.MobileControls.OnMove += Move;
@@ -79,6 +72,17 @@ public class PlayerController : TankController
             HUDManager.Instance.MobileControls.OnLook += Look;
             HUDManager.Instance.MobileControls.OnLookEnded += ShootEnd;
         }
+        // Keyboard & Gamepad
+        else
+        {
+            InputManager.Instance.OnMove += Move;
+
+            InputManager.Instance.OnLookStarted += ShootStart;
+            InputManager.Instance.OnLook += Look;
+            InputManager.Instance.OnLookEnded += ShootEnd;
+
+            InputManager.Instance.OnMouseMove += MouseMove;
+        }
 
         InputManager.Instance.Enable();
     }
@@ -87,16 +91,8 @@ public class PlayerController : TankController
     {
         InputManager.Instance.Disable();
 
-        InputManager.Instance.OnMove -= Move;
-
-        InputManager.Instance.OnLookStarted -= ShootStart;
-        InputManager.Instance.OnLook -= Look;
-        InputManager.Instance.OnLookEnded -= ShootEnd;
-
         InputManager.Instance.OnShootStarted -= ShootStartMouse;
         InputManager.Instance.OnShootEnded -= ShootEnd;
-
-        InputManager.Instance.OnMouseMove -= MouseMove;
 
         InputManager.Instance.OnFirstUpgrade -= Tank.SelectUpgrade;
         InputManager.Instance.OnSecondUpgrade -= Tank.SelectUpgrade;
@@ -107,7 +103,7 @@ public class PlayerController : TankController
         InputManager.Instance.OnEscape -= GameManager.Instance.TogglePause;
 #endif
 
-        // Mobile controls
+        // Touch
         if (Application.isMobilePlatform)
         {
             HUDManager.Instance.MobileControls.OnMove -= Move;
@@ -116,6 +112,17 @@ public class PlayerController : TankController
             HUDManager.Instance.MobileControls.OnLookStarted -= ShootStart;
             HUDManager.Instance.MobileControls.OnLook -= Look;
             HUDManager.Instance.MobileControls.OnLookEnded -= ShootEnd;
+        }
+        // Keyboard & Gamepad
+        else
+        {
+            InputManager.Instance.OnMove -= Move;
+
+            InputManager.Instance.OnLookStarted -= ShootStart;
+            InputManager.Instance.OnLook -= Look;
+            InputManager.Instance.OnLookEnded -= ShootEnd;
+
+            InputManager.Instance.OnMouseMove -= MouseMove;
         }
     }
 
@@ -126,7 +133,7 @@ public class PlayerController : TankController
 
         if (DisabledInput) return;
         Vector2 rotDirection;
-        if (GameManager.Instance.IsKeyboardControls)
+        if (GameManager.Instance.CurrentInputControl == InputControl.Keyboard)
         {
             Vector2 mousePos = GameManager.Instance.MainCamera.ScreenToWorldPoint(_mousePosition);
             rotDirection = transform.position.DirectionToPoint(mousePos);
@@ -185,7 +192,7 @@ public class PlayerController : TankController
 
         _moveInput = input;
 
-        if (!GameManager.Instance.IsKeyboardControls)
+        if (GameManager.Instance.CurrentInputControl != InputControl.Keyboard)
         {
             if (_moveInput != Vector2.zero)
                 if (!_isLooking)

@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 public class GameManager
 {
     public static GameManager Instance { get; private set; }
-    public bool IsKeyboardControls { get; private set; } = true;
+    public InputControl CurrentInputControl { get; private set; } = InputControl.Keyboard;
+    public event Action<InputControl> OnInputChanged;
 
     private Camera _camera;
     public Camera MainCamera => _camera;
@@ -36,7 +37,7 @@ public class GameManager
     public event Action<bool> OnPauseChanged;
     public event Action OnGameRestarting;
     public bool GameRestarting { get; private set; }
-    public bool GameTutorial { get; private set; } = true;
+    public bool GameTutorial { get; set; } = true;
     public event Action<SaveData> OnSaveLoaded;
 
     public GameManager()
@@ -45,13 +46,11 @@ public class GameManager
 
         _camera = Camera.main;
 
-        if (!Application.isMobilePlatform)
+        Bootstrap.Instance.StartCoroutine(CheckControlsTypeIE());
+
+        if (Application.isMobilePlatform)
         {
-            Bootstrap.Instance.StartCoroutine(CheckControlsTypeIE());
-        }
-        else
-        {
-            IsKeyboardControls = false;
+            CurrentInputControl = InputControl.Touch;
             Application.targetFrameRate = 60;
         }
     }
@@ -77,18 +76,19 @@ public class GameManager
 
     private IEnumerator CheckControlsTypeIE()
     {
+        if (Application.isMobilePlatform) yield break;
+
         while (true)
         {
             yield return new WaitForSeconds(1f);
 
-            if (Application.platform == RuntimePlatform.Android || Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                yield break;
-            }
-
             if (Gamepad.current == null)
             {
-                IsKeyboardControls = true;
+                if (CurrentInputControl != InputControl.Keyboard)
+                {
+                    CurrentInputControl = InputControl.Keyboard;
+                    OnInputChanged?.Invoke(CurrentInputControl);
+                }
                 continue;
             }
 
@@ -96,9 +96,22 @@ public class GameManager
             var mouse = Mouse.current.lastUpdateTime;
             var keyboard = Keyboard.current.lastUpdateTime;
             if (gamepad > keyboard && gamepad > mouse)
-                IsKeyboardControls = false;
+            {
+                if (CurrentInputControl != InputControl.Gamepad)
+                {
+                    CurrentInputControl = InputControl.Gamepad;
+                    OnInputChanged?.Invoke(CurrentInputControl);
+                }
+            }
             else
-                IsKeyboardControls = true;
+            {
+                if (CurrentInputControl != InputControl.Keyboard)
+                {
+                    CurrentInputControl = InputControl.Keyboard;
+                    OnInputChanged?.Invoke(CurrentInputControl);
+                }
+
+            }
         }
     }
 
@@ -132,6 +145,7 @@ public class GameManager
         SaveData data = new()
         {
             gameTutorial = GameTutorial,
+            gameRated = Yandex.Instance.GameRated,
             batterySaving = GetBatterySave(),
             masterVolume = SoundManager.Instance.GetMasterVolume()
         };

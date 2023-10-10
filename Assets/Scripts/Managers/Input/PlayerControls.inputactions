@@ -173,6 +173,61 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "Arrows",
+                    "id": "a7995cb8-971e-47ee-9164-fc9e999c5dd2",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "6133a020-3585-48be-9395-53c537911ad7",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "fec5d79a-a847-495d-a69a-05003305828d",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "28e500ae-e51d-423b-813a-43d7503356fe",
+                    "path": "<Keyboard>/leftArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "2036a214-361a-40bf-94a7-1e959eeaecd3",
+                    "path": "<Keyboard>/rightArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "7342786a-f8f4-41d3-b205-476643469cfe",
                     "path": "<Gamepad>/rightStick",
@@ -273,6 +328,17 @@
                 },
                 {
                     "name": "",
+                    "id": "7d307fe6-8113-496d-91c0-69f87323e43a",
+                    "path": "<Keyboard>/numpad1",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "FirstUpgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "06c019d1-ed00-482b-ae76-542097cbb395",
                     "path": "<Keyboard>/2",
                     "interactions": "",
@@ -286,6 +352,17 @@
                     "name": "",
                     "id": "8a380137-9dc9-4b6d-9de5-d850f4ef5d98",
                     "path": "<Gamepad>/buttonNorth",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SecondUpgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cbb0ad61-3648-49d4-b25a-bde8982d70e1",
+                    "path": "<Keyboard>/numpad2",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -317,6 +394,17 @@
                 },
                 {
                     "name": "",
+                    "id": "df073be8-5b36-4c93-9212-a1169f703787",
+                    "path": "<Keyboard>/numpad3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ThirdUpgrade",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "c380bdf3-c250-4e64-96d6-a42b43cbd760",
                     "path": "<Keyboard>/tab",
                     "interactions": "",
@@ -330,6 +418,17 @@
                     "name": "",
                     "id": "e7a91d10-4811-4be9-a021-2d2272611761",
                     "path": "<Gamepad>/leftShoulder",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Back",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "945a0d54-985f-4c7b-bb5a-4139a908c151",
+                    "path": "<Keyboard>/rightShift",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

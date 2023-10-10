@@ -9,23 +9,22 @@ public class ExceptionHandler : MonoBehaviour
 
     private void Awake()
     {
-        if (!Application.isEditor && Application.platform != RuntimePlatform.WebGLPlayer)
+#if UNITY_WEBGL || UNITY_EDITOR
+        Destroy(gameObject);
+#else
+        if (_instance == null)
         {
-            if (_instance == null)
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-            }
-            else
-            {
-                Destroy(gameObject);
-                return;
-            }
-
-            Application.logMessageReceived += HandleException;
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
         }
         else
+        {
             Destroy(gameObject);
+            return;
+        }
+
+        Application.logMessageReceived += HandleException;
+#endif
     }
 
     private void HandleException(string logString, string stackTrace, LogType type)
@@ -38,11 +37,7 @@ public class ExceptionHandler : MonoBehaviour
         }
         else
         {
-            appPath = Application.platform switch
-            {
-                RuntimePlatform.IPhonePlayer or RuntimePlatform.Android or RuntimePlatform.WebGLPlayer => Application.persistentDataPath,
-                _ => Application.dataPath,
-            };
+            appPath = Application.dataPath;
         }
 
         switch (type)
@@ -75,7 +70,7 @@ public class ExceptionHandler : MonoBehaviour
                 Directory.CreateDirectory(dir);
 
             using StreamWriter writer = new(path, true);
-            writer.WriteLine(DateTime.Now.ToString("g"));
+            writer.WriteLine(DateTime.Now.ToString("g") + " | Version: " + Application.version);
             writer.WriteLine("-----------------------------------------");
             writer.WriteLine(logString);
             writer.WriteLine(stackTrace);
