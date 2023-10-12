@@ -58,7 +58,7 @@ public static class SaveSystem
 
 	static SaveSystem()
 	{
-		if (Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer)
+        if ((Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer) && !Application.isEditor)
         {
             _savesPath = Application.persistentDataPath;
         }

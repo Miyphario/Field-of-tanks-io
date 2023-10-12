@@ -10,6 +10,8 @@ public class Yandex : MonoBehaviour
 #if (UNITY_WEBGL && !UNITY_EDITOR)
      [DllImport("__Internal")]
      private static extern void RateGameExtern();
+     [DllImport("__Internal")]
+    private static extern void CanRateGameExtern();
 #endif
 
     private bool _gameRated;
@@ -20,12 +22,14 @@ public class Yandex : MonoBehaviour
     public void Initialize()
     {
         Instance = this;
-
+#if UNITY_WEBGL && !UNITY_EDITOR
+        CanRateGameExtern();
+#else
         GameManager.Instance.OnSaveLoaded += data =>
         {
             _gameRated = data.gameRated;
         };
-
+#endif
         WorldManager.Instance.OnGameEnded += HandleOnGameEnded;
     }
 
@@ -40,20 +44,38 @@ public class Yandex : MonoBehaviour
     {
         if (CannotRateGame || _gameRated) return;
 
-        if (Application.platform == RuntimePlatform.WebGLPlayer)
-        {
-#if (UNITY_WEBGL && !UNITY_EDITOR)
-            RateGameExtern();
+#if UNITY_WEBGL && !UNITY_EDITOR
+        RateGameExtern();
+#else
+        Application.OpenURL("market://details?id=" + Application.identifier);
 #endif
-        }
-        else
-        {
-            Application.OpenURL("market://details?id=" + Application.identifier);
-        }
         
+        ButtonRateGameEnabled = false;
         CannotRateGame = true;
         _gameRated = true;
         HUDManager.Instance.MenuUI.ToggleRateGameButton(false);
+#if !UNITY_WEBGL || UNITY_EDITOR
         GameManager.Instance.SaveGame();
+#endif
+    }
+
+    public void IsGameRated(int canRate)
+    {
+        // Can rate the game
+        if (canRate == 0)
+        {
+            _gameRated = false;
+        }
+        // Can't rate the game
+        else if (canRate == 1)
+        {
+            CannotRateGame = true;
+            _gameRated = true;
+            if (ButtonRateGameEnabled)
+            {
+                HUDManager.Instance.MenuUI.ToggleRateGameButton(false);
+                ButtonRateGameEnabled = false;
+            }
+        }
     }
 }

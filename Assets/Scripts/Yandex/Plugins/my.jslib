@@ -11,7 +11,22 @@ mergeInto(LibraryManager.library, {
                     console.log(feedbackSent);
                 })
             } else {
-                console.log(reason)
+                myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
+                console.log(reason);
+            }
+        })
+    },
+
+    CanRateGameExtern: function() {
+        if (player == null) return;
+
+        ysdk.feedback.canReview()
+        .then(({ value, reason }) => {
+            if (value) {
+                myGameInstance.SendMessage("Yandex", "IsGameRated", 0);
+            } else {
+                myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
+                console.log(reason);
             }
         })
     },

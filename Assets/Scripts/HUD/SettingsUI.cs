@@ -30,6 +30,7 @@ public class SettingsUI : MonoBehaviour
         _defaultBackButtonPos = _backButton.GetComponent<RectTransform>().anchoredPosition;
         SetSettings();
         GameManager.Instance.OnSaveLoaded += HandleSaveLoaded;
+        HandleSaveLoaded(null);
     }
 
     private void HandleSaveLoaded(SaveData data)
