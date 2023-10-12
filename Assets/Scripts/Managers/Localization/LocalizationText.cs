@@ -34,7 +34,10 @@ public class LocalizationText : MonoBehaviour
             _text.text = _key;
             return;
         }
-        _text.text = LocalizationManager.GetLocalizedText(_key);
+
+        string newText = LocalizationManager.GetLocalizedText(_key);
+        if (newText == null || newText.Trim() == string.Empty) return;
+        _text.text = newText;
     }
 
     public void SetKey(string key)

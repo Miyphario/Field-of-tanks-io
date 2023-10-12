@@ -279,9 +279,8 @@ static class LocalizationManager
         }
         else
         {
-            if (!_isLoading)
-                Initialize();
-            return key;
+            if (!_isLoading) Initialize();
+            return string.Empty;
         }
     }
 }

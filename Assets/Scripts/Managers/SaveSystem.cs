@@ -1,9 +1,9 @@
 using System;
 using System.IO;
 using UnityEngine;
-#if (UNITY_WEBGL && !UNITY_EDITOR)
-using System.Runtime.InteropServices;
-#endif
+//#if (UNITY_WEBGL && !UNITY_EDITOR)
+//using System.Runtime.InteropServices;
+//#endif
 
 [Serializable]
 public class SaveData
@@ -45,20 +45,20 @@ public class SaveData
 
 public static class SaveSystem
 {
-#if (UNITY_WEBGL && !UNITY_EDITOR)
-    [DllImport("__Internal")]
-    private static extern void SaveGameExtern(string data, bool flush);
+//#if (UNITY_WEBGL && !UNITY_EDITOR)
+//    [DllImport("__Internal")]
+//    private static extern void SaveGameExtern(string data, bool flush);
 
-    [DllImport("__Internal")]
-    private static extern void LoadGameExtern();
-#endif
+//    [DllImport("__Internal")]
+//    private static extern void LoadGameExtern();
+//#endif
 
     private static readonly string _savesPath;
 	private const string SAVE_NAME = "Save.sav";
 
 	static SaveSystem()
 	{
-		if (Application.isMobilePlatform)
+		if (Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer)
         {
             _savesPath = Application.persistentDataPath;
         }
@@ -76,10 +76,10 @@ public static class SaveSystem
 	public static void Save(SaveData data, bool flush = false)
 	{
         if (data == null) return;
-#if (UNITY_WEBGL && !UNITY_EDITOR)
-        string json = JsonUtility.ToJson(data, true);
-        SaveGameExtern(json, flush);
-#else
+//#if (UNITY_WEBGL && !UNITY_EDITOR)
+//        string json = JsonUtility.ToJson(data, true);
+//        SaveGameExtern(json, flush);
+//#else
         if (!Directory.Exists(_savesPath))
             Directory.CreateDirectory(_savesPath);
         string savePath = Path.Combine(_savesPath, SAVE_NAME);
@@ -96,16 +96,16 @@ public static class SaveSystem
         {
             Debug.LogError("Cannot write save to file!");
         }
-#endif
+//#endif
 
 	}
 
 	public static SaveData LoadData()
     {
-#if (UNITY_WEBGL && !UNITY_EDITOR)
-        LoadGameExtern();
-        return default;
-#else
+//#if (UNITY_WEBGL && !UNITY_EDITOR)
+//        LoadGameExtern();
+//        return default;
+//#else
         if (!Directory.Exists(_savesPath)) return default;
         string savePath = Path.Combine(_savesPath, SAVE_NAME);
         if (!File.Exists(savePath)) return default;
@@ -115,7 +115,7 @@ public static class SaveSystem
         byte[] bytes = reader.ReadAllBytes();
         SaveData data = SaveData.Deserealize(bytes);
         return data;
-#endif
+//#endif
     }
 
 	public static SaveData LoadData(string json)
