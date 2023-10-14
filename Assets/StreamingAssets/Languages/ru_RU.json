@@ -53,6 +53,10 @@
 			"key": "btn.RateGame",
 			"value": "Оценить игру"
 		},
+		{
+			"key": "btn.ShowFps",
+			"value": "Показать FPS"
+		},
 
 		{
 			"key": "tutor.MoveArea",

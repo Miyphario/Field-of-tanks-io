@@ -6,16 +6,11 @@ public class PlayerInfoUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _levelText;
     [SerializeField] private TextMeshProUGUI _xpText;
     [SerializeField] private TextMeshProUGUI _otherInfo;
-
-    private void Awake()
-    {
-#if !UNITY_EDITOR
-        Destroy(gameObject);
-#endif
-    }
-
     public void Initialize()
     {
+#if !UNITY_EDITOR
+        gameObject.Toggle(false);
+#else
         WorldManager.Instance.OnPlayerCreated += player =>
         {
             player.OnUpgrade += HandlePlayerUpgrade;
@@ -27,6 +22,7 @@ public class PlayerInfoUI : MonoBehaviour
             HandlePlayerLevelUp(player.Level);
             HandlePlayerXpUpdated(player.XP, player.MaxXP);
         };
+#endif
     }
 
     private void HandlePlayerUpgrade()

@@ -5,6 +5,13 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
 
+public class AudioClipSetup
+{
+    public AudioClip clip;
+    public float volume;
+    public float pitch;
+}
+
 public class HUDManager : MonoBehaviour
 {
     [SerializeField] private BackgroundUI _darkBackground;
@@ -20,24 +27,30 @@ public class HUDManager : MonoBehaviour
 
     [Header("HUDs")]
     [SerializeField] private UpgradesUI _upgradesUI;
-    [SerializeField] private MobileControls _mobileControls;
     public MobileControls MobileControls => _mobileControls;
-    [SerializeField] private MenuUI _menuUI;
+    [SerializeField] private MobileControls _mobileControls;
     public MenuUI MenuUI =>_menuUI;
+    [SerializeField] private MenuUI _menuUI;
     [SerializeField] private SettingsUI _settingsUI;
     [SerializeField] private KeyUIManager _keyUIManager;
     [SerializeField] private GameTutorialUI _gameTutorialUI;
     [SerializeField] private RectTransform _gameOverText;
     [SerializeField] private LeanTweenType _gameOverAnimType;
     private Vector2 _defaultGameOverTextSize;
-#if UNITY_EDITOR
+    public FpsCounterUI FPSCounterUI => _fpsCounterUI;
+    [SerializeField] private FpsCounterUI _fpsCounterUI;
     [SerializeField] private PlayerInfoUI _playerInfoUI;
+#if UNITY_EDITOR
     [SerializeField] private PauseUI _pauseUI;
 #endif
 
     [Header("Sounds")]
+    [SerializeField] private AudioSource _audioSourceOneShot;
     [SerializeField] private AudioSource _audioSource;
+    private bool _canPlaySound = true;
     [SerializeField] private AudioClip _buttonClick;
+
+    public bool ShowFPS { get; private set; }
 
     public void Initialize()
     {
@@ -48,19 +61,20 @@ public class HUDManager : MonoBehaviour
         _gameOverText.gameObject.Toggle(false);
 
         _darkBackground.Initialize();
+        _fpsCounterUI.Initialize();
 
         _menuUI.Initialize();
         _mobileControls.Initialize();
         _mobileControls.gameObject.Toggle(false);
 
         _upgradesUI.Initialize();
-        _settingsUI.Initialize();
         _keyUIManager.Initialize();
         _gameTutorialUI.Initialize();
+        _playerInfoUI.Initialize();
 #if UNITY_EDITOR
         _pauseUI.Initialize();
-        _playerInfoUI.Initialize();
 #endif
+        _settingsUI.Initialize();
 
         GameManager.Instance.OnPauseChanged += pause =>
         {
@@ -154,29 +168,59 @@ public class HUDManager : MonoBehaviour
         return raycastResults.Count > 0;
     }
 
-    public void PlaySound(UISound sound)
+    public void PlaySoundOneShot(UISound sound)
     {
+        AudioClipSetup clip = GetUISoundClip(sound);
+        if (clip == null) return;
+
+        _audioSourceOneShot.pitch = clip.pitch;
+        _audioSourceOneShot.volume = clip.volume;
+        _audioSourceOneShot.PlayOneShot(clip.clip);
+    }
+
+    public AudioClipSetup GetUISoundClip(UISound sound)
+    {
+        AudioClipSetup clip = new();
+
         switch (sound)
         {
             case UISound.Button:
-                _audioSource.pitch = Random.Range(0.9f, 1.1f);
-                _audioSource.volume = Random.Range(0.9f, 1f);
-                _audioSource.clip = _buttonClick;
-                break;
+                clip.pitch = Random.Range(0.9f, 1.1f);
+                clip.volume = Random.Range(0.9f, 1f);
+                clip.clip = _buttonClick;
+                return clip;
 
             case UISound.Exit:
                 break;
         }
 
-        if (_audioSource.clip == null) return;
+        return default;
+    }
 
-        _audioSource.PlayOneShot(_audioSource.clip);
-        _audioSource.clip = null;
+    private IEnumerator PlaySoundDelayIE(UISound sound)
+    {
+        _canPlaySound = false;
+
+        AudioClipSetup clip = GetUISoundClip(sound);
+        _audioSource.pitch = clip.pitch;
+        _audioSource.volume = clip.volume;
+        _audioSource.clip = clip.clip;
+        _audioSource.Play();
+
+        yield return new WaitForSecondsRealtime(_audioSource.GetClipRemainingTime());
+        _canPlaySound = true;
     }
 
     public void PlayButtonSound()
     {
-        PlaySound(UISound.Button);
+        PlaySoundOneShot(UISound.Button);
+    }
+
+    public void PlayButtonSoundDelay()
+    {
+        if (!_canPlaySound) return;
+
+        StartCoroutine(PlaySoundDelayIE(UISound.Button));
     }
 
     public bool IsTouchInput()

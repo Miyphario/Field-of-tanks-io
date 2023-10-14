@@ -53,6 +53,10 @@
 			"key": "btn.RateGame",
 			"value": "Rate the game"
 		},
+		{
+			"key": "btn.ShowFps",
+			"value": "Show FPS"
+		},
 
 		{
 			"key": "tutor.MoveArea",

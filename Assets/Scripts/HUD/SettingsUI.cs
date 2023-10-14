@@ -3,9 +3,12 @@ using UnityEngine.UI;
 
 public class SettingsUI : MonoBehaviour
 {
+    [Header("Settings")]
     [SerializeField] private Slider _masterVolumeSlider;
     [SerializeField] private Toggle _batterySaveToggle;
+    [SerializeField] private Toggle _showFpsToggle;
 
+    [Header("Animations")]
     [SerializeField] private RectTransform _settingsLayout;
     [SerializeField] private Vector2 _animSettingsLayoutPos;
     private Vector2 _defaultSettingsLayoutPos;
@@ -18,8 +21,10 @@ public class SettingsUI : MonoBehaviour
 
     private void Awake()
     {
+#if !UNITY_EDITOR
         if (!Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer)
             _batterySaveToggle.transform.parent.gameObject.Toggle(false);
+#endif
         
         Hide(true);
     }
@@ -30,7 +35,10 @@ public class SettingsUI : MonoBehaviour
         _defaultBackButtonPos = _backButton.GetComponent<RectTransform>().anchoredPosition;
         SetSettings();
         GameManager.Instance.OnSaveLoaded += HandleSaveLoaded;
-        HandleSaveLoaded(null);
+        if (!SaveSystem.SaveExists)
+        {
+            HandleSaveLoaded(null);
+        }
     }
 
     private void HandleSaveLoaded(SaveData data)
@@ -88,7 +96,10 @@ public class SettingsUI : MonoBehaviour
         GameManager.Instance.SetBatterySave(enable);
 
         if (_saveLoaded)
+        {
             DelayedSaveGame();
+            HUDManager.Instance.PlayButtonSound();
+        }
     }
 
     public void SetMasterVolume(float value)
@@ -96,7 +107,10 @@ public class SettingsUI : MonoBehaviour
         SoundManager.Instance.SetMasterVolume(value);
 
         if (_saveLoaded)
+        {
             DelayedSaveGame();
+            HUDManager.Instance.PlayButtonSoundDelay();
+        }
     }
 
     public void ResetTutorial()
@@ -104,8 +118,20 @@ public class SettingsUI : MonoBehaviour
         if (GameManager.Instance.GameTutorial) return;
 
         GameManager.Instance.GameTutorial = true;
+
         if (_saveLoaded)
             DelayedSaveGame();
+    }
+
+    public void ToggleFpsCounter(bool enable)
+    {
+        HUDManager.Instance.FPSCounterUI.Toggle(enable);
+
+        if (_saveLoaded)
+        {
+            DelayedSaveGame();
+            HUDManager.Instance.PlayButtonSound();
+        }
     }
 
     public void DelayedSaveGame() => WorldManager.Instance.SaveGame(1f);
@@ -114,5 +140,6 @@ public class SettingsUI : MonoBehaviour
     {
         _masterVolumeSlider.value = SoundManager.Instance.GetMasterVolume();
         _batterySaveToggle.isOn = GameManager.Instance.GetBatterySave();
+        _showFpsToggle.isOn = HUDManager.Instance.FPSCounterUI.ShowFPS;
     }
 }

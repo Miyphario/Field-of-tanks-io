@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
 //#if (UNITY_WEBGL && !UNITY_EDITOR)
 //using System.Runtime.InteropServices;
@@ -10,8 +11,9 @@ public class SaveData
 {
 	public bool gameTutorial = true;
 	public float masterVolume = 1f;
-	public bool batterySaving = false;
+    public bool batterySaving;
     public bool gameRated;
+    public bool showFps;
 
     public byte[] Serialize()
     {
@@ -21,6 +23,7 @@ public class SaveData
         writer.Write(masterVolume);
         writer.Write(batterySaving);
         writer.Write(gameRated);
+        writer.Write(showFps);
         return stream.ToArray();
     }
 
@@ -36,6 +39,7 @@ public class SaveData
             result.masterVolume = reader.ReadSingle();
             result.batterySaving = reader.ReadBoolean();
             result.gameRated = reader.ReadBoolean();
+            result.showFps = reader.ReadBoolean();
         }
         catch {}
         
@@ -56,7 +60,18 @@ public static class SaveSystem
     private static readonly string _savesPath;
 	private const string SAVE_NAME = "Save.sav";
 
-	static SaveSystem()
+    public static bool SaveExists
+    {
+        get
+        {
+            if (!Directory.Exists(_savesPath)) return false;
+            string savePath = Path.Combine(_savesPath, SAVE_NAME);
+            if (!File.Exists(savePath)) return false;
+            return true;
+        }
+    }
+
+    static SaveSystem()
 	{
         if ((Application.isMobilePlatform || Application.platform == RuntimePlatform.WebGLPlayer) && !Application.isEditor)
         {

@@ -53,6 +53,10 @@
 			"key": "btn.RateGame",
 			"value": "Oyunu değerlendirin"
 		},
+		{
+			"key": "btn.ShowFps",
+			"value": "Fps'yi göster"
+		},
 
 		{
 			"key": "tutor.MoveArea",

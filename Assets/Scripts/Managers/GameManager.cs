@@ -135,10 +135,7 @@ public class GameManager
         }
     }
 
-    public bool GetBatterySave()
-    {
-        return Application.targetFrameRate == 30;
-    }
+    public bool GetBatterySave() => Application.targetFrameRate == 30;
 
     public void SaveGame()
     {
@@ -147,7 +144,8 @@ public class GameManager
             gameTutorial = GameTutorial,
             gameRated = Yandex.Instance.GameRated,
             batterySaving = GetBatterySave(),
-            masterVolume = SoundManager.Instance.GetMasterVolume()
+            masterVolume = SoundManager.Instance.GetMasterVolume(),
+            showFps = HUDManager.Instance.FPSCounterUI.ShowFPS
         };
         SaveSystem.Save(data);
     }
@@ -170,6 +168,7 @@ public class GameManager
 
         GameTutorial = data.gameTutorial;
         SetBatterySave(data.batterySaving);
+        Debug.Log("Save data is loaded!");
         OnSaveLoaded?.Invoke(data);
     }
 }
