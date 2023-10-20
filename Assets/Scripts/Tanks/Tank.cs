@@ -44,6 +44,7 @@ public class Tank : MonoBehaviour
     private bool _isInvisible;
     public bool IsInvisible => _isInvisible;
     public event Action<bool> OnInvisible;
+    public event Action<Tank> OnEnemyDestroy;
 
     [SerializeField] private AudioSource _audioSource;
 
@@ -82,7 +83,10 @@ public class Tank : MonoBehaviour
             Health = 0f;
             OnDestroyed?.Invoke(this);
             if (attacker != null)
+            {
                 attacker.TakeDamage(-(MaxHealth / 3.5f));
+                attacker.OnEnemyDestroy?.Invoke(this);
+            }
             DestroyMe();
             return true;
         }
@@ -104,18 +108,26 @@ public class Tank : MonoBehaviour
 
     private void DestroyMe()
     {
+        DestroyMe(null);
+    }
+
+    protected void DestroyMe(Action actionAfterDestroy)
+    {
         StopAllCoroutines();
         _healthbar.Disable();
         GetComponent<Collider2D>().enabled = false;
         gameObject.DisableAllExcept(_audioSource);
-        if (NearFromCamera())
+        if (gameObject.activeSelf)
         {
-            PlayDestroySound();
-            PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+            if (NearFromCamera())
+            {
+                PlayDestroySound();
+                PrefabManager.Instance.CreateParticles(ParticlesType.TankExplode, transform.position, Quaternion.identity);
+            }
         }
 
         if (gameObject.activeSelf)
-            StartCoroutine(DestroyMeIE());
+            StartCoroutine(DestroyMeIE(actionAfterDestroy));
         else
         {
             DestroySelf();
@@ -138,6 +150,12 @@ public class Tank : MonoBehaviour
         yield return new WaitForSeconds(_audioSource.GetClipRemainingTime());
         DestroySelf();
         GetComponent<Collider2D>().enabled = true;
+    }
+
+    private IEnumerator DestroyMeIE(Action actionAfterDestroy)
+    {
+        yield return DestroyMeIE();
+        actionAfterDestroy?.Invoke();
     }
 
     public void AddXP(int xp)

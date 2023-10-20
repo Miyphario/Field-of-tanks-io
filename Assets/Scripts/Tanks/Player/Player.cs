@@ -1,6 +1,47 @@
 using System;
+using UnityEngine;
 using sfloat = SafeFloat;
 using sint = SafeInt;
+
+[Serializable]
+public class PlayerScore : IComparable
+{
+    public int frags;
+    public float time;
+    public int level;
+    public string date;
+
+    public int CompareTo(object obj)
+    {
+        if (obj is PlayerScore score)
+        {
+            if (frags.CompareTo(score.frags) == 0)
+            {
+                if (time.CompareTo(score.time) == 0)
+                {
+                    return level.CompareTo(score.level) * -1;
+                }
+                return time.CompareTo(score.time) * -1;
+            }
+            return frags.CompareTo(score.frags) * -1;
+        }
+        else
+            return 0;
+    }
+
+    public void SetDate()
+    {
+        date = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
+    }
+
+    public void Reset()
+    {
+        frags = 0;
+        time = 0;
+        level = 0;
+        date = string.Empty;
+    }
+}
 
 public class Player : Tank
 {
@@ -33,11 +74,20 @@ public class Player : Tank
     private UpgradeMenu _upgradeMenu;
     public event Action<UpgradeMenu> OnMenuSelected;
 
+    private readonly PlayerScore _score = new();
+
     protected override void Awake()
     {
         base.Awake();
         OnLevelUp += HandleLevelUp;
         OnTierUpdated += HandleTierUpdated;
+        OnEnemyDestroy += HandleEnemyDestroy;
+    }
+
+    private void Update()
+    {
+        if (WorldManager.Instance.IsPlaying)
+            _score.time += Time.deltaTime;
     }
 
     public new void Initialize(int teamID)
@@ -50,6 +100,9 @@ public class Player : Tank
 
     private void HandleLevelUp(int level)
     {
+        if (WorldManager.Instance.IsPlaying)
+            _score.level = Level;
+
         int lastTierLevel = PrefabManager.Instance.GetLastTierLevel(level);
         if (lastTierLevel > 0 && level > lastTierLevel && !_gunSelected)
         {
@@ -72,8 +125,21 @@ public class Player : Tank
         OnMenuSelected?.Invoke(_upgradeMenu);
     }
 
+    private void HandleEnemyDestroy(Tank tank)
+    {
+        if (!WorldManager.Instance.IsPlaying) return;
+        _score.frags++;
+    }
+
     protected override void DestroySelf()
     {
+        if (_score.level > 0)
+        {
+            _score.SetDate();
+            GameManager.Instance.SetNewScore(_score);
+        }
+        _score.Reset();
+
         gameObject.Toggle(false);
         ResetToDefault();
     }

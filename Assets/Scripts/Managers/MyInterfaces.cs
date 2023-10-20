@@ -7,4 +7,5 @@ public interface IPoolable
     GameObject gameObject { get; }
     event Action OnAddedToPool;
     void AddToPool();
+    void Kill();
 }

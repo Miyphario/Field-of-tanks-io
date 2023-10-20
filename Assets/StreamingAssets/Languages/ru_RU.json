@@ -57,6 +57,10 @@
 			"key": "btn.ShowFps",
 			"value": "Показать FPS"
 		},
+		{
+			"key": "btn.Login",
+			"value": "Авторизоваться"
+		},
 
 		{
 			"key": "tutor.MoveArea",
@@ -82,6 +86,58 @@
 		{
 			"key": "scr.GameOver",
 			"value": "Конец Игры"
+		},
+		
+		{
+			"key": "score.Frags",
+			"value": "Фраги"
+		},
+		{
+			"key": "score.Lifetime",
+			"value": "Продолжительность жизни"
+		},
+		{
+			"key": "score.Level",
+			"value": "Уровень"
+		},
+		{
+			"key": "score.EmptyHere",
+			"value": "Здесь пока пусто..."
+		},
+		
+		{
+			"key": "num.bil",
+			"value": "млрд"
+		},
+		{
+			"key": "num.mln",
+			"value": "млн"
+		},
+		{
+			"key": "num.thous",
+			"value": "т"
+		},
+		
+		{
+			"key": "time.sec",
+			"value": "сек"
+		},
+		{
+			"key": "time.min",
+			"value": "мин"
+		},
+		{
+			"key": "num.h",
+			"value": "ч"
+		},
+		{
+			"key": "num.d",
+			"value": "д"
+		},
+		
+		{
+			"key": "auth.Window",
+			"value": "Войдите в аккаунт, чтобы соревноваться с другими игроками и продвигаться по таблице лидеров"
 		}
 	]
 }

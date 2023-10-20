@@ -57,6 +57,10 @@
 			"key": "btn.ShowFps",
 			"value": "Show FPS"
 		},
+		{
+			"key": "btn.Login",
+			"value": "Log in"
+		},
 
 		{
 			"key": "tutor.MoveArea",
@@ -82,6 +86,58 @@
 		{
 			"key": "scr.GameOver",
 			"value": "Game Over"
+		},
+		
+		{
+			"key": "score.Frags",
+			"value": "Frags"
+		},
+		{
+			"key": "score.Lifetime",
+			"value": "Lifetime"
+		},
+		{
+			"key": "score.Level",
+			"value": "Level"
+		},
+		{
+			"key": "score.EmptyHere",
+			"value": "It's still empty here..."
+		},
+		
+		{
+			"key": "num.bil",
+			"value": "b"
+		},
+		{
+			"key": "num.mln",
+			"value": "mln"
+		},
+		{
+			"key": "num.thous",
+			"value": "k"
+		},
+		
+		{
+			"key": "time.sec",
+			"value": "sec"
+		},
+		{
+			"key": "time.min",
+			"value": "min"
+		},
+		{
+			"key": "num.h",
+			"value": "h"
+		},
+		{
+			"key": "num.d",
+			"value": "d"
+		},
+		
+		{
+			"key": "auth.Window",
+			"value": "Log in to compete with other players and move up the leaderboard"
 		}
 	]
 }

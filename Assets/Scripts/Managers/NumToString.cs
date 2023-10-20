@@ -32,7 +32,7 @@ public static class NumToString
         return GetShortFloat(num, 2);
     }
 
-    /* public static string GetReducedTime(float timeInSec)
+    public static string GetReducedTime(float timeInSec)
     {
         string time = "";
         switch (timeInSec)
@@ -134,5 +134,5 @@ public static class NumToString
 
         time += addNum.ToString("n" + maxNums) + suffix;
         return time;
-    } */
+    }
 }

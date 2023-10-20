@@ -1,9 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.EnhancedTouch;
+using Random = UnityEngine.Random;
 
 public class AudioClipSetup
 {
@@ -34,9 +36,12 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private SettingsUI _settingsUI;
     [SerializeField] private KeyUIManager _keyUIManager;
     [SerializeField] private GameTutorialUI _gameTutorialUI;
+    [SerializeField] private ScoresUI _scoresUI;
+    public ScoresUI ScoresUI => _scoresUI;
     [SerializeField] private RectTransform _gameOverText;
     [SerializeField] private LeanTweenType _gameOverAnimType;
     private Vector2 _defaultGameOverTextSize;
+    public event Action OnGameOverScreenHidden;
     public FpsCounterUI FPSCounterUI => _fpsCounterUI;
     [SerializeField] private FpsCounterUI _fpsCounterUI;
     [SerializeField] private PlayerInfoUI _playerInfoUI;
@@ -74,6 +79,7 @@ public class HUDManager : MonoBehaviour
 #if UNITY_EDITOR
         _pauseUI.Initialize();
 #endif
+        _scoresUI.Initialize();
         _settingsUI.Initialize();
 
         GameManager.Instance.OnPauseChanged += pause =>
@@ -248,6 +254,7 @@ public class HUDManager : MonoBehaviour
                 {
                     _gameOverText.gameObject.Toggle(false);
                     AdsManager.ShowAds();
+                    OnGameOverScreenHidden?.Invoke();
                     HandleGameEnded();
                 });
             }

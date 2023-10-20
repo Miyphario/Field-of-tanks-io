@@ -43,7 +43,7 @@ public class Destructible : MonoBehaviour
     private void Start()
     {
         _healthbar = HUDManager.Instance.CreateHealthbar(true);
-        _healthbar.Initialize(gameObject, 0f, _maxHealth);
+        _healthbar.Initialize(gameObject, 0f, _maxHealth, NearFromCamera());
 
         StartCoroutine(CheckPositionIE());
     }

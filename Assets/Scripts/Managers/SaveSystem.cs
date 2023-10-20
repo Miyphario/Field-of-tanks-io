@@ -1,10 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+using System.Security.Cryptography;
 using UnityEngine;
-//#if (UNITY_WEBGL && !UNITY_EDITOR)
-//using System.Runtime.InteropServices;
-//#endif
+#if UNITY_WEBGL && !UNITY_EDITOR
+using System.Runtime.InteropServices;
+#endif
 
 [Serializable]
 public class SaveData
@@ -14,51 +15,43 @@ public class SaveData
     public bool batterySaving;
     public bool gameRated;
     public bool showFps;
+    public List<PlayerScore> scores = new();
 
-    public byte[] Serialize()
+    public string Serialize()
     {
-        using MemoryStream stream = new();
-        using BinaryWriter writer = new(stream);
-        writer.Write(gameTutorial);
-        writer.Write(masterVolume);
-        writer.Write(batterySaving);
-        writer.Write(gameRated);
-        writer.Write(showFps);
-        return stream.ToArray();
+        return JsonUtility.ToJson(this);
     }
 
-    public static SaveData Deserealize(byte[] data)
+    public static SaveData Deserealize(string data)
     {
         if (data.Length <= 0) return default;
 
         SaveData result = new();
         try
         {
-            using BinaryReader reader = new(new MemoryStream(data));
-            result.gameTutorial = reader.ReadBoolean();
-            result.masterVolume = reader.ReadSingle();
-            result.batterySaving = reader.ReadBoolean();
-            result.gameRated = reader.ReadBoolean();
-            result.showFps = reader.ReadBoolean();
+            result = JsonUtility.FromJson<SaveData>(data);
         }
-        catch {}
-        
+        catch { }
+
         return result;
     }
 }
 
 public static class SaveSystem
 {
-//#if (UNITY_WEBGL && !UNITY_EDITOR)
-//    [DllImport("__Internal")]
-//    private static extern void SaveGameExtern(string data, bool flush);
+#if UNITY_WEBGL && !UNITY_EDITOR
+    [DllImport("__Internal")]
+    private static extern void SaveGameExtern(string data, bool flush);
 
-//    [DllImport("__Internal")]
-//    private static extern void LoadGameExtern();
-//#endif
+    [DllImport("__Internal")]
+    private static extern void LoadGameExtern();
+#endif
 
     private static readonly string _savesPath;
 	private const string SAVE_NAME = "Save.sav";
+#if !UNITY_WEBGL || UNITY_EDITOR
+    private readonly static byte[] _savedKey = { 0x01, 0x25, 0x05, 0x12, 0x13, 0x20, 0x02, 0x01, 0x25, 0x05, 0x12, 0x13, 0x20, 0x02, 0x15, 0x13 };
+#endif
 
     public static bool SaveExists
     {
@@ -91,49 +84,62 @@ public static class SaveSystem
 	public static void Save(SaveData data, bool flush = false)
 	{
         if (data == null) return;
-//#if (UNITY_WEBGL && !UNITY_EDITOR)
-//        string json = JsonUtility.ToJson(data, true);
-//        SaveGameExtern(json, flush);
-//#else
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+        string json = JsonUtility.ToJson(data, true);
+        SaveGameExtern(json, flush);
+#else
         if (!Directory.Exists(_savesPath))
             Directory.CreateDirectory(_savesPath);
         string savePath = Path.Combine(_savesPath, SAVE_NAME);
         if (File.Exists(savePath)) File.WriteAllText(savePath, string.Empty);
 
-        byte[] bytes = data.Serialize();
+        Aes iAes = Aes.Create();
+
         using FileStream stream = new(savePath, FileMode.OpenOrCreate);
-        try
-        {
-            using BinaryWriter writer = new(stream);
-            writer.Write(bytes);
-        }
-        catch
-        {
-            Debug.LogError("Cannot write save to file!");
-        }
-//#endif
+        byte[] inputIV = iAes.IV;
+        stream.Write(inputIV, 0, inputIV.Length);
+        CryptoStream iStream = new(
+            stream,
+            iAes.CreateEncryptor(_savedKey, iAes.IV),
+            CryptoStreamMode.Write);
 
-	}
+        using StreamWriter writer = new(iStream);
+        writer.Write(data.Serialize());
+#endif
+    }
 
-	public static SaveData LoadData()
+    public static SaveData LoadData()
     {
-//#if (UNITY_WEBGL && !UNITY_EDITOR)
-//        LoadGameExtern();
-//        return default;
-//#else
+#if (UNITY_WEBGL && !UNITY_EDITOR)
+        LoadGameExtern();
+        return default;
+#else
         if (!Directory.Exists(_savesPath)) return default;
         string savePath = Path.Combine(_savesPath, SAVE_NAME);
         if (!File.Exists(savePath)) return default;
 
+        Aes oAes = Aes.Create();
+        byte[] outputIV = new byte[oAes.IV.Length];
+
         using FileStream stream = new(savePath, FileMode.Open);
-        using BinaryReader reader = new(stream);
-        byte[] bytes = reader.ReadAllBytes();
-        SaveData data = SaveData.Deserealize(bytes);
-        return data;
-//#endif
+        stream.Read(outputIV, 0, outputIV.Length);
+        try
+        {
+            CryptoStream oStream = new(
+                stream,
+                oAes.CreateDecryptor(_savedKey, outputIV),
+                CryptoStreamMode.Read);
+            using StreamReader reader = new(oStream);
+            string text = reader.ReadToEnd();
+            SaveData data = SaveData.Deserealize(text);
+            return data;
+        }
+        catch { }
+        return default;
+#endif
     }
 
-	public static SaveData LoadData(string json)
+    public static SaveData LoadData(string json)
 	{
 		if (json == null || json.Length < 2) return default;
 

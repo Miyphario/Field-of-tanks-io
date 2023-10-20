@@ -121,4 +121,9 @@ public class Enemy : Tank, IPoolable
             }
         }
     }
+
+    public void Kill()
+    {
+        DestroyMe(() => Destroy(gameObject));
+    }
 }

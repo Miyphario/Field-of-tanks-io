@@ -78,17 +78,10 @@ public class SettingsUI : MonoBehaviour
         }
 
         LeanTween.move(_settingsLayout, _animSettingsLayoutPos, animSpeed).setIgnoreTimeScale(true).
-        setEase(_animType).setOnComplete(() => 
-        {
-            _settingsLayout.gameObject.Toggle(false);
-        });
+        setEase(_animType).setOnComplete(() => _settingsLayout.gameObject.Toggle(false));
 
         LeanTween.move(_backButton.GetComponent<RectTransform>(), _animBackButtonPos, animSpeed).setIgnoreTimeScale(true).
-        setEase(_animType).setOnComplete(() => 
-        {
-            _backButton.gameObject.Toggle(false);
-            _backButton.interactable = true;
-        });
+        setEase(_animType).setOnComplete(() => _backButton.gameObject.Toggle(false));
     }
 
     public void SetBatterySave(bool enable)

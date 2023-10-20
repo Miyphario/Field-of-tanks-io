@@ -19,36 +19,32 @@ public static class AdsManager
     private static InterstitialAd _interstitialAd;
     private static bool _adLoaded;
 
+    private const uint ANDROID_SLOT_ID = 1428217;
+
     public static void Initialize()
     {
         if (Application.platform != RuntimePlatform.WebGLPlayer && !Application.isMobilePlatform) return;
         _canShowAds = true;
 
         if (Application.platform != RuntimePlatform.Android && Application.platform != RuntimePlatform.IPhonePlayer) return;
-        //_interstitialAd = CreateInterstitialAd();
-        
-        //// Устанавливаем обработчики событий
-        //_interstitialAd.AdLoadCompleted += OnLoadCompleted;
-        //_interstitialAd.AdDismissed += OnAdDismissed;
-        //_interstitialAd.AdDisplayed += OnAdDisplayed;
-        //_interstitialAd.AdVideoCompleted += OnAdVideoCompleted;
-        //_interstitialAd.AdClicked += OnAdClicked;
-        //_interstitialAd.AdLoadFailed += OnAdLoadFailed;
-        
-        //// Запускаем загрузку данных
-        //_interstitialAd.Load();
+        _interstitialAd = CreateInterstitialAd();
+
+        // Устанавливаем обработчики событий
+        _interstitialAd.AdLoadCompleted += OnLoadCompleted;
+        _interstitialAd.AdDismissed += OnAdDismissed;
+        _interstitialAd.AdDisplayed += OnAdDisplayed;
+        _interstitialAd.AdVideoCompleted += OnAdVideoCompleted;
+        _interstitialAd.AdClicked += OnAdClicked;
+        _interstitialAd.AdLoadFailed += OnAdLoadFailed;
+
+        // Запускаем загрузку данных
+        _interstitialAd.Load();
     }
 
     private static InterstitialAd CreateInterstitialAd()
     {
-        uint slotId = 0;
-    // #if UNITY_ANDROID
-    //     slotId = ANDROID_SLOT_ID;
-    // #elif UNITY_IOS
-    //     slotId = IOS_SLOT_ID;
-    // #endif
-    
-    
+        uint slotId = ANDROID_SLOT_ID;
+
         // Включение режима отладки
         // InterstitialAd.IsDebugMode = true;
         // Создаем экземпляр InterstitialAd
@@ -92,7 +88,7 @@ public static class AdsManager
         ShowAdsExtern();
 #elif (UNITY_IOS || UNITY_ANDROID)
         if (!_adLoaded) return;
-        //_interstitialAd.Show();
+        _interstitialAd.Show();
         _adLoaded = false;
 #endif
         _canShowAds = false;

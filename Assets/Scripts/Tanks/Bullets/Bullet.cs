@@ -78,4 +78,9 @@ public class Bullet : MonoBehaviour, IPoolable
         _isAlive = false;
         OnAddedToPool?.Invoke();
     }
+
+    public void Kill()
+    {
+        Destroy(gameObject);
+    }
 }

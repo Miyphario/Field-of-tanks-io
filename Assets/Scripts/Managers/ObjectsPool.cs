@@ -87,7 +87,7 @@ public class ObjectsPool : MonoBehaviour
             if (!child.IsAlive)
             {
                 _inactiveObjects--;
-                Destroy(child.gameObject);
+                child.Kill();
             }
         }
         

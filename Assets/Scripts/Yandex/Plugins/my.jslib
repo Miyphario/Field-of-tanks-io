@@ -31,6 +31,39 @@ mergeInto(LibraryManager.library, {
         })
     },
 
+    SetToLeaderboardExtern: function(frags) {
+        if (lb == null)
+            initLeaderboards();
+
+        ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then(available => {
+            if (available)
+            {
+                console.log('Leaderboard is available!');
+                lb.getLeaderboardPlayerEntry('frags')
+                .then(res => {
+                    console.log('Trying add ' + frags + ' frags to leaderboards');
+                    if (res < frags)
+                    {
+                        console.log('Leaderboards res < frags');
+                        lb.setLeaderboardScore('frags', frags);
+                        console.log('Frags' + frags + ' added to leaderboard!');
+                    }
+                })
+                .catch(err => {
+                    if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
+                      // Срабатывает, если у игрока нет записи в лидерборде
+                        console.log('Leaderboard: Player not present');
+                        lb.setLeaderboardScore('frags', frags);
+                    }
+                });
+            }
+            else
+            {
+                console.log('Leaderboard is not available!');
+            }
+        })
+    },
+
     SaveGameExtern: function (data, flush) {
         if (player == null) return;
 
@@ -85,17 +118,16 @@ mergeInto(LibraryManager.library, {
     GetAuthExtern: function () {
         initPlayer().then(_player => {
             if (_player.getMode() === 'lite') {
-                    // myGameInstance.SendMessage("GameManager", "SetAuth", 0);
+                myGameInstance.SendMessage("Yandex", "SetAuth", 0);
                 return;
             }
+            myGameInstance.SendMessage("Yandex", "SetAuth", 1);
 
-                // myGameInstance.SendMessage("GameManager", "SetAuth", 1);
-
-                // if (lb == null)
-                //     initLeaderboards();
+            if (lb == null)
+                initLeaderboards();
 
         }).catch(err => {
-                // myGameInstance.SendMessage("GameManager", "SetAuth", 0);
+            myGameInstance.SendMessage("Yandex", "SetAuth", 0);
         });
     },
 
@@ -103,20 +135,20 @@ mergeInto(LibraryManager.library, {
         initPlayer().then(_player => {
             if (_player.getMode() === 'lite') {
                 ysdk.auth.openAuthDialog().then(() => {
-                        // myGameInstance.SendMessage("GameManager", "SetAuth", 1);
+                    myGameInstance.SendMessage("Yandex", "SetAuth", 1);
 
-                        // if (lb == null)
-                        //     initLeaderboards();
+                    if (lb == null)
+                        initLeaderboards();
 
                     initPlayer().catch(err => {
-                            // myGameInstance.SendMessage("GameManager", "SetAuth", 0);
+                        myGameInstance.SendMessage("Yandex", "SetAuth", 0);
                     });
                 }).catch(() => {
-                        // myGameInstance.SendMessage("GameManager", "SetAuth", 0);
+                    myGameInstance.SendMessage("Yandex", "SetAuth", 0);
                 });
             }
         }).catch(err => {
-                // myGameInstance.SendMessage("GameManager", "SetAuth", 0);
+            myGameInstance.SendMessage("Yandex", "SetAuth", 0);
         });
     },
 

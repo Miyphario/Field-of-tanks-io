@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -39,6 +40,12 @@ public class GameManager
     public bool GameRestarting { get; private set; }
     public bool GameTutorial { get; set; } = true;
     public event Action<SaveData> OnSaveLoaded;
+    public bool SaveLoaded { get; private set; }
+
+    private List<PlayerScore> _scores = new();
+    public IReadOnlyList<PlayerScore> Scores => _scores;
+    public event Action<PlayerScore, int> OnScoreAdded;
+    public event Action<PlayerScore> OnScoreRemoved;
 
     public GameManager()
     {
@@ -145,7 +152,8 @@ public class GameManager
             gameRated = Yandex.Instance.GameRated,
             batterySaving = GetBatterySave(),
             masterVolume = SoundManager.Instance.GetMasterVolume(),
-            showFps = HUDManager.Instance.FPSCounterUI.ShowFPS
+            showFps = HUDManager.Instance.FPSCounterUI.ShowFPS,
+            scores = _scores
         };
         SaveSystem.Save(data);
     }
@@ -164,11 +172,57 @@ public class GameManager
 
     private void SetupGameSave(SaveData data)
     {
-        if (data == null) return;
+        data ??= new();
 
         GameTutorial = data.gameTutorial;
+        _scores = data.scores;
         SetBatterySave(data.batterySaving);
         Debug.Log("Save data is loaded!");
+        SaveLoaded = true;
         OnSaveLoaded?.Invoke(data);
+    }
+
+    public void SetNewScore(PlayerScore score)
+    {
+        if (_scores.Count >= 50)
+        {
+            int deleteIndex = -1;
+            for (int i = _scores.Count - 1; i >= 0; i--)
+            {
+                if (_scores[i].frags < score.frags)
+                {
+                    deleteIndex = i;
+                    break;
+                }
+                else if (_scores[i].frags == score.frags)
+                {
+                    if (_scores[i].time < score.time)
+                    {
+                        deleteIndex = i;
+                        break;
+                    }
+                    else if (_scores[i].time == score.time)
+                    {
+                        if (_scores[i].level < score.level)
+                        {
+                            deleteIndex = i;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (deleteIndex > -1)
+            {
+                OnScoreRemoved?.Invoke(_scores[deleteIndex]);
+                _scores.RemoveAt(deleteIndex);
+            }
+            else return;
+        }
+
+        _scores.Add(score);
+        _scores.Sort();
+        OnScoreAdded?.Invoke(score, _scores.IndexOf(score));
+        SaveGame();
     }
 }
