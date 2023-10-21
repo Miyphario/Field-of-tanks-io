@@ -17,6 +17,9 @@ public class ScoresUI : MonoBehaviour
     [SerializeField] private LeanTweenType _animType;
     [SerializeField] private float _animSpeed = 0.5f;
 
+    private Coroutine _setScoresRoutine;
+    private int _minContainerChildren;
+
     private void Awake()
     {
         Hide(true);
@@ -26,8 +29,15 @@ public class ScoresUI : MonoBehaviour
     {
         _scoresDefaultAnimPos = _scoresTransform.anchoredPosition;
         _backButtonDefaultAnimPos = _backButton.GetComponent<RectTransform>().anchoredPosition;
+        _minContainerChildren = _scorePrefab.transform.parent.childCount;
 
-        GameManager.Instance.OnSaveLoaded += data => StartCoroutine(SetScoresIE(data.scores));
+        GameManager.Instance.OnSaveLoaded += data =>
+        {
+            if (_setScoresRoutine != null)
+                StopCoroutine(_setScoresRoutine);
+
+            _setScoresRoutine = StartCoroutine(SetScoresIE(data.scores));
+        };
         GameManager.Instance.OnScoreAdded += AddNewScore;
         GameManager.Instance.OnScoreRemoved += HandleScoreRemoved;
     }
@@ -43,7 +53,7 @@ public class ScoresUI : MonoBehaviour
         ScoreUI sc = Instantiate(_scorePrefab, _scorePrefab.transform.parent);
         sc.SetScore(score);
         sc.Initialize();
-        if (index > -1) sc.transform.SetSiblingIndex(index + 2);
+        if (index > -1) sc.transform.SetSiblingIndex(index + _minContainerChildren);
         sc.gameObject.Toggle(true);
     }
 
@@ -56,7 +66,7 @@ public class ScoresUI : MonoBehaviour
     {
         if (scores.Count() <= 0) _emptyText.gameObject.Toggle(true);
 
-        for (int i = _scorePrefab.transform.parent.childCount - 1; i >= 2; i--)
+        for (int i = _scorePrefab.transform.parent.childCount - 1; i >= _minContainerChildren; i--)
         {
             Destroy(_scorePrefab.transform.parent.GetChild(i).gameObject);
         }

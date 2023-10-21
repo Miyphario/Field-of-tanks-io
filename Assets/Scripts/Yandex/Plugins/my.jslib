@@ -41,19 +41,22 @@ mergeInto(LibraryManager.library, {
                 console.log('Leaderboard is available!');
                 lb.getLeaderboardPlayerEntry('frags')
                 .then(res => {
-                    console.log('Trying add ' + frags + ' frags to leaderboards');
-                    if (res < frags)
+                    //console.log('Trying add ' + frags + ' frags to leaderboards');
+                    if (res.score < frags)
                     {
-                        console.log('Leaderboards res < frags');
                         lb.setLeaderboardScore('frags', frags);
-                        console.log('Frags' + frags + ' added to leaderboard!');
+                        //console.log('Frags' + frags + ' added to leaderboard!');
                     }
                 })
                 .catch(err => {
                     if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
                       // Срабатывает, если у игрока нет записи в лидерборде
-                        console.log('Leaderboard: Player not present');
+                        //console.log('Leaderboard: Player not present');
                         lb.setLeaderboardScore('frags', frags);
+                    }
+                    else
+                    {
+                        //console.log('Leaderboard error: ' + err.code);
                     }
                 });
             }

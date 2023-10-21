@@ -175,6 +175,13 @@ public class GameManager
         data ??= new();
 
         GameTutorial = data.gameTutorial;
+        if (data.scores != null)
+        {
+            for (int i = data.scores.Count - 1; i >= 0; i--)
+            {
+                if (data.scores[i] == null) data.scores.RemoveAt(i);
+            }
+        }
         _scores = data.scores;
         SetBatterySave(data.batterySaving);
         Debug.Log("Save data is loaded!");

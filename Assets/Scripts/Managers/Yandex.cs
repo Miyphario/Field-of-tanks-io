@@ -33,30 +33,35 @@ public class Yandex : MonoBehaviour
 #if UNITY_WEBGL && !UNITY_EDITOR
         CanRateGameExtern();
         GetAuthExtern();
-#else
+#elif UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR
         GameManager.Instance.OnSaveLoaded += data =>
         {
             _gameRated = data.gameRated;
             if (_gameRated) CannotRateGame = true;
         };
 #endif
-
-#if !UNITY_EDITOR
+#if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
         GameManager.Instance.OnScoreAdded += (score, index) =>
         {
             SetToLeaderboard(score.frags);
         };
-#endif
+
         HUDManager.Instance.OnGameOverScreenHidden += HandleOnGameEnded;
+#else
+        _gameRated = true;
+        CannotRateGame = true;
+#endif
     }
 
     private void HandleOnGameEnded()
     {
+#if UNITY_WEBGL
         if (_canAuth && !IsAuth)
         {
             _canAuth = false;
             HUDManager.Instance.MenuUI.ToggleAuthWindow(true);
         }
+#endif
 
         if (CannotRateGame) return;
 
@@ -67,7 +72,7 @@ public class Yandex : MonoBehaviour
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
         RateGameExtern();
-#else
+#elif UNITY_ANDROID || UNITY_IOS
         Application.OpenURL("market://details?id=" + Application.identifier);
 #endif
         
