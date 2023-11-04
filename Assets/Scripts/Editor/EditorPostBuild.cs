@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
@@ -12,6 +13,20 @@ public class EditorPostBuild : IPostprocessBuildWithReport
         string outputPath = report.summary.outputPath;
         string pathToBackup = Path.Combine(Directory.GetParent(outputPath).FullName, "Backup");
         CopyFilesRecursively(pathToBackup, outputPath);
+
+        string outputZip = Path.Combine(outputPath, "WebGL.zip");
+        if (File.Exists(outputZip)) File.Delete(outputZip);
+
+        Process proc = new();
+        ProcessStartInfo startInfo = new()
+        {
+            WindowStyle = ProcessWindowStyle.Hidden,
+            CreateNoWindow = true,
+            FileName = "cmd",
+            Arguments = $"7z a -tzip -ssw -mx5 -r0 \"{outputZip}\" \"{Path.Combine(outputPath, "*")}\" -x!*.zip -x!*.7z -x!*.rar"
+        };
+        proc.StartInfo = startInfo;
+        proc.Start();
 #endif
     }
 
