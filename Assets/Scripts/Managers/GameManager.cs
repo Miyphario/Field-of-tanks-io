@@ -57,7 +57,6 @@ public class GameManager
 
         if (Application.isMobilePlatform)
         {
-            CurrentInputControl = InputControl.Touch;
             Application.targetFrameRate = 60;
         }
     }
@@ -83,7 +82,11 @@ public class GameManager
 
     private IEnumerator CheckControlsTypeIE()
     {
-        if (Application.isMobilePlatform) yield break;
+        if (Application.isMobilePlatform)
+        {
+            CurrentInputControl = InputControl.Touch;
+            OnInputChanged?.Invoke(InputControl.Touch);
+        }
 
         while (true)
         {
@@ -91,15 +94,48 @@ public class GameManager
 
             if (Gamepad.current == null)
             {
-                if (CurrentInputControl != InputControl.Keyboard)
+                if (Application.isMobilePlatform)
+                {
+                    if (CurrentInputControl != InputControl.Touch)
+                    {
+                        CurrentInputControl = InputControl.Touch;
+                        OnInputChanged?.Invoke(CurrentInputControl);
+                    }
+                }
+                else if (CurrentInputControl != InputControl.Keyboard)
                 {
                     CurrentInputControl = InputControl.Keyboard;
                     OnInputChanged?.Invoke(CurrentInputControl);
                 }
+
                 continue;
             }
 
             var gamepad = Gamepad.current.lastUpdateTime;
+
+            if (Application.isMobilePlatform)
+            {
+                var touch = Touchscreen.current.lastUpdateTime;
+                if (gamepad > touch)
+                {
+                    if (CurrentInputControl != InputControl.Gamepad)
+                    {
+                        CurrentInputControl = InputControl.Gamepad;
+                        OnInputChanged?.Invoke(CurrentInputControl);
+                    }
+                }
+                else
+                {
+                    if (CurrentInputControl != InputControl.Touch)
+                    {
+                        CurrentInputControl = InputControl.Touch;
+                        OnInputChanged?.Invoke(CurrentInputControl);
+                    }
+                }
+
+                continue;
+            }
+
             var mouse = Mouse.current.lastUpdateTime;
             var keyboard = Keyboard.current.lastUpdateTime;
             if (gamepad > keyboard && gamepad > mouse)
@@ -160,6 +196,9 @@ public class GameManager
 
     public void LoadGame()
     {
+#if !UNITY_WEBGL
+        if (SaveLoaded) return;
+#endif
         SaveData data = SaveSystem.LoadData();
         SetupGameSave(data);
     }
@@ -184,7 +223,7 @@ public class GameManager
         }
         _scores = data.scores;
         SetBatterySave(data.batterySaving);
-        Debug.Log("Save data is loaded!");
+        Debug.LogWarning("Save data is loaded!");
         SaveLoaded = true;
         OnSaveLoaded?.Invoke(data);
     }

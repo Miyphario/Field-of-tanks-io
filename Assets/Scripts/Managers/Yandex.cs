@@ -8,7 +8,10 @@ public class Yandex : MonoBehaviour
     public static Yandex Instance { get; private set; }
 
 #if UNITY_WEBGL
-     [DllImport("__Internal")]
+    [DllImport("__Internal")]
+    private static extern int CheckSDKExtern();
+
+    [DllImport("__Internal")]
      private static extern void RateGameExtern();
      [DllImport("__Internal")]
      private static extern void CanRateGameExtern();
@@ -27,12 +30,16 @@ public class Yandex : MonoBehaviour
     public bool IsAuth { get; private set; }
     private bool _canAuth = true;
 
+    private bool _ysdkInitialized;
+
     public void Initialize()
     {
         Instance = this;
 #if UNITY_WEBGL && !UNITY_EDITOR
-        CanRateGameExtern();
-        GetAuthExtern();
+        CheckSDK();
+        HUDManager.Instance.MenuUI.ButtonPlay.onClick.AddListener(() => CheckSDK());
+        HUDManager.Instance.MenuUI.ScoreButton.onClick.AddListener(() => CheckSDK());
+        HUDManager.Instance.MenuUI.SettingsButton.onClick.AddListener(() => CheckSDK());
 #elif UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR
         GameManager.Instance.OnSaveLoaded += data =>
         {
@@ -53,6 +60,35 @@ public class Yandex : MonoBehaviour
 #endif
     }
 
+    private void Start()
+    {
+#if UNITY_WEBGL
+        CheckSDK();
+#endif
+    }
+
+#if UNITY_WEBGL
+    private void CheckSDK()
+    {
+        if (_ysdkInitialized) return;
+
+        try
+        {
+            int init = CheckSDKExtern();
+            if (init == 0) _ysdkInitialized = false;
+            else if (init == 1) _ysdkInitialized = true;
+        }
+        catch { return; }
+
+        if (!_ysdkInitialized) return;
+
+        CanRateGameExtern();
+        GetAuthExtern();
+        GameManager.Instance.LoadGame();
+        LocalizationManager.SetSystemLanguage();
+    }
+#endif
+
     private void HandleOnGameEnded()
     {
 #if UNITY_WEBGL
@@ -71,11 +107,14 @@ public class Yandex : MonoBehaviour
     public void RateGame()
     {
 #if UNITY_WEBGL && !UNITY_EDITOR
-        RateGameExtern();
+        if (_ysdkInitialized)
+        {
+            RateGameExtern();
+        }
 #elif UNITY_ANDROID || UNITY_IOS
         Application.OpenURL("market://details?id=" + Application.identifier);
 #endif
-        
+
         ButtonRateGameEnabled = false;
         CannotRateGame = true;
         _gameRated = true;
@@ -123,5 +162,15 @@ public class Yandex : MonoBehaviour
 #if UNITY_WEBGL
         AuthExtern();
 #endif
+    }
+
+    public void OnApplicationFocus(bool focus)
+    {
+        if (focus)
+        {
+#if UNITY_WEBGL
+            CheckSDK();
+#endif
+        }
     }
 }

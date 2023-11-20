@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using UnityEngine;
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
 
@@ -39,7 +39,7 @@ public class SaveData
 
 public static class SaveSystem
 {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern void SaveGameExtern(string data, bool flush);
 
@@ -84,7 +84,7 @@ public static class SaveSystem
 	public static void Save(SaveData data, bool flush = false)
 	{
         if (data == null) return;
-#if (UNITY_WEBGL && !UNITY_EDITOR)
+#if UNITY_WEBGL && !UNITY_EDITOR
         string json = JsonUtility.ToJson(data, true);
         SaveGameExtern(json, flush);
 #else
@@ -110,7 +110,7 @@ public static class SaveSystem
 
     public static SaveData LoadData()
     {
-#if (UNITY_WEBGL && !UNITY_EDITOR)
+#if UNITY_WEBGL && !UNITY_EDITOR
         LoadGameExtern();
         return default;
 #else
@@ -141,7 +141,7 @@ public static class SaveSystem
 
     public static SaveData LoadData(string json)
 	{
-		if (json == null || json.Length < 2) return default;
+		if (json == null || json.Length <= 2) return default;
 
 		try
 		{

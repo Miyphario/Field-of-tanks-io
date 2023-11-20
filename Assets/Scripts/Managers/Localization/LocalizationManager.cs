@@ -4,18 +4,16 @@ using System.Collections;
 using System.IO;
 using UnityEngine;
 using System.Linq;
-#if !UNITY_EDITOR
 #if UNITY_WEBGL || UNITY_ANDROID
 using UnityEngine.Networking;
 #endif
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
-#endif
 
 static class LocalizationManager
 {
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern string GetLangExtern();
 #endif
@@ -39,6 +37,24 @@ static class LocalizationManager
 
         Debug.Log("Loading languages...");
         Bootstrap.Instance.StartCoroutine(GetInstalledLanguagesIE());
+    }
+
+    public static void SetSystemLanguage()
+    {
+        string lang;
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        lang = GetLangExtern();
+#else
+        lang = Application.systemLanguage switch
+        {
+            SystemLanguage.Russian => "ru_RU",
+            SystemLanguage.Turkish => "tr_TR",
+            _ => "en_US",
+        };
+#endif
+        Debug.Log($"Current language: {lang}");
+        ChangeLanguage(lang);
     }
 
     private static IEnumerator GetInstalledLanguagesIE()
@@ -132,20 +148,7 @@ static class LocalizationManager
 #endif
             yield return addLanguages(files);
 
-            string lang;
-
-#if UNITY_WEBGL && !UNITY_EDITOR
-            lang = GetLangExtern();
-#else
-            lang = Application.systemLanguage switch
-            {
-                SystemLanguage.Russian => "ru_RU",
-                SystemLanguage.Turkish => "tr_TR",
-                _ => "en_US",
-            };
-#endif
-            Debug.Log($"Current language: {lang}");
-            ChangeLanguage(lang);
+            SetSystemLanguage();
         }
         else
         {

@@ -1,74 +1,45 @@
 mergeInto(LibraryManager.library, {
 
-    RateGameExtern: function () {
-        if (player == null) return;
-
-        ysdk.feedback.canReview()
-        .then(({ value, reason }) => {
-            if (value) {
-                ysdk.feedback.requestReview()
-                .then(({ feedbackSent }) => {
-                    console.log(feedbackSent);
-                })
-            } else {
-                myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
-                console.log(reason);
-            }
-        })
+    CheckSDKExtern: function () {
+        if (!ysdkInitialized) return 0;
+        else return 1;
     },
 
-    CanRateGameExtern: function() {
-        if (player == null) return;
-
-        ysdk.feedback.canReview()
-        .then(({ value, reason }) => {
-            if (value) {
-                myGameInstance.SendMessage("Yandex", "IsGameRated", 0);
-            } else {
-                myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
-                console.log(reason);
-            }
-        })
-    },
-
-    SetToLeaderboardExtern: function(frags) {
-        if (lb == null)
-            initLeaderboards();
+    SetToLeaderboardExtern: function (frags) {
+        if (!ysdkInitialized) return;
 
         ysdk.isAvailableMethod('leaderboards.setLeaderboardScore').then(available => {
-            if (available)
-            {
+            if (available) {
                 console.log('Leaderboard is available!');
-                lb.getLeaderboardPlayerEntry('frags')
-                .then(res => {
-                    //console.log('Trying add ' + frags + ' frags to leaderboards');
-                    if (res.score < frags)
-                    {
-                        lb.setLeaderboardScore('frags', frags);
-                        //console.log('Frags' + frags + ' added to leaderboard!');
-                    }
-                })
-                .catch(err => {
-                    if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
-                      // Срабатывает, если у игрока нет записи в лидерборде
-                        //console.log('Leaderboard: Player not present');
-                        lb.setLeaderboardScore('frags', frags);
-                    }
-                    else
-                    {
-                        //console.log('Leaderboard error: ' + err.code);
-                    }
+                initLeaderboards().then(_lb => {
+                    _lb.getLeaderboardPlayerEntry('frags')
+                        .then(res => {
+                            //console.log('Trying add ' + frags + ' frags to leaderboards');
+                            if (res.score < frags) {
+                                _lb.setLeaderboardScore('frags', frags);
+                                //console.log('Frags' + frags + ' added to leaderboard!');
+                            }
+                        })
+                        .catch(err => {
+                            if (err.code === 'LEADERBOARD_PLAYER_NOT_PRESENT') {
+                                // Срабатывает, если у игрока нет записи в лидерборде
+                                //console.log('Leaderboard: Player not present');
+                                _lb.setLeaderboardScore('frags', frags);
+                            }
+                            else {
+                                //console.log('Leaderboard error: ' + err.code);
+                            }
+                        });
                 });
             }
-            else
-            {
+            else {
                 console.log('Leaderboard is not available!');
             }
         })
     },
 
     SaveGameExtern: function (data, flush) {
-        if (player == null) return;
+        if (!ysdkInitialized || player == null) return;
 
         var dataString = UTF8ToString(data);
         var myObj = JSON.parse(dataString);
@@ -76,7 +47,7 @@ mergeInto(LibraryManager.library, {
     },
 
     LoadGameExtern: function () {
-        if (player == null) return;
+        if (!ysdkInitialized || player == null) return;
 
         player.getData().then(data => {
             const myJson = JSON.stringify(data);
@@ -85,20 +56,24 @@ mergeInto(LibraryManager.library, {
     },
 
     ShowAdsExtern: function () {
+        if (!ysdkInitialized) return;
+
         ysdk.adv.showFullscreenAdv({
             callbacks: {
                 onClose: function (wasShown) {
-                        // some action after close
+                    // some action after close
                     console.log("Adv Closed");
                 },
                 onError: function (error) {
-                        // some action on error
+                    // some action on error
                 }
             }
         })
     },
 
     ShowAdvExtern: function () {
+        if (!ysdkInitialized) return;
+
         ysdk.adv.showRewardedVideo({
             callbacks: {
                 onOpen: () => {
@@ -106,7 +81,7 @@ mergeInto(LibraryManager.library, {
                 },
                 onRewarded: () => {
                     console.log('Rewarded!');
-                        // myGameInstance.SendMessage('YandexAds', 'AddCoins', 1);
+                    // myGameInstance.SendMessage('YandexAds', 'AddCoins', 1);
                 },
                 onClose: () => {
                     console.log('Video ad closed.');
@@ -118,16 +93,48 @@ mergeInto(LibraryManager.library, {
         })
     },
 
+    RateGameExtern: function () {
+        if (!ysdkInitialized) return;
+
+        ysdk.feedback.canReview()
+            .then(({ value, reason }) => {
+                if (value) {
+                    ysdk.feedback.requestReview()
+                        .then(({ feedbackSent }) => {
+                            console.log(feedbackSent);
+                        })
+                } else {
+                    myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
+                    console.log(reason);
+                }
+            })
+    },
+
+    CanRateGameExtern: function () {
+        if (!ysdkInitialized) return;
+
+        ysdk.feedback.canReview()
+            .then(({ value, reason }) => {
+                if (value) {
+                    myGameInstance.SendMessage("Yandex", "IsGameRated", 0);
+                } else {
+                    myGameInstance.SendMessage("Yandex", "IsGameRated", 1);
+                    console.log(reason);
+                }
+            })
+    },
+
     GetAuthExtern: function () {
+        if (!ysdkInitialized) return;
+
         initPlayer().then(_player => {
             if (_player.getMode() === 'lite') {
                 myGameInstance.SendMessage("Yandex", "SetAuth", 0);
                 return;
             }
-            myGameInstance.SendMessage("Yandex", "SetAuth", 1);
 
-            if (lb == null)
-                initLeaderboards();
+            myGameInstance.SendMessage("Yandex", "SetAuth", 1);
+            if (lb == null) initLeaderboards();
 
         }).catch(err => {
             myGameInstance.SendMessage("Yandex", "SetAuth", 0);
@@ -135,17 +142,14 @@ mergeInto(LibraryManager.library, {
     },
 
     AuthExtern: function () {
+        if (!ysdkInitialized) return;
+
         initPlayer().then(_player => {
             if (_player.getMode() === 'lite') {
                 ysdk.auth.openAuthDialog().then(() => {
                     myGameInstance.SendMessage("Yandex", "SetAuth", 1);
 
-                    if (lb == null)
-                        initLeaderboards();
-
-                    initPlayer().catch(err => {
-                        myGameInstance.SendMessage("Yandex", "SetAuth", 0);
-                    });
+                    if (lb == null) initLeaderboards();
                 }).catch(() => {
                     myGameInstance.SendMessage("Yandex", "SetAuth", 0);
                 });
@@ -156,6 +160,14 @@ mergeInto(LibraryManager.library, {
     },
 
     GetLangExtern: function () {
+        if (!ysdkInitialized) {
+            var lang = "en";
+            var bufSize = lengthBytesUTF8(lang) + 1;
+            var buf = _malloc(bufSize);
+            stringToUTF8(lang, buf, bufSize);
+            return buf;
+        }
+
         var returnStr = ysdk.environment.i18n.lang;
         var bufferSize = lengthBytesUTF8(returnStr) + 1;
         var buffer = _malloc(bufferSize);

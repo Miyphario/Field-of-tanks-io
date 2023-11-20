@@ -4,9 +4,14 @@ using UnityEngine.UI;
 public class MenuUI : MonoBehaviour
 {
     [SerializeField] private Button _buttonPlay;
+    public Button ButtonPlay => _buttonPlay;
     [SerializeField] private Vector2 _buttonPlayAnimPos;
     private Vector2 _buttonPlayDefaultPos;
     [SerializeField] private RectTransform _rightButtonsPanel;
+    [SerializeField] private Button _scoresButton;
+    public Button ScoreButton => _scoresButton;
+    [SerializeField] private Button _settingsButton;
+    public Button SettingsButton => _settingsButton;
     [SerializeField] private Vector2 _rightButtonsPanelAnimPos;
     private Vector2 _rightButtonPanelDefaultPos;
     [SerializeField] private Button _buttonRateGame;
@@ -117,7 +122,7 @@ public class MenuUI : MonoBehaviour
 
     public void ToggleRateGameButton(bool enable, bool force = false)
     {
-        bool canShow = Yandex.Instance != null && !Yandex.Instance.CannotRateGame && Yandex.Instance.ButtonRateGameEnabled;
+        bool canShow = Yandex.Instance != null && !Yandex.Instance.CannotRateGame && Yandex.Instance.ButtonRateGameEnabled && Yandex.Instance.IsAuth;
         if (enable)
         {
             if (canShow)
