@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using GoogleMobileAds.Api;
 using Mycom.Target.Unity.Ads;
 using UnityEngine;
+using InterstitialAd = Mycom.Target.Unity.Ads.InterstitialAd;
 #if (UNITY_WEBGL && !UNITY_EDITOR)
 using System.Runtime.InteropServices;
 #endif
@@ -27,6 +29,9 @@ public static class AdsManager
         _canShowAds = true;
 
         if (Application.platform != RuntimePlatform.Android && Application.platform != RuntimePlatform.IPhonePlayer) return;
+
+        MobileAds.Initialize(initStatus => { });
+
         _interstitialAd = CreateInterstitialAd();
 
         // Устанавливаем обработчики событий

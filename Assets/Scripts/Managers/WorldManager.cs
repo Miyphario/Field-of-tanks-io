@@ -90,7 +90,6 @@ public class WorldManager : MonoBehaviour
             HostPlayer.OnDestroyed += tank => 
             {
                 _tanks.Remove(HostPlayer);
-                GameManager.Instance.SaveGame();
                 Restart();
                 OnGameEnded?.Invoke();
                 _isPlaying = false;

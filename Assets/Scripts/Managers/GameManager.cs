@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -214,14 +215,14 @@ public class GameManager
         data ??= new();
 
         GameTutorial = data.gameTutorial;
-        if (data.scores != null)
+        _scores = data.scores;
+        if (_scores != null)
         {
-            for (int i = data.scores.Count - 1; i >= 0; i--)
+            for (int i = _scores.Count - 1; i >= 0; i--)
             {
-                if (data.scores[i] == null) data.scores.RemoveAt(i);
+                if (_scores[i] == null) _scores.RemoveAt(i);
             }
         }
-        _scores = data.scores;
         SetBatterySave(data.batterySaving);
         Debug.LogWarning("Save data is loaded!");
         SaveLoaded = true;
@@ -230,6 +231,8 @@ public class GameManager
 
     public void SetNewScore(PlayerScore score)
     {
+        _scores ??= new();
+
         if (_scores.Count >= 50)
         {
             int deleteIndex = -1;
