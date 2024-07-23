@@ -57,6 +57,12 @@ public class WorldManager : MonoBehaviour
 
     private Coroutine _focusVolumeRoutine;
 
+    private WaitForSeconds _maxTanksWait = new(3f);
+    private WaitForSeconds _maxDestructiblesWait = new(4f);
+    private WaitForSeconds _tanksWait = new(0.5f);
+    private WaitForSeconds _destructiblesWait = new(1f);
+    private WaitForSeconds _destroyTimeWait = new(0.05f);
+
     public void Initialize()
     {
         if (Instance == null)
@@ -219,13 +225,13 @@ public class WorldManager : MonoBehaviour
 
     private IEnumerator EnemySpawnIE()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return _tanksWait;
 
         while (true)
         {
             if (_tanks.Count >= _maxTanks)
             {
-                yield return new WaitForSeconds(3f);
+                yield return _maxTanksWait;
                 continue;
             }
 
@@ -274,7 +280,7 @@ public class WorldManager : MonoBehaviour
         {
             if (_destructibles.Count >= _maxDestructibles)
             {
-                yield return new WaitForSeconds(4f);
+                yield return _maxDestructiblesWait;
                 continue;
             }
 
@@ -293,7 +299,7 @@ public class WorldManager : MonoBehaviour
                     if (_destructibles.Count >= _maxDestructibles) break;
                 }
 
-                yield return new WaitForSeconds(1f);
+                yield return _destructiblesWait;
             }
         }
     }
@@ -308,7 +314,7 @@ public class WorldManager : MonoBehaviour
                 if (_destructibles.Count <= 0) break;
             }
 
-            yield return new WaitForSeconds(_destroyTime);
+            yield return _destroyTimeWait;
         }
     }
 
@@ -330,7 +336,7 @@ public class WorldManager : MonoBehaviour
                 if (curBush >= _maxBushes) yield break;
             }
 
-            yield return new WaitForSeconds(_destroyTime);
+            yield return _destroyTimeWait;
         }
     }
 
@@ -344,7 +350,7 @@ public class WorldManager : MonoBehaviour
                 if (_bushesParent.childCount <= 1) break;
             }
 
-            yield return new WaitForSeconds(_destroyTime);
+            yield return _destroyTimeWait;
         }
     }
 

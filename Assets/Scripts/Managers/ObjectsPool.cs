@@ -49,6 +49,8 @@ public class ObjectsPool : MonoBehaviour
     public IEnumerator CleanupIE(int objectsPerCycle, float destroyTime)
     {
         int index = transform.childCount - 1;
+        WaitForSeconds destroyWait = new(destroyTime);
+
         while (index >= 0)
         {
             for (int i = 0; i < objectsPerCycle; i++)
@@ -73,7 +75,7 @@ public class ObjectsPool : MonoBehaviour
                 index--;
             }
 
-            yield return new WaitForSeconds(destroyTime);
+            yield return destroyWait;
         }
 
         DestroyInactive();

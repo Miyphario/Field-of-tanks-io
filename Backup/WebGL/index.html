@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="TemplateData/style.css">
 
     <!-- Yandex Games SDK -->
-    <script src="https://yandex.ru/games/sdk/v2"></script>
+    <script src="/sdk.js"></script>
 </head>
 
 <body>
@@ -25,51 +25,58 @@
     </div>
     <script>
 
-        // Yandex
-        var ysdk = null;
-        var ysdkInitialized = false;
-        var player = null;
-        var lb = null;
-		
-        function initYSDK() {
-			YaGames.init().then(_sdk => {
-				ysdk = _sdk;
-				ysdkInitialized = true;
-				showAdv();
-				
-				initPlayer();
-				initLeaderboards();
-			}).catch(console.error);
-
-            // ysdk.features.LoadingAPI?.ready(); // Показываем SDK, что игра загрузилась и можно начинать играть
-        }
-
-        // Game
-        var myGameInstance = null;
-
-        function initPlayer() {
-            return ysdk.getPlayer().then(_player => {
-                player = _player;
-                return player;
+        YaGames
+            .init()
+            .then(ysdk => {
+                console.log('Yandex SDK initialized');
+                window.ysdk = ysdk;
             });
-        }
 
-        function initLeaderboards() {
-            return ysdk.getLeaderboards().then(_lb => {
-                lb = _lb
-                return lb;
-            });
-        }
 
-        function showAdv() {
-            ysdk.adv.showFullscreenAdv({
-                callbacks: {
-                    onClose: function (wasShown) {
-                        console.log("Adv Closed");
-                    }
-                }
-            });
-        }
+
+        //// Yandex
+        //var ysdk = null;
+        //var ysdkInitialized = false;
+        //var player = null;
+        //var lb = null;
+
+        //function initYSDK() {
+        //    YaGames.init().then(_sdk => {
+        //        ysdk = _sdk;
+        //        ysdkInitialized = true;
+        //        showAdv();
+
+        //        initPlayer();
+        //        initLeaderboards();
+        //    }).catch(console.error);
+        //}
+
+        //// Game
+        //var myGameInstance = null;
+
+        //function initPlayer() {
+        //    return ysdk.getPlayer().then(_player => {
+        //        player = _player;
+        //        return player;
+        //    });
+        //}
+
+        //function initLeaderboards() {
+        //    return ysdk.getLeaderboards().then(_lb => {
+        //        lb = _lb
+        //        return lb;
+        //    });
+        //}
+
+        //function showAdv() {
+        //    ysdk.adv.showFullscreenAdv({
+        //        callbacks: {
+        //            onClose: function (wasShown) {
+        //                console.log("Adv Closed");
+        //            }
+        //        }
+        //    });
+        //}
 
         var container = document.querySelector("#unity-container");
         var canvas = document.querySelector("#unity-canvas");
@@ -111,7 +118,7 @@
             streamingAssetsUrl: "StreamingAssets",
             companyName: "Miyphics",
             productName: "Field of Tanks",
-            productVersion: "1.0.2 WebGL",
+            productVersion: "1.0.3 WebGL",
             showBanner: unityShowBanner,
         };
 
@@ -155,7 +162,7 @@
             }).then((unityInstance) => {
                 myGameInstance = unityInstance;
                 loadingBar.style.display = "none";
-				initYSDK();
+                initYSDK();
 
             }).catch((message) => {
                 alert(message);

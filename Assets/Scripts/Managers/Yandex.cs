@@ -1,4 +1,7 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
+
 #if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
@@ -7,26 +10,39 @@ public class Yandex : MonoBehaviour
 {
     public static Yandex Instance { get; private set; }
 
+    [Header("Events")]
+    public UnityEvent SDKLoaded;
+    public UnityEvent GameLoaded;
+    public UnityEvent GameSaved;
+    public UnityEvent GameRated;
+
 #if UNITY_WEBGL
     [DllImport("__Internal")]
     private static extern int CheckSDKExtern();
+    
+    [DllImport("__Internal")]
+    private static extern void RateGameExtern();
+    [DllImport("__Internal")]
+    private static extern void CanRateGameExtern();
+    [DllImport("__Internal")]
+    private static extern void SetToLeaderboardExtern(int frags);
+    [DllImport("__Internal")]
+    private static extern void GetAuthExtern();
+    [DllImport("__Internal")]
+    private static extern void AuthExtern();
 
     [DllImport("__Internal")]
-     private static extern void RateGameExtern();
-     [DllImport("__Internal")]
-     private static extern void CanRateGameExtern();
-     [DllImport("__Internal")]
-     private static extern void SetToLeaderboardExtern(int frags);
-     [DllImport("__Internal")]
-     private static extern void GetAuthExtern();
-     [DllImport("__Internal")]
-     private static extern void AuthExtern();
+    private static extern void GameReadyExtern();
+    [DllImport("__Internal")]
+    private static extern void GameStartedExtern();
+    [DllImport("__Internal")]
+    private static extern void GameStoppedExtern();
 #endif
 
-    private bool _gameRated;
+    private bool _isGameRated;
     public bool CannotRateGame { get; private set; }
     public bool ButtonRateGameEnabled { get; private set; }
-    public bool GameRated => _gameRated;
+    public bool IsGameRated => _isGameRated;
     public bool IsAuth { get; private set; }
     private bool _canAuth = true;
 
@@ -35,16 +51,32 @@ public class Yandex : MonoBehaviour
     public void Initialize()
     {
         Instance = this;
-#if UNITY_WEBGL && !UNITY_EDITOR
+#if UNITY_WEBGL
         CheckSDK();
         HUDManager.Instance.MenuUI.ButtonPlay.onClick.AddListener(() => CheckSDK());
         HUDManager.Instance.MenuUI.ScoreButton.onClick.AddListener(() => CheckSDK());
         HUDManager.Instance.MenuUI.SettingsButton.onClick.AddListener(() => CheckSDK());
+        GameManager.Instance.OnPauseChanged += paused =>
+        {
+            if (paused)
+            {
+                GameStoppedExtern();
+            }
+            else
+            {
+                if (WorldManager.Instance.IsPlaying)
+                {
+                    GameStartedExtern();
+                }
+            }
+        };
+        WorldManager.Instance.OnGameStarted += OnGameStarted;
+        WorldManager.Instance.OnGameEnded += OnGameEnded;
 #elif UNITY_ANDROID || UNITY_IOS || UNITY_EDITOR
         GameManager.Instance.OnSaveLoaded += data =>
         {
-            _gameRated = data.gameRated;
-            if (_gameRated) CannotRateGame = true;
+            _isGameRated = data.gameRated;
+            if (_isGameRated) CannotRateGame = true;
         };
 #endif
 #if UNITY_ANDROID || UNITY_IOS || UNITY_WEBGL
@@ -60,11 +92,30 @@ public class Yandex : MonoBehaviour
 #endif
     }
 
+    private void OnGameStarted()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        GameStartedExtern();
+#endif
+    }
+
+    private void OnGameEnded()
+    {
+#if UNITY_WEBGL && !UNITY_EDITOR
+        GameStoppedExtern();
+#endif
+    }
+
     private void Start()
     {
-#if UNITY_WEBGL
+#if UNITY_WEBGL && !UNITY_EDITOR
         CheckSDK();
 #endif
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        GameManager.Instance.IsPaused = pause;
     }
 
 #if UNITY_WEBGL
@@ -86,6 +137,7 @@ public class Yandex : MonoBehaviour
         GetAuthExtern();
         GameManager.Instance.LoadGame();
         LocalizationManager.SetSystemLanguage();
+        GameReadyExtern();
     }
 #endif
 
@@ -117,25 +169,25 @@ public class Yandex : MonoBehaviour
 
         ButtonRateGameEnabled = false;
         CannotRateGame = true;
-        _gameRated = true;
+        _isGameRated = true;
         HUDManager.Instance.MenuUI.ToggleRateGameButton(false);
 #if !UNITY_WEBGL || UNITY_EDITOR
         GameManager.Instance.SaveGame();
 #endif
     }
 
-    public void IsGameRated(int canRate)
+    public void GetGameRated(int canRate)
     {
         // Can rate the game
         if (canRate == 0)
         {
-            _gameRated = false;
+            _isGameRated = false;
         }
         // Can't rate the game
         else if (canRate == 1)
         {
             CannotRateGame = true;
-            _gameRated = true;
+            _isGameRated = true;
             if (ButtonRateGameEnabled)
             {
                 HUDManager.Instance.MenuUI.ToggleRateGameButton(false);

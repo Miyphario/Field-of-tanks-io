@@ -5,6 +5,21 @@ mergeInto(LibraryManager.library, {
         else return 1;
     },
 
+    GameReadyExtern: function(){
+        if (!ysdkInitialized) return;
+        ysdk.features.LoadingAPI?.ready(); // Показываем SDK, что игра загрузилась и можно начинать играть
+    },
+
+    GameStartedExtern: function(){
+        if (!ysdkInitialized) return;
+        ysdk.features.GameplayAPI?.start();
+    },
+
+    GameStoppedExtern: function(){
+        if (!ysdkInitialized) return;
+        ysdk.features.GameplayAPI?.stop();
+    },
+
     SetToLeaderboardExtern: function (frags) {
         if (!ysdkInitialized) return;
 

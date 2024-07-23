@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -186,7 +185,7 @@ public class GameManager
         SaveData data = new()
         {
             gameTutorial = GameTutorial,
-            gameRated = Yandex.Instance.GameRated,
+            gameRated = Yandex.Instance.IsGameRated,
             batterySaving = GetBatterySave(),
             masterVolume = SoundManager.Instance.GetMasterVolume(),
             showFps = HUDManager.Instance.FPSCounterUI.ShowFPS,

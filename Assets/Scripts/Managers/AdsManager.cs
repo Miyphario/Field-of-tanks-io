@@ -1,16 +1,12 @@
-using System;
 using System.Collections;
-using GoogleMobileAds.Api;
-using Mycom.Target.Unity.Ads;
 using UnityEngine;
-using InterstitialAd = Mycom.Target.Unity.Ads.InterstitialAd;
-#if (UNITY_WEBGL && !UNITY_EDITOR)
+#if UNITY_WEBGL
 using System.Runtime.InteropServices;
 #endif
 
 public static class AdsManager
 {
-#if (UNITY_WEBGL && !UNITY_EDITOR)
+#if UNITY_WEBGL
      [DllImport("__Internal")]
      private static extern void ShowAdsExtern();
      [DllImport("__Internal")]
@@ -18,10 +14,8 @@ public static class AdsManager
 #endif
 
     private static bool _canShowAds = true;
-    private static InterstitialAd _interstitialAd;
-    private static bool _adLoaded;
 
-    private const uint ANDROID_SLOT_ID = 1428217;
+    private static WaitForSecondsRealtime _refreshAdsWait = new(60f);
 
     public static void Initialize()
     {
@@ -29,61 +23,6 @@ public static class AdsManager
         _canShowAds = true;
 
         if (Application.platform != RuntimePlatform.Android && Application.platform != RuntimePlatform.IPhonePlayer) return;
-
-        MobileAds.Initialize(initStatus => { });
-
-        _interstitialAd = CreateInterstitialAd();
-
-        // Устанавливаем обработчики событий
-        _interstitialAd.AdLoadCompleted += OnLoadCompleted;
-        _interstitialAd.AdDismissed += OnAdDismissed;
-        _interstitialAd.AdDisplayed += OnAdDisplayed;
-        _interstitialAd.AdVideoCompleted += OnAdVideoCompleted;
-        _interstitialAd.AdClicked += OnAdClicked;
-        _interstitialAd.AdLoadFailed += OnAdLoadFailed;
-
-        // Запускаем загрузку данных
-        _interstitialAd.Load();
-    }
-
-    private static InterstitialAd CreateInterstitialAd()
-    {
-        uint slotId = ANDROID_SLOT_ID;
-
-        // Включение режима отладки
-        // InterstitialAd.IsDebugMode = true;
-        // Создаем экземпляр InterstitialAd
-        return new InterstitialAd(slotId);
-    }
-
-    private static void OnAdLoadFailed(object sender, ErrorEventArgs e)
-    {
-
-    }
-
-    private static void OnAdClicked(object sender, EventArgs e)
-    {
-
-    }
-
-    private static void OnAdVideoCompleted(object sender, EventArgs e)
-    {
-
-    }
-
-    private static void OnAdDisplayed(object sender, EventArgs e)
-    {
-
-    }
-
-    private static void OnAdDismissed(object sender, EventArgs e)
-    {
-
-    }
-
-    private static void OnLoadCompleted(object sender, EventArgs e)
-    {
-        _adLoaded = true;
     }
 
     public static void ShowAds()
@@ -93,8 +32,7 @@ public static class AdsManager
         ShowAdsExtern();
 #elif (UNITY_IOS || UNITY_ANDROID)
         if (!_adLoaded) return;
-        _interstitialAd.Show();
-        _adLoaded = false;
+        // Show ads
 #endif
         _canShowAds = false;
         Bootstrap.Instance.StartCoroutine(RefreshAdsIE());
@@ -123,7 +61,7 @@ public static class AdsManager
 
     private static IEnumerator RefreshAdsIE()
     {
-        yield return new WaitForSecondsRealtime(60);
+        yield return _refreshAdsWait;
         _canShowAds = true;
     }
 }
